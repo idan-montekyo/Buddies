@@ -1,4 +1,4 @@
-package com.example.buddies;
+package com.example.buddies.enums;
 
 public enum eDogGender {
     UNINITIALIZED,

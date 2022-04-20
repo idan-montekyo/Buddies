@@ -38,7 +38,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.buddies.BuildConfig;
 import com.example.buddies.R;
-import com.example.buddies.eDogGender;
+import com.example.buddies.enums.eDogGender;
 
 import java.io.File;
 import java.io.IOException;

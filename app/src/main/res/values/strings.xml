@@ -29,4 +29,5 @@
     <string name="log_out">Log Out</string>
     <string name="pick_location">pick location</string>
     <string name="google_maps_key" translatable="false">AIzaSyBuPUqzWKE20Ppmhn1lB2kY3-kbYIkFer8</string>
+    <string name="pick">pick</string>
 </resources>

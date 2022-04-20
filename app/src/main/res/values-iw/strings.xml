@@ -29,4 +29,5 @@
     <string name="settings">הגדרות</string>
     <string name="log_out">התנתקות</string>
     <string name="pick_location">בחר מיקום</string>
+    <string name="pick">בחר</string>
 </resources>
