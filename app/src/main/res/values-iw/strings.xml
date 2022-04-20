@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Buddies</string>
+    <string name="register">הירשם</string>
+    <string name="username">שם משתמש</string>
+    <string name="password">סיסמה</string>
+    <string name="login">הכנס</string>
+    <string name="login_as_guest">הכנס כאורח</string>
+    <string name="registration">הרשמה</string>
+    <string name="full_name">שם מלא</string>
+    <string name="age">גיל</string>
+    <string name="dogs_gender">מין הכלב</string>
+    <string name="male">זכר</string>
+    <string name="female">נקבה</string>
+    <string name="both">גם וגם</string>
+    <string name="save">שמור</string>
+    <string name="search_city">חפש עיר</string>
+    <string name="reset">איפוס</string>
+    <string name="new_post">פוסט חדש</string>
+    <string name="city">עיר</string>
+    <string name="street">רחוב</string>
+    <string name="time">זמן</string>
+    <string name="content">תוכן</string>
+    <string name="upload">העלה</string>
+    <string name="options">אפשרויות</string>
+    <string name="my_profile">הפרופיל שלי</string>
+    <string name="my_posts">הפוסטים שלי</string>
+    <string name="posts_i_commented_on">פוסטים שהגבתי עליהם</string>
+    <string name="settings">הגדרות</string>
+    <string name="log_out">התנתקות</string>
+    <string name="pick_location">בחר מיקום</string>
+</resources>

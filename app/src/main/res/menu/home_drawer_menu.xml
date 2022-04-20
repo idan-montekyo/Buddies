@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_my_profile"
+        android:title="@string/my_profile"
+        android:icon="@drawable/ic_person"/>
+
+    <item
+        android:id="@+id/menu_my_posts"
+        android:title="@string/my_posts"
+        android:icon="@drawable/ic_post"/>
+
+    <item
+        android:id="@+id/menu_posts_i_commented_on"
+        android:title="@string/posts_i_commented_on"
+        android:icon="@drawable/ic_message"/>
+
+    <item
+        android:id="@+id/menu_settings"
+        android:title="@string/settings"
+        android:icon="@drawable/ic_settings"/>
+
+    <item
+        android:id="@+id/menu_log_out"
+        android:title="@string/log_out"
+        android:icon="@drawable/ic_logout"/>
+
+</menu>

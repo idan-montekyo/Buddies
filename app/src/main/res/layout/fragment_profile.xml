@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/gray50">
+
+    <ImageButton
+        android:id="@+id/profile_back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        app:tint="@color/white"
+        android:background="@null"
+        android:layout_gravity="top|start"
+        android:layout_margin="20dp"
+        android:contentDescription="@null" />
+
+    <ImageView
+        android:id="@+id/profile_image_view"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/dog_default_profile_rounded"
+        android:contentDescription="@null"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/profile_camera_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_camera"
+            android:background="@drawable/rounded_button"
+            android:layout_marginEnd="15dp" />
+
+        <ImageButton
+            android:id="@+id/profile_gallery_image_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:background="@drawable/rounded_button"
+            android:layout_marginEnd="15dp"/>
+
+        <Button
+            android:id="@+id/profile_reset_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reset"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_button"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center_horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textColorHint="@color/faded_white"
+            android:background="@null">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/profile_full_name_input"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:textColor="@color/white"
+                android:inputType="text"
+                android:hint="@string/full_name"
+                android:backgroundTint="@color/faded_white"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textColorHint="@color/faded_white">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/profile_age_input"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                android:textColor="@color/white"
+                android:inputType="number"
+                android:hint="@string/age"
+                android:backgroundTint="@color/faded_white"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/dogs_gender"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"/>
+
+    <RadioGroup
+        android:id="@+id/profile_radio_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center">
+
+        <RadioButton
+            android:id="@+id/profile_radio_button_male"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/male"
+            android:textSize="20sp"
+            android:textColor="@color/faded_white"
+            android:layout_marginEnd="5dp"
+            android:buttonTint="@color/faded_white"/>
+
+        <RadioButton
+            android:id="@+id/profile_radio_button_female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/female"
+            android:textSize="20sp"
+            android:textColor="@color/faded_white"
+            android:layout_marginEnd="5dp"
+            android:buttonTint="@color/faded_white"/>
+
+        <RadioButton
+            android:id="@+id/profile_radio_button_both"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/both"
+            android:textSize="20sp"
+            android:textColor="@color/faded_white"
+            android:buttonTint="@color/faded_white"/>
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <Button
+        android:id="@+id/profile_save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="50dp"
+        android:text="@string/save"
+        android:textAllCaps="false"
+        android:textSize="20sp"/>
+
+</LinearLayout>
