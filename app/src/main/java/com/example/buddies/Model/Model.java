@@ -82,7 +82,7 @@ public class Model implements IModel,
         // firebase code here
         try
         {
-            Task<AuthResult> loginHandler = this.m_FirebaseAuth.signInWithEmailAndPassword(i_UserName + "Buddies.com", i_Password);
+            Task<AuthResult> loginHandler = this.m_FirebaseAuth.signInWithEmailAndPassword(i_UserName + "@Buddies.com", i_Password);
             loginHandler.addOnCompleteListener(new OnCompleteListener<AuthResult>()
             {
                 @Override

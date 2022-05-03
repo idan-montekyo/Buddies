@@ -17,24 +17,26 @@ import androidx.fragment.app.Fragment;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
+import com.example.buddies.interfaces.MVVM.IView;
 import com.google.android.material.snackbar.Snackbar;
 
-public class LoginFragment extends Fragment implements RegisterFragment.IOnRegisteredListener,
+public class LoginFragment extends Fragment implements IView,
+                                                       RegisterFragment.IOnRegisteredListener,
                                                        ILoginResponsesEventHandler
 {
-
-//    // void newInstance
-//    // used to get args from calling fragment, working with newInstance method
-//    @Override
-//    public void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//    }
-
     public final String LOGIN_FRAGMENT_TAG = "login_fragment";
     public final String REGISTER_FRAGMENT_TAG = "register_fragment";
     public final String HOME_FRAGMENT_TAG = "home_fragment";
 
     CoordinatorLayout loginCoordinatorLayout;
+    ViewModel m_ViewModel = ViewModel.getInstance();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        this.m_ViewModel.registerForEvents((IView) this);
+        super.onCreate(savedInstanceState);
+    }
 
     // inflate fragment_login
     @Nullable
@@ -82,7 +84,7 @@ public class LoginFragment extends Fragment implements RegisterFragment.IOnRegis
                 String i_UserName = usernameEt.getText().toString();
                 String i_Password = passwordEt.getText().toString();
 
-                ViewModel.getInstance().onRequestToLogin(i_UserName, i_Password);
+                LoginFragment.this.m_ViewModel.onRequestToLogin(i_UserName, i_Password);
             }
         });
 
@@ -91,7 +93,7 @@ public class LoginFragment extends Fragment implements RegisterFragment.IOnRegis
         {
             @Override
             public void onClick(View v) {
-                ViewModel.getInstance().onRequestToAnonymousLogin();
+                LoginFragment.this.m_ViewModel.onRequestToAnonymousLogin();
             }
         });
     }

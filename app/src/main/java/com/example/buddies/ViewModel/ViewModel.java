@@ -78,7 +78,7 @@ public class ViewModel implements IViewModel,
     @Override
     public void onRequestToLogin(String i_UserName, String i_Password)
     {
-        Model.getInstance().onRequestToLogin(i_UserName, i_Password);
+        this.m_Model.onRequestToLogin(i_UserName, i_Password);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class ViewModel implements IViewModel,
     @Override
     public void onRequestToAnonymousLogin()
     {
-        Model.getInstance().onRequestToAnonymousLogin();
+        this.m_Model.onRequestToAnonymousLogin();
     }
 
     @Override
@@ -169,7 +169,7 @@ public class ViewModel implements IViewModel,
     public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender)
     {
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToSignup", "calling onRequestToSignup()");
-        Model.getInstance().onRequestToSignup(i_Context, i_UserName, i_Password, i_FullName, i_Age, i_DogGender);
+        this.m_Model.onRequestToSignup(i_Context, i_UserName, i_Password, i_FullName, i_Age, i_DogGender);
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToSignup", "returned from onRequestToSignup()");
     }
 
