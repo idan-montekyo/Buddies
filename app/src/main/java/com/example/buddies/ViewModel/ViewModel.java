@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.buddies.Model.Model;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.enums.eDogGender;
 import com.example.buddies.interfaces.LocationSelectionEvent.ILocationSelect_EventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
@@ -165,10 +166,10 @@ public class ViewModel implements IViewModel,
     }
 
     @Override
-    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age)
+    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender)
     {
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToSignup", "calling onRequestToSignup()");
-        Model.getInstance().onRequestToSignup(i_Context, i_UserName, i_Password, i_FullName, i_Age);
+        Model.getInstance().onRequestToSignup(i_Context, i_UserName, i_Password, i_FullName, i_Age, i_DogGender);
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToSignup", "returned from onRequestToSignup()");
     }
 

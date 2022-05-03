@@ -3,6 +3,9 @@ package com.example.buddies.common;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
@@ -127,5 +130,16 @@ public class AppUtils
         }
 
         Log.d(debuggerKey, currentTime + "[" + i_CallerClass + "][" + i_CallerMethod + "] " + i_Message);
+    }
+
+    // Get selected RadioButton. If nothing is selected, return null.
+    public static RadioButton getSelectedRadioButtonFromRadioGroup(RadioGroup i_OwnerRadioGroup, View i_OwnerView)
+    {
+        // TODO: what if no button selected?
+        int radioId = i_OwnerRadioGroup.getCheckedRadioButtonId();
+
+        RadioButton selectedRadioButton = (RadioButton) i_OwnerView.findViewById(radioId);
+
+        return selectedRadioButton;
     }
 }

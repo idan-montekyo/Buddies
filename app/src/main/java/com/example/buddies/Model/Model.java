@@ -1,11 +1,12 @@
 package com.example.buddies.Model;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.UserProfile;
+import com.example.buddies.enums.eDogGender;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutRequestEventHandler;
@@ -18,6 +19,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Model implements IModel,
                               ILoginRequestEventHandler,
@@ -33,6 +36,9 @@ public class Model implements IModel,
     private FirebaseAuth m_FirebaseAuth;
     FirebaseAuth.AuthStateListener m_AuthStateListener;
 
+    FirebaseDatabase m_DatabaseReference = null;
+    DatabaseReference m_UsersTable = null;
+
     private Model()
     {
         this.m_FirebaseAuth = FirebaseAuth.getInstance();
@@ -40,13 +46,13 @@ public class Model implements IModel,
         this.m_AuthStateListener = new FirebaseAuth.AuthStateListener()
         {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
-            {
-
-            }
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) { }
         };
 
         this.m_FirebaseAuth.addAuthStateListener(this.m_AuthStateListener);
+
+        this.m_DatabaseReference = FirebaseDatabase.getInstance();
+        this.m_UsersTable = m_DatabaseReference.getReference("users");
     }
 
     public static Model getInstance()
@@ -183,7 +189,7 @@ public class Model implements IModel,
     }
 
     @Override
-    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age)
+    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender)
     {
         try
         {
@@ -197,7 +203,21 @@ public class Model implements IModel,
                     AppUtils.printDebugToLogcat("Model", "onRequestToSignup.onComplete", "task.isSuccessful() == " + task.isSuccessful());
                     if (task.isSuccessful() == true)
                     {
-                        Model.this.onSuccessToSignup();
+                        try
+                        {
+                            UserProfile currentUserProfile = new UserProfile(i_FullName, Integer.parseInt(i_Age), i_DogGender);
+                            String currentUserId = Model.this.m_FirebaseAuth.getCurrentUser().getUid();
+
+                            // Save the extra details of the user in the database too.
+                            Model.this.m_UsersTable.child(currentUserId).setValue(currentUserProfile);
+
+                            // Notify that the signup process has been successfully accomplished.
+                            Model.this.onSuccessToSignup();
+                        }
+                        catch (Exception err)
+                        {
+
+                        }
                     }
                     else
                     {

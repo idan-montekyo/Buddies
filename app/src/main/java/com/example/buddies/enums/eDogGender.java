@@ -4,5 +4,4 @@ public enum eDogGender {
     UNINITIALIZED,
     MALE,
     FEMALE,
-    BOTH
 }

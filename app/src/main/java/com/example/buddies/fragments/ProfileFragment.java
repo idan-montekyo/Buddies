@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.buddies.BuildConfig;
 import com.example.buddies.R;
+import com.example.buddies.common.AppUtils;
 import com.example.buddies.enums.eDogGender;
 
 import java.io.File;
@@ -219,9 +220,9 @@ public class ProfileFragment extends Fragment {
                 else {
 
                     int ageInput = Integer.parseInt(tempAgeInput);
-                    m_radioButton = getSelectedButton(view);
+                    m_radioButton = AppUtils.getSelectedRadioButtonFromRadioGroup(m_radioGroup, view);
                     if(m_radioButton != null) // If RadioButton selected
-                        m_dogGender = getDogGender(m_radioButton.getText().toString());
+                        m_dogGender = eDogGender.valueOf(m_radioButton.getText().toString());
 
                     // TODO: save all info in DataBase.
 
@@ -231,30 +232,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-    }
-
-    // Get selected RadioButton. If nothing is selected, return null.
-    public RadioButton getSelectedButton(View view) {
-        // TODO: what if no button selected?
-        int radioId = m_radioGroup.getCheckedRadioButtonId();
-        return view.findViewById(radioId);
-    }
-
-    // Assuming a button is selected, return matching enum gender.
-    public eDogGender getDogGender(String text) {
-        eDogGender tempGender = eDogGender.UNINITIALIZED;
-
-        switch (text) {
-            case "Male":
-                tempGender = eDogGender.MALE;
-                break;
-            case "Female":
-                tempGender = eDogGender.FEMALE;
-                break;
-            case "Both":
-                tempGender = eDogGender.BOTH;
-        }
-        return tempGender;
     }
 
     // Source - https://developer.android.com/training/camera/photobasics

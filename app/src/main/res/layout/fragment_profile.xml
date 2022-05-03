@@ -146,15 +146,6 @@
             android:textColor="@color/faded_white"
             android:layout_marginEnd="5dp"
             android:buttonTint="@color/faded_white"/>
-
-        <RadioButton
-            android:id="@+id/profile_radio_button_both"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/both"
-            android:textSize="20sp"
-            android:textColor="@color/faded_white"
-            android:buttonTint="@color/faded_white"/>
     </RadioGroup>
 
     <View

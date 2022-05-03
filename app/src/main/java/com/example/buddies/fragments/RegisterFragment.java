@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.enums.eDogGender;
 import com.example.buddies.interfaces.MVVM.IView;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 
@@ -25,6 +28,9 @@ public class RegisterFragment extends Fragment implements IView,
 {
     public final String LOGIN_FRAGMENT_TAG = "login_fragment";
     private ViewModel m_ViewModel = ViewModel.getInstance();
+
+    RadioGroup m_radioGroup;
+    RadioButton m_radioButton;
 
     public interface IOnRegisteredListener {
         void onRegistered();
@@ -65,6 +71,7 @@ public class RegisterFragment extends Fragment implements IView,
         EditText passwordEt = view.findViewById(R.id.register_password_input);
         EditText fullNameEt = view.findViewById(R.id.register_full_name_input);
         EditText ageEt = view.findViewById(R.id.register_age_input);
+        this.m_radioGroup = view.findViewById(R.id.register_radio_group);
 
         ImageButton backBtn = view.findViewById(R.id.register_back_button);
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -83,6 +90,26 @@ public class RegisterFragment extends Fragment implements IView,
                 String passwordInput = passwordEt.getText().toString();
                 String fullNameInput = fullNameEt.getText().toString();
                 String tempAgeInput = ageEt.getText().toString();
+                eDogGender dogGenderInput = eDogGender.UNINITIALIZED;
+
+                m_radioButton = AppUtils.getSelectedRadioButtonFromRadioGroup(m_radioGroup, view);
+
+                String dogGenderLabel = m_radioButton.getText().toString();
+
+                // If RadioButton selected
+                if(m_radioButton != null)
+                {
+                    if (dogGenderLabel.equals("זכר"))
+                    {
+                        dogGenderLabel = "MALE";
+                    }
+                    else if (dogGenderLabel.equals("נקבה"))
+                    {
+                        dogGenderLabel = "FEMALE";
+                    }
+
+                    dogGenderInput = eDogGender.valueOf(dogGenderLabel);
+                }
 
                 /*
 
@@ -108,7 +135,7 @@ public class RegisterFragment extends Fragment implements IView,
                 */
 
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "calling onRequestToSignup()");
-                ViewModel.getInstance().onRequestToSignup(requireContext(), usernameInput, passwordInput, fullNameInput, tempAgeInput);
+                ViewModel.getInstance().onRequestToSignup(requireContext(), usernameInput, passwordInput, fullNameInput, tempAgeInput, dogGenderInput);
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "returned from onRequestToSignup()");
             }
         });
