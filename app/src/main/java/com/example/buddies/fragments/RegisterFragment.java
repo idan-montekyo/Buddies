@@ -13,13 +13,18 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.transition.TransitionInflater;
 
 import com.example.buddies.R;
+import com.example.buddies.ViewModel.ViewModel;
+import com.example.buddies.common.AppUtils;
+import com.example.buddies.interfaces.MVVM.IView;
+import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 
-public class RegisterFragment extends Fragment {
-
+public class RegisterFragment extends Fragment implements IView,
+                                                          ISignupResponsesEventHandler
+{
     public final String LOGIN_FRAGMENT_TAG = "login_fragment";
+    private ViewModel m_ViewModel = ViewModel.getInstance();
 
     public interface IOnRegisteredListener {
         void onRegistered();
@@ -31,6 +36,8 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
+        this.m_ViewModel.registerForEvents((IView) this);
 
         Fragment loginFragment = getParentFragmentManager().findFragmentByTag(LOGIN_FRAGMENT_TAG);
         try {
@@ -77,6 +84,10 @@ public class RegisterFragment extends Fragment {
                 String fullNameInput = fullNameEt.getText().toString();
                 String tempAgeInput = ageEt.getText().toString();
 
+                /*
+
+                // TODO: The code below should be changed / moved from here to viewmodel / model / other locations.
+
                 if(usernameInput.equals("") || passwordInput.equals("")
                         || fullNameInput.equals("") || tempAgeInput.equals("")) {
 
@@ -94,8 +105,25 @@ public class RegisterFragment extends Fragment {
                     getParentFragmentManager().popBackStack();
                     onRegisteredListener.onRegistered();
                 }
+                */
+
+                AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "calling onRequestToSignup()");
+                ViewModel.getInstance().onRequestToSignup(requireContext(), usernameInput, passwordInput, fullNameInput, tempAgeInput);
+                AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "returned from onRequestToSignup()");
             }
         });
     }
 
+    @Override
+    public void onSuccessToSignup()
+    {
+        Toast.makeText(requireContext(), "The user has been successfully registered !", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFailureToSignup(Exception i_Reason)
+    {
+        AppUtils.printDebugToLogcat("RegisterFragment", "onFailureToSignup", i_Reason.toString());
+        Toast.makeText(requireContext(), i_Reason.getMessage(), Toast.LENGTH_LONG).show();
+    }
 }

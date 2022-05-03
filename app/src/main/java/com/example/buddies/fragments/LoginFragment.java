@@ -7,17 +7,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
-import androidx.transition.TransitionInflater;
 
 import com.example.buddies.R;
+import com.example.buddies.ViewModel.ViewModel;
+import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.google.android.material.snackbar.Snackbar;
 
-public class LoginFragment extends Fragment implements RegisterFragment.IOnRegisteredListener {
+public class LoginFragment extends Fragment implements RegisterFragment.IOnRegisteredListener,
+                                                       ILoginResponsesEventHandler
+{
 
 //    // void newInstance
 //    // used to get args from calling fragment, working with newInstance method
@@ -70,34 +74,69 @@ public class LoginFragment extends Fragment implements RegisterFragment.IOnRegis
         });
 
         Button loginBtn = view.findViewById(R.id.login_login_button);
-        loginBtn.setOnClickListener(new View.OnClickListener() {
+        loginBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
+                String i_UserName = usernameEt.getText().toString();
+                String i_Password = passwordEt.getText().toString();
 
-                getParentFragmentManager().beginTransaction()
-                        .setCustomAnimations(
-                                R.anim.slide_in,  // enter
-                                R.anim.fade_out,  // exit
-                                R.anim.fade_in,   // popEnter
-                                R.anim.slide_out) // popExit
-                        .replace(R.id.root_main_activity, new HomeFragment(), HOME_FRAGMENT_TAG)
-                        .commit();
+                ViewModel.getInstance().onRequestToLogin(i_UserName, i_Password);
             }
         });
 
         Button guestBtn = view.findViewById(R.id.login_login_guest_button);
-        guestBtn.setOnClickListener(new View.OnClickListener() {
+        guestBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v) {
-
+                ViewModel.getInstance().onRequestToAnonymousLogin();
             }
         });
     }
 
     // Show snackbar message after returning from RegisterFragment and successfully creating a new user.
     @Override
-    public void onRegistered() {
+    public void onRegistered()
+    {
         Snackbar.make(loginCoordinatorLayout, "successfully registered", Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
+    }
+
+    @Override
+    public void onSuccessToLogin()
+    {
+        this.moveToMainProgramFragment();
+    }
+
+    @Override
+    public void onFailureToLogin(Exception i_Reason)
+    {
+        Toast.makeText(requireContext(), "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onSuccessToAnonymousLogin()
+    {
+        this.moveToMainProgramFragment();
+    }
+
+    @Override
+    public void onFailureToAnonymousLogin(Exception i_Reason)
+    {
+        Toast.makeText(requireContext(), "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
+    }
+
+    private void moveToMainProgramFragment()
+    {
+        getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(
+                        R.anim.slide_in,  // enter
+                        R.anim.fade_out,  // exit
+                        R.anim.fade_in,   // popEnter
+                        R.anim.slide_out) // popExit
+                .replace(R.id.root_main_activity, new HomeFragment(), HOME_FRAGMENT_TAG)
+                .commit();
     }
 }

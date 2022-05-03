@@ -1,4 +1,4 @@
-package com.example.buddies.interfaces;
+package com.example.buddies.interfaces.LocationSelectionEvent;
 
 import com.google.android.gms.maps.model.LatLng;
 

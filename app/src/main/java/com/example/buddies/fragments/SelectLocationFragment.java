@@ -14,13 +14,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.AppUtils;
-import com.example.buddies.interfaces.ILocationSelect_EventHandler;
-import com.example.buddies.interfaces.IView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -81,7 +78,7 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
-                            ViewModel.getInstance().setLocation(currentLatLng);
+                            // ViewModel.getInstance().setLocation(currentLatLng);
                             AppUtils.closeFragmentsByFragmentsTags(getActivity().getSupportFragmentManager(), SELECT_LOCATION_FRAGMENT_TAG);
 //                            FragmentsCenter.isSelectLocationFragmentAlive = false;
                             ViewModel.getInstance().onLocationSelected(currentLatLng);

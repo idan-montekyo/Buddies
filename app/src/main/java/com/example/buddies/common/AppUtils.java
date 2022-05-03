@@ -1,6 +1,8 @@
 package com.example.buddies.common;
 
+import android.icu.text.SimpleDateFormat;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
@@ -16,9 +18,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-public class AppUtils {
+public class AppUtils
+{
     /*
     Remove all the desired fragments from container, by their given fragments tags
     (Source: https://stackoverflow.com/a/39569243/2196301)
@@ -107,5 +112,20 @@ public class AppUtils {
         }
 
         return null;
+    }
+
+    public static void printDebugToLogcat(String i_CallerClass, String i_CallerMethod, String i_Message)
+    {
+        SimpleDateFormat sdf = null;
+        String currentTime = "";
+        String debuggerKey = "#AppDebugger#";
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N)
+        {
+            sdf = new SimpleDateFormat("[dd.MM.yyyy][HH:mm:ss]", Locale.getDefault());
+            currentTime = sdf.format(new Date());
+        }
+
+        Log.d(debuggerKey, currentTime + "[" + i_CallerClass + "][" + i_CallerMethod + "] " + i_Message);
     }
 }
