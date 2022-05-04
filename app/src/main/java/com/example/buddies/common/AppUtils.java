@@ -52,6 +52,12 @@ public class AppUtils
         }
     }
 
+    /**
+     * You can read the docs (Link: https://positionstack.com/documentation) which indicating how to receive
+     * the reversed-geolocation data from the api.
+     * @param i_Coordinates
+     * @return
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String[] getStringValueFromJsonObject(LatLng i_Coordinates)
     {
