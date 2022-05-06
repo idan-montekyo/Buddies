@@ -35,6 +35,7 @@ public class Model implements IModel,
 
     private FirebaseAuth m_FirebaseAuth;
     FirebaseAuth.AuthStateListener m_AuthStateListener;
+    FirebaseAuth.AuthStateListener m_LogoutListener;
 
     FirebaseDatabase m_DatabaseReference = null;
     DatabaseReference m_UsersTable = null;
@@ -46,7 +47,10 @@ public class Model implements IModel,
         this.m_AuthStateListener = new FirebaseAuth.AuthStateListener()
         {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) { }
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
+            {
+                AppUtils.printDebugToLogcat("", "", "breakpoint");
+            }
         };
 
         this.m_FirebaseAuth.addAuthStateListener(this.m_AuthStateListener);
@@ -76,6 +80,75 @@ public class Model implements IModel,
         this.viewModel = null;
     }
 
+    /*
+    ****************************************************************************************************
+                                            TASK: Signup
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender)
+    {
+        try
+        {
+            AppUtils.printDebugToLogcat("Model", "onRequestToSignup", "trying to sign up the desired user ...");
+            Task<AuthResult> signupHandler = this.m_FirebaseAuth.createUserWithEmailAndPassword(i_UserName + "@Buddies.com", i_Password);
+            signupHandler.addOnCompleteListener(new OnCompleteListener<AuthResult>()
+            {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task)
+                {
+                    AppUtils.printDebugToLogcat("Model", "onRequestToSignup.onComplete", "task.isSuccessful() == " + task.isSuccessful());
+                    if (task.isSuccessful() == true)
+                    {
+                        try
+                        {
+                            UserProfile currentUserProfile = new UserProfile(i_FullName, Integer.parseInt(i_Age), i_DogGender);
+                            String currentUserId = Model.this.m_FirebaseAuth.getCurrentUser().getUid();
+
+                            // Save the extra details of the user in the database too.
+                            Model.this.m_UsersTable.child(currentUserId).setValue(currentUserProfile);
+
+                            // Notify that the signup process has been successfully accomplished.
+                            Model.this.onSuccessToSignup();
+                        }
+                        catch (Exception err)
+                        {
+                            Model.this.onFailureToSignup(err);
+                        }
+                    }
+                    else
+                    {
+                        Exception reason = task.getException();
+                        Model.this.onFailureToSignup(reason);
+                    }
+                }
+            });
+        }
+        catch (Exception err)
+        {
+            this.onFailureToSignup(err);
+        }
+    }
+
+    @Override
+    public void onSuccessToSignup()
+    {
+        ((ISignupResponsesEventHandler)this.viewModel).onSuccessToSignup();
+    }
+
+    @Override
+    public void onFailureToSignup(Exception i_Reason)
+    {
+        ((ISignupResponsesEventHandler)this.viewModel).onFailureToSignup(i_Reason);
+    }
+
+    /*
+    ****************************************************************************************************
+                                            TASK: Login
+    ****************************************************************************************************
+    */
+
     @Override
     public void onRequestToLogin(String i_UserName, String i_Password)
     {
@@ -94,7 +167,8 @@ public class Model implements IModel,
                     }
                     else
                     {
-                        Model.this.onFailureToLogin(new Exception("An error occured while trying to login to the system.\nPlease retry or contact our support."));
+                        // Model.this.onFailureToLogin(new Exception("An error occured while trying to login to the system.\nPlease retry or contact our support."));
+                        Model.this.onFailureToLogin(task.getException());
                     }
                 }
             });
@@ -118,6 +192,12 @@ public class Model implements IModel,
         // if firebase login failed
         ((ILoginResponsesEventHandler)this.viewModel).onFailureToLogin(i_Reason);
     }
+
+    /*
+    ****************************************************************************************************
+                                        TASK: Anonymous Login
+    ****************************************************************************************************
+    */
 
     @Override
     public void onRequestToAnonymousLogin()
@@ -148,9 +228,42 @@ public class Model implements IModel,
         ((ILoginResponsesEventHandler)this.viewModel).onFailureToAnonymousLogin(i_Reason);
     }
 
+    /*
+    ****************************************************************************************************
+                                            TASK: Logout
+    ****************************************************************************************************
+    */
+
     @Override
     public void onRequestToLogout()
     {
+        // TODO: Decide later what to do with the use case of logging out when the WiFi and either the Mobile Data
+        //       both turned off.
+        /*
+        if (this.m_LogoutListener == null)
+        {
+            // Initialize the listener
+            this.m_LogoutListener = new FirebaseAuth.AuthStateListener()
+            {
+                @Override
+                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
+                {
+                    if (firebaseAuth.getCurrentUser() == null)
+                    {
+                        Model.this.onSuccessToLogout();
+                    }
+                    else
+                    {
+                        Model.this.onFailureToLogout(new Exception("Couldn't log you out"));
+                    }
+                }
+            };
+
+            // Register the listener
+            this.m_FirebaseAuth.addAuthStateListener(this.m_LogoutListener);
+        }
+        */
+
         try
         {
             this.m_FirebaseAuth.signOut();
@@ -173,82 +286,5 @@ public class Model implements IModel,
     {
         // if firebase logout failed
         ((ILogoutResponsesEventHandler)this.viewModel).onFailureToLogout(i_Reason);
-    }
-
-    @Override
-    public void onSuccessToAnonymousLogout()
-    {
-        ((ILogoutResponsesEventHandler)this.viewModel).onSuccessToAnonymousLogout();
-    }
-
-    @Override
-    public void onFailureToAnonymousLogout(Exception i_Reason)
-    {
-        // if firebase anonymous logout failed
-        ((ILogoutResponsesEventHandler)this.viewModel).onFailureToAnonymousLogout(i_Reason);
-    }
-
-    @Override
-    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender)
-    {
-        try
-        {
-            AppUtils.printDebugToLogcat("Model", "onRequestToSignup", "trying to sign up the desired user ...");
-            Task<AuthResult> signupHandler = this.m_FirebaseAuth.createUserWithEmailAndPassword(i_UserName + "@Buddies.com", i_Password);
-            signupHandler.addOnCompleteListener(new OnCompleteListener<AuthResult>()
-            {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task)
-                {
-                    AppUtils.printDebugToLogcat("Model", "onRequestToSignup.onComplete", "task.isSuccessful() == " + task.isSuccessful());
-                    if (task.isSuccessful() == true)
-                    {
-                        try
-                        {
-                            UserProfile currentUserProfile = new UserProfile(i_FullName, Integer.parseInt(i_Age), i_DogGender);
-                            String currentUserId = Model.this.m_FirebaseAuth.getCurrentUser().getUid();
-
-                            // Save the extra details of the user in the database too.
-                            Model.this.m_UsersTable.child(currentUserId).setValue(currentUserProfile);
-
-                            // Notify that the signup process has been successfully accomplished.
-                            Model.this.onSuccessToSignup();
-                        }
-                        catch (Exception err)
-                        {
-
-                        }
-                    }
-                    else
-                    {
-                        Exception reason = task.getException();
-                        Model.this.onFailureToSignup(reason);
-                    }
-                }
-            });
-
-            /*
-            TODO: add here the other data of the user, except the username and the password.
-                  for example:
-                      1. Full Name
-                      2. Age
-             */
-        }
-        catch (Exception err)
-        {
-            this.onFailureToSignup(err);
-        }
-    }
-
-    @Override
-    public void onSuccessToSignup()
-    {
-        ((ISignupResponsesEventHandler)this.viewModel).onSuccessToSignup();
-    }
-
-    @Override
-    public void onFailureToSignup(Exception i_Reason)
-    {
-        ((ISignupResponsesEventHandler)this.viewModel).onFailureToSignup(i_Reason);
     }
 }

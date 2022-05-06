@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "832391102207",
-    "project_id": "buddies-bf1de",
-    "storage_bucket": "buddies-bf1de.appspot.com"
+    "project_number": "515573904255",
+    "project_id": "leafy-firmament-349212",
+    "storage_bucket": "leafy-firmament-349212.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:832391102207:android:36e6ee28644637588656ca",
+        "mobilesdk_app_id": "1:515573904255:android:f11b83b4bb156fa54e604a",
         "android_client_info": {
           "package_name": "com.example.buddies"
         }
       },
       "oauth_client": [
         {
-          "client_id": "832391102207-45a518ak1ru73qkpt1pl74hua84qmrdd.apps.googleusercontent.com",
+          "client_id": "515573904255-berbusvn4dt19fkrf5ofnm0uv2n2dl5o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBGz38o4-IKcdp-Fkn9KDDtukn6fIJ5RHU"
+          "current_key": "AIzaSyD4-Gv0BdS-hBMY7rHjAeJK6NygcZikfj0"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "832391102207-45a518ak1ru73qkpt1pl74hua84qmrdd.apps.googleusercontent.com",
+              "client_id": "515573904255-berbusvn4dt19fkrf5ofnm0uv2n2dl5o.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

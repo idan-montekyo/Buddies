@@ -141,4 +141,11 @@ public class LoginFragment extends Fragment implements IView,
                 .replace(R.id.root_main_activity, new HomeFragment(), HOME_FRAGMENT_TAG)
                 .commit();
     }
+
+    @Override
+    public void onDestroy()
+    {
+        this.m_ViewModel.unregisterForEvents((IView) this);
+        super.onDestroy();
+    }
 }

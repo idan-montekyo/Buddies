@@ -138,31 +138,31 @@ public class ViewModel implements IViewModel,
     @Override
     public void onRequestToLogout()
     {
-
+        this.m_Model.onRequestToLogout();
     }
 
     @Override
     public void onSuccessToLogout()
     {
-
+        for (IView view : views)
+        {
+            if (view instanceof ILogoutResponsesEventHandler)
+            {
+                ((ILogoutResponsesEventHandler)view).onSuccessToLogout();
+            }
+        }
     }
 
     @Override
     public void onFailureToLogout(Exception i_Reason)
     {
-
-    }
-
-    @Override
-    public void onSuccessToAnonymousLogout()
-    {
-
-    }
-
-    @Override
-    public void onFailureToAnonymousLogout(Exception i_Reason)
-    {
-
+        for (IView view : views)
+        {
+            if (view instanceof ILogoutResponsesEventHandler)
+            {
+                ((ILogoutResponsesEventHandler)view).onFailureToLogout(i_Reason);
+            }
+        }
     }
 
     @Override
@@ -184,7 +184,7 @@ public class ViewModel implements IViewModel,
             }
         }
     }
-
+    
     @Override
     public void onFailureToSignup(Exception i_Reason)
     {

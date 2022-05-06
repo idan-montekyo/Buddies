@@ -22,13 +22,18 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.buddies.R;
+import com.example.buddies.ViewModel.ViewModel;
+import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
+import com.example.buddies.interfaces.MVVM.IView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
-public class HomeFragment extends Fragment implements CreatePostFragment.IOnUploadListener,
-                                                        ProfileFragment.IOnSaveListener {
-
+public class HomeFragment extends Fragment implements IView,
+                                                      CreatePostFragment.IOnUploadListener,
+                                                      ProfileFragment.IOnSaveListener,
+                                                      ILogoutResponsesEventHandler
+{
     public final String LOGIN_FRAGMENT_TAG = "login_fragment";
     public final String REGISTER_FRAGMENT_TAG = "register_fragment";
     public final String PROFILE_FRAGMENT_TAG = "profile_fragment";
@@ -38,6 +43,14 @@ public class HomeFragment extends Fragment implements CreatePostFragment.IOnUplo
     DrawerLayout m_drawerLayout;
     NavigationView m_navigationView;
     CoordinatorLayout m_coordinatorLayout;
+    ViewModel m_ViewModel = ViewModel.getInstance();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        this.m_ViewModel.registerForEvents((IView) this);
+        super.onCreate(savedInstanceState);
+    }
 
     // Inflate fragment_home.
     @SuppressLint("WrongConstant")
@@ -72,8 +85,8 @@ public class HomeFragment extends Fragment implements CreatePostFragment.IOnUplo
         m_navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @SuppressLint("NonConstantResourceId")
             @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
+            public boolean onNavigationItemSelected(@NonNull MenuItem item)
+            {
                 m_drawerLayout.closeDrawers();
 
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
@@ -98,10 +111,7 @@ public class HomeFragment extends Fragment implements CreatePostFragment.IOnUplo
                     case R.id.menu_settings:
                         break;
                     case R.id.menu_log_out:
-                        getParentFragmentManager().beginTransaction()
-                                .setCustomAnimations(R.anim.slide_out, R.anim.fade_out)
-                                .replace(R.id.root_main_activity, new LoginFragment(), LOGIN_FRAGMENT_TAG)
-                                .commit();
+                        HomeFragment.this.m_ViewModel.onRequestToLogout();
                         break;
                 }
 
@@ -139,14 +149,12 @@ public class HomeFragment extends Fragment implements CreatePostFragment.IOnUplo
                         .addToBackStack(null).commit();
             }
         });
-
-
     }
 
     @SuppressLint("WrongConstant")
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
         if(item.getItemId() == android.R.id.home) {
             m_drawerLayout.openDrawer(Gravity.START);
             return true;
@@ -156,14 +164,39 @@ public class HomeFragment extends Fragment implements CreatePostFragment.IOnUplo
     }
 
     @Override
-    public void onSave() {
+    public void onSave()
+    {
         Snackbar.make(m_coordinatorLayout, "profile info successfully saved", Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
 
     @Override
-    public void onUpload() {
+    public void onUpload()
+    {
         Snackbar.make(m_coordinatorLayout, "post successfully uploaded", Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
+    }
+
+    @Override
+    public void onSuccessToLogout()
+    {
+        getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_out, R.anim.fade_out)
+                .replace(R.id.root_main_activity, new LoginFragment(), LOGIN_FRAGMENT_TAG)
+                .commit();
+    }
+
+    @Override
+    public void onFailureToLogout(Exception i_Reason)
+    {
+        Snackbar.make(m_coordinatorLayout, "Logout Failed: " + i_Reason.getMessage(), Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.BLACK).show();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        this.m_ViewModel.unregisterForEvents((IView) this);
+        super.onDestroy();
     }
 }

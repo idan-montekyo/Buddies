@@ -101,8 +101,10 @@ public class CreatePostFragment extends Fragment implements IView,
         pickLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: merge location picker.
-                m_mapView.setVisibility(View.GONE);
+                // If a location has not been already selected
+                if (m_CurrMarker == null) {
+                    m_mapView.setVisibility(View.GONE);
+                }
 
                 // FragmentsCenter.m_Fragment_AddNewSong = new Fragment_AddNewSong();
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
@@ -169,7 +171,7 @@ public class CreatePostFragment extends Fragment implements IView,
             @Override
             public void run() {
 
-                m_LocationDetails = AppUtils.getStringValueFromJsonObject(i_SelectedLocation);
+                m_LocationDetails = AppUtils.getStringValueFromJsonObject(requireContext(), i_SelectedLocation);
 
                 // Update the Activity's TextView
                 m_MainActivityHandlerFromRemoteThreads.post(new Runnable() {
@@ -178,21 +180,13 @@ public class CreatePostFragment extends Fragment implements IView,
                     public void run() {
 
                         assert m_LocationDetails != null;
-                        m_cityTv.setText(m_LocationDetails[2]);
+                        m_cityTv.setText(m_LocationDetails[0] + " (" + m_LocationDetails[2] + ")");
                         m_streetTv.setText(m_LocationDetails[1]);
 
                         m_mapView.setVisibility(View.VISIBLE);
                         m_mapView.getMapAsync(CreatePostFragment.this);
                     }
                 });
-
-                /* TODO: show here the selected coordinates in preview mode
-                TACTICS:
-                    1. load the coordinates to a google maps parameterized url
-                    2. load the url response to a mapview in that activity (needs to be added)
-
-                NOTE: This can be done also in that way too: https://stackoverflow.com/a/15237869/2196301
-                 */
             }
         }).start();
     }
@@ -206,11 +200,17 @@ public class CreatePostFragment extends Fragment implements IView,
 
         m_GoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        m_CurrMarker = m_GoogleMap.addMarker(new MarkerOptions().position(m_SelectedLocation)
-                .title(m_LocationDetails[0]).snippet(m_SelectedLocation.toString()));
+        if (m_CurrMarker == null)
+        {
+            m_CurrMarker = m_GoogleMap.addMarker(new MarkerOptions().position(m_SelectedLocation)
+                    .title(m_LocationDetails[0]).snippet(m_SelectedLocation.toString()));
+        }
+        else
+        {
+            m_CurrMarker.setPosition(m_SelectedLocation);
+        }
 
         // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
         m_GoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(m_SelectedLocation, 14f));
-
     }
 }

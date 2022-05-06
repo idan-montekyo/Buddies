@@ -108,7 +108,7 @@ public class RegisterFragment extends Fragment implements IView,
                         dogGenderLabel = "FEMALE";
                     }
 
-                    dogGenderInput = eDogGender.valueOf(dogGenderLabel);
+                    dogGenderInput = eDogGender.valueOf(dogGenderLabel.toUpperCase());
                 }
 
                 /*

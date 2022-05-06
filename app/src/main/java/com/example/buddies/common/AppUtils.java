@@ -1,5 +1,7 @@
 package com.example.buddies.common;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.util.Log;
@@ -13,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -25,8 +28,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.buddies.R;
+
 public class AppUtils
 {
+    public static String GetResourceStringValueByStringName(String i_StringName, Context i_Context)
+    {
+        Resources res = i_Context.getResources();
+        String packageName = i_Context.getPackageName();
+
+        int stringId = res.getIdentifier(i_StringName, "string", packageName);
+
+        return i_Context.getString(stringId);
+    }
+
     /*
     Remove all the desired fragments from container, by their given fragments tags
     (Source: https://stackoverflow.com/a/39569243/2196301)
@@ -59,9 +74,10 @@ public class AppUtils
      * @return
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static String[] getStringValueFromJsonObject(LatLng i_Coordinates)
+    public static String[] getStringValueFromJsonObject(Context i_Context, LatLng i_Coordinates)
     {
-        String url = "http://api.positionstack.com/v1/reverse?access_key=d0ff480a5bda3210213193c176ac35c6&limit=1&query=" + i_Coordinates.latitude + "," + i_Coordinates.longitude;
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + i_Coordinates.latitude + "," + i_Coordinates.longitude + "&key=" + AppUtils.GetResourceStringValueByStringName("google_maps_key", i_Context);
+        // String url = "http://api.positionstack.com/v1/reverse?access_key=d0ff480a5bda3210213193c176ac35c6&limit=1&query=" + i_Coordinates.latitude + "," + i_Coordinates.longitude;
         final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.65 Safari/537.31";
 
         try
@@ -83,40 +99,77 @@ public class AppUtils
                 reader.close();
 
                 final JSONObject jObj = new JSONObject(buffer.toString());
-                JSONObject items = jObj.getJSONArray("data").getJSONObject(0);
+                JSONArray items = jObj.getJSONArray("results");
+                JSONObject firstAddress = items.getJSONObject(0);
+                JSONArray addressComponentsAsJsonArray = firstAddress.getJSONArray("address_components");
+                JSONObject[] addressComponents = new JSONObject[addressComponentsAsJsonArray.length()];
 
-                String placeCountry = items.getString("country");
-
-                String[] locationDetails = null;
-
-                if (placeCountry.equals("Palestine") == true)
+                for (int i = 0; i < addressComponents.length; i++)
                 {
-                    placeCountry = "Israel";
+                    addressComponents[i] = addressComponentsAsJsonArray.getJSONObject(i);
                 }
 
-                if (placeCountry.equals("Israel") == true)
+                JSONObject currentObject = null;
+                String currentObjectInformationType = null;
+
+                JSONObject plusCodeObject      = null;
+                JSONObject establishmentObject = null;
+                JSONObject streetObject        = null;
+                JSONObject cityObject          = null;
+                JSONObject countryObject       = null;
+
+                String plusCode      = null;
+                String establishment = null;
+                String street        = null;
+                String city          = null;
+                String country       = null;
+
+                for (int i = 0; i < addressComponents.length; i++)
                 {
-                    String placeName    = items.getString("name");
-                    String placeStreet  = items.getString("street");
-                    String placeCity    = items.getString("county"); // Equals to 'City', not exact.
+                    currentObject = addressComponents[i];
+                    currentObjectInformationType = currentObject.getJSONArray("types").getString(0);
 
-                    locationDetails = new String[]{ placeName, placeStreet, placeCity, placeCountry };
-
-                    for (int i = 0; i < locationDetails.length; i++)
+                    switch (currentObjectInformationType)
                     {
-                        if (locationDetails[i].equals("null") == true) {
-                            locationDetails[i] = "Unknown";
-                        }
+                        case "plus_code":
+                            plusCodeObject = currentObject;
+                            break;
+                        case "establishment":
+                            establishmentObject = currentObject;
+                            break;
+                        case "route":
+                            streetObject = currentObject;
+                            break;
+                        case "locality":
+                            cityObject = currentObject;
+                            break;
+                        case "country":
+                            countryObject = currentObject;
+                            break;
+                        default:
+                            break;
                     }
                 }
-                else {
+
+                country = (countryObject == null) ? "Israel" : countryObject.getString("long_name");
+
+                if (country.equals("Israel") == false)
+                {
                     throw new IllegalArgumentException("The selected location is not located in Israel, please select another location.");
                 }
+
+                street        = (streetObject == null)        ? "Unknown Street"   : streetObject.getString("long_name");
+                city          = (cityObject == null)          ? "Unknown City"     : cityObject.getString("long_name");
+                establishment = (establishmentObject == null) ? "Unknown Place"    : establishmentObject.getString("long_name");
+                plusCode      = (plusCodeObject == null)      ? "Unknown PlusCode" : plusCodeObject.getString("long_name");
+
+                String[] locationDetails = new String[]{establishment, street, city, country};
 
                 return locationDetails;
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             String err = e.toString();
         }
 
