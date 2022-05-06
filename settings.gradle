@@ -1,3 +1,12 @@
+// Add this in order to try improve maps rendering (Source: https://developers.google.com/maps/documentation/android-sdk/config#step_2_set_up_the_sdk)
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {

@@ -94,11 +94,11 @@ public class RegisterFragment extends Fragment implements IView,
 
                 m_radioButton = AppUtils.getSelectedRadioButtonFromRadioGroup(m_radioGroup, view);
 
-                String dogGenderLabel = m_radioButton.getText().toString();
-
                 // If RadioButton selected
                 if(m_radioButton != null)
                 {
+                    String dogGenderLabel = m_radioButton.getText().toString();
+
                     if (dogGenderLabel.equals("זכר"))
                     {
                         dogGenderLabel = "MALE";

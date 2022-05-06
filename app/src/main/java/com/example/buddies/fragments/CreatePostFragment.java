@@ -93,7 +93,7 @@ public class CreatePostFragment extends Fragment implements IView,
             }
         });
 
-        m_mapView = view.findViewById(R.id.create_post_map_view);
+        m_mapView = (MapView) view.findViewById(R.id.create_post_map_view);
         m_mapView.onCreate(savedInstanceState);
         m_mapView.onResume();
 
