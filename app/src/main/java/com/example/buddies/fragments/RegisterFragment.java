@@ -28,7 +28,7 @@ public class RegisterFragment extends Fragment implements IView,
                                                           ISignupResponsesEventHandler
 {
     public final String LOGIN_FRAGMENT_TAG = "login_fragment";
-    private ViewModel m_ViewModel = ViewModel.getInstance();
+    private final ViewModel m_ViewModel = ViewModel.getInstance();
 
     RadioGroup m_radioGroup;
     RadioButton m_radioButton;
@@ -144,10 +144,17 @@ public class RegisterFragment extends Fragment implements IView,
                 */
 
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "calling onRequestToSignup()");
-                ViewModel.getInstance().onRequestToSignup(RegisterFragment.this.m_Context, usernameInput, passwordInput, fullNameInput, tempAgeInput, dogGenderInput);
+                m_ViewModel.onRequestToSignup(RegisterFragment.this.m_Context, usernameInput, passwordInput, fullNameInput, tempAgeInput, dogGenderInput);
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "returned from onRequestToSignup()");
             }
         });
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        this.m_ViewModel.unregisterForEvents((IView) this);
+        super.onDestroy();
     }
 
     @Override
@@ -161,12 +168,5 @@ public class RegisterFragment extends Fragment implements IView,
     {
         AppUtils.printDebugToLogcat("RegisterFragment", "onFailureToSignup", i_Reason.toString());
         Toast.makeText(this.m_Context, i_Reason.getMessage(), Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        this.m_ViewModel.unregisterForEvents((IView) this);
-        super.onDestroy();
     }
 }

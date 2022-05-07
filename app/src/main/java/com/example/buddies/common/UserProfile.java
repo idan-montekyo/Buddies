@@ -14,33 +14,11 @@ public class UserProfile
         this.m_DogGender = i_DogGender;
     }
 
-    public String getFullName()
-    {
-        return this.m_FullName;
-    }
+    public String getFullName() { return this.m_FullName; }
+    public int getAge() { return this.m_Age; }
+    public eDogGender getDogGender() { return this.m_DogGender; }
 
-    public void setFullName(String i_NewFullName)
-    {
-        this.m_FullName = i_NewFullName;
-    }
-
-    public int getAge()
-    {
-        return this.m_Age;
-    }
-
-    public void setAge(int i_NewAge)
-    {
-        this.m_Age = i_NewAge;
-    }
-
-    public eDogGender getDogGender()
-    {
-        return this.m_DogGender;
-    }
-
-    public void setDogGender(eDogGender i_NewDogGender)
-    {
-        this.m_DogGender = i_NewDogGender;
-    }
+    public void setFullName(String i_NewFullName) { this.m_FullName = i_NewFullName; }
+    public void setAge(int i_NewAge) { this.m_Age = i_NewAge; }
+    public void setDogGender(eDogGender i_NewDogGender) { this.m_DogGender = i_NewDogGender; }
 }

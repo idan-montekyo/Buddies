@@ -4,12 +4,15 @@ import android.content.Context;
 
 import com.example.buddies.Model.Model;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.Post;
 import com.example.buddies.enums.eDogGender;
 import com.example.buddies.interfaces.LocationSelectionEvent.ILocationSelect_EventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutRequestEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
+import com.example.buddies.interfaces.PostCreationEvent.IPostCreationRequestEventHandler;
+import com.example.buddies.interfaces.PostCreationEvent.IPostCreationResponseEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupRequestEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
@@ -26,7 +29,9 @@ public class ViewModel implements IViewModel,
                                   ILogoutRequestEventHandler,
                                   ILogoutResponsesEventHandler,
                                   ISignupRequestEventHandler,
-                                  ISignupResponsesEventHandler
+                                  ISignupResponsesEventHandler,
+                                  IPostCreationRequestEventHandler,
+                                  IPostCreationResponseEventHandler
 {
     private static ViewModel _instance = null;
     // private LatLng location;
@@ -193,6 +198,33 @@ public class ViewModel implements IViewModel,
             if (view instanceof ISignupResponsesEventHandler)
             {
                 ((ISignupResponsesEventHandler)view).onFailureToSignup(i_Reason);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestToCreatePost(Context i_Context, Post i_Post) {
+
+        AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "calling onRequestToCreatePost()");
+        this.m_Model.onRequestToCreatePost(i_Context, i_Post);
+        AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "returned from onRequestToCreatePost()");
+
+    }
+
+    @Override
+    public void onSuccessToCreatePost() {
+        for (IView view : views) {
+            if (view instanceof IPostCreationResponseEventHandler) {
+                ((IPostCreationResponseEventHandler)view).onSuccessToCreatePost();
+            }
+        }
+    }
+
+    @Override
+    public void onFailureToCreatePost(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof IPostCreationResponseEventHandler) {
+                ((IPostCreationResponseEventHandler)view).onFailureToCreatePost(i_Reason);
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.buddies.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.icu.util.Calendar;
@@ -24,11 +25,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.Post;
 import com.example.buddies.interfaces.LocationSelectionEvent.ILocationSelect_EventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
+import com.example.buddies.interfaces.PostCreationEvent.IPostCreationResponseEventHandler;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -38,11 +42,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class CreatePostFragment extends Fragment implements IView,
-        ILocationSelect_EventHandler,
-        OnMapReadyCallback, TimePickerDialog.OnTimeSetListener {
+                                                            ILocationSelect_EventHandler,
+                                                            OnMapReadyCallback,
+                                                            TimePickerDialog.OnTimeSetListener,
+                                                            IPostCreationResponseEventHandler
+{
 
     public final String HOME_FRAGMENT_TAG = "home_fragment";
     public final String CREATE_POST_FRAGMENT_TAG = "create_post_fragment";
+
+    ViewModel m_ViewModel = ViewModel.getInstance();
 
     String[] m_LocationDetails;
 
@@ -76,12 +85,17 @@ public class CreatePostFragment extends Fragment implements IView,
         }
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        this.m_ViewModel.registerForEvents((IView) this);
+        super.onCreate(savedInstanceState);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_create_post, container, false);
-        ViewModel.getInstance().registerForEvents((IView) this);
         return view;
     }
 
@@ -160,9 +174,11 @@ public class CreatePostFragment extends Fragment implements IView,
 
         Button uploadBtn = view.findViewById(R.id.create_post_upload_button);
         uploadBtn.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
 
+                String userUID = Model.getInstance().getCurrentUserUID();
                 String cityInput = m_cityTv.getText().toString();
                 String streetInput = m_streetTv.getText().toString();
                 String timeInput = m_timeTv.getText().toString();
@@ -174,12 +190,20 @@ public class CreatePostFragment extends Fragment implements IView,
                 } else {
 
                     // TODO: save post to DataBase and notify to refresh adapter.
+                    Post newPost = new Post(userUID, cityInput, streetInput, timeInput,
+                                            m_SelectedLocation, contentInput);
+                    m_ViewModel.onRequestToCreatePost(requireContext(), newPost);
 
                     getParentFragmentManager().popBackStack();
-                    onUploadListener.onUpload();
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        this.m_ViewModel.unregisterForEvents((IView) this);
+        super.onDestroy();
     }
 
     @Override
@@ -193,15 +217,19 @@ public class CreatePostFragment extends Fragment implements IView,
             @Override
             public void run() {
 
+                // TODO: sometimes crashes! with exception:
+                //  " java.lang.IllegalStateException: Fragment CreatePostFragment{ce75c49}
+                //  (63531ab2-d50d-41b3-a78e-b38cc032b083) not attached to a context. "
                 m_LocationDetails = AppUtils.getStringValueFromJsonObject(requireContext(), i_SelectedLocation);
 
                 // Update the Activity's TextView
                 m_MainActivityHandlerFromRemoteThreads.post(new Runnable() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void run() {
 
                         assert m_LocationDetails != null;
-                        m_cityTv.setText(m_LocationDetails[0] + " (" + m_LocationDetails[2] + ")");
+                        m_cityTv.setText(m_LocationDetails[2]);
                         m_streetTv.setText(m_LocationDetails[1]);
 
                         m_mapView.setVisibility(View.VISIBLE);
@@ -235,9 +263,25 @@ public class CreatePostFragment extends Fragment implements IView,
         m_GoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(m_SelectedLocation, 14f));
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute)
     {
-        m_timeTv.setText(String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
+        if (minute < 10) {
+            m_timeTv.setText(String.valueOf(hourOfDay) + ":0" + String.valueOf(minute));
+        } else {
+            m_timeTv.setText(String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
+        }
+    }
+
+    @Override
+    public void onSuccessToCreatePost() {
+        onUploadListener.onUpload();
+    }
+
+    @Override
+    public void onFailureToCreatePost(Exception i_Reason) {
+        AppUtils.printDebugToLogcat("CreatePostFragment", "onFailureToCreatePost", i_Reason.toString());
+        Toast.makeText(requireContext(), "Failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }
 }

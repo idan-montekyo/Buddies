@@ -21,7 +21,11 @@
         android:id="@+id/registerFragment"
         android:name="com.example.buddies.fragments.RegisterFragment"
         tools:layout="@layout/fragment_register"
-        android:label="RegisterFragment" />
+        android:label="RegisterFragment" >
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.buddies.fragments.HomeFragment"
@@ -33,6 +37,9 @@
         <action
             android:id="@+id/action_homeFragment_to_createPostFragment"
             app:destination="@id/createPostFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -51,5 +58,17 @@
         <action
             android:id="@+id/action_createPostFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_createPostFragment_to_selectLocationFragment"
+            app:destination="@id/selectLocationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/selectLocationFragment"
+        android:name="com.example.buddies.fragments.SelectLocationFragment"
+        tools:layout="@layout/fragment_select_location"
+        android:label="SelectLocationFragment" >
+        <action
+            android:id="@+id/action_selectLocationFragment_to_createPostFragment"
+            app:destination="@id/createPostFragment" />
     </fragment>
 </navigation>

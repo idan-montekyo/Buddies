@@ -13,6 +13,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.buddies.Model.Model;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -33,6 +34,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class AppUtils
 {
+
+    Model m_Model = Model.getInstance();
+
     public static String GetResourceStringValueByStringName(String i_StringName, Context i_Context)
     {
         Resources res = i_Context.getResources();

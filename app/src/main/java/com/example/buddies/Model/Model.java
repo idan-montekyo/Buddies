@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
 import com.example.buddies.enums.eOnAuthStateChangedCaller;
@@ -13,6 +14,8 @@ import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutRequestEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IModel;
+import com.example.buddies.interfaces.PostCreationEvent.IPostCreationRequestEventHandler;
+import com.example.buddies.interfaces.PostCreationEvent.IPostCreationResponseEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupRequestEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IViewModel;
@@ -24,13 +27,18 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Date;
+import java.util.Objects;
+
 public class Model implements IModel,
                               ILoginRequestEventHandler,
                               ILoginResponsesEventHandler,
                               ILogoutRequestEventHandler,
                               ILogoutResponsesEventHandler,
                               ISignupRequestEventHandler,
-                              ISignupResponsesEventHandler
+                              ISignupResponsesEventHandler,
+                              IPostCreationRequestEventHandler,
+                              IPostCreationResponseEventHandler
 {
     private static Model _instance = null;
     IViewModel viewModel = null;
@@ -41,6 +49,7 @@ public class Model implements IModel,
 
     FirebaseDatabase m_DatabaseReference = null;
     DatabaseReference m_UsersTable = null;
+    DatabaseReference m_PostsTable = null;
 
     eOnAuthStateChangedCaller m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
 
@@ -85,6 +94,7 @@ public class Model implements IModel,
 
         this.m_DatabaseReference = FirebaseDatabase.getInstance();
         this.m_UsersTable = m_DatabaseReference.getReference("users");
+        this.m_PostsTable = m_DatabaseReference.getReference("posts");
     }
 
     public static Model getInstance()
@@ -134,7 +144,7 @@ public class Model implements IModel,
                         try
                         {
                             UserProfile currentUserProfile = new UserProfile(i_FullName, Integer.parseInt(i_Age), i_DogGender);
-                            String currentUserId = Model.this.m_FirebaseAuth.getCurrentUser().getUid();
+                            String currentUserId = getCurrentUserUID();
 
                             // Save the extra details of the user in the database too.
                             Model.this.m_UsersTable.child(currentUserId).setValue(currentUserProfile);
@@ -293,13 +303,49 @@ public class Model implements IModel,
         ((ILogoutResponsesEventHandler)this.viewModel).onFailureToLogout(i_Reason);
     }
 
-    public boolean isCurrentUserAnonymous()
-    {
-        return this.m_CurrentUser.isAnonymous();
+    /*
+    ****************************************************************************************************
+                                         TASK: Create Post
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToCreatePost(Context i_Context, Post i_Post) {
+        AppUtils.printDebugToLogcat("Model", "onRequestToCreatePost", "trying to save post details to FireBase...");
+
+        try {
+            // Save post under the current user at FireBase -> posts.
+            String newPostKey = m_PostsTable.child(getCurrentUserUID()).push().getKey();
+            m_PostsTable.child(getCurrentUserUID()).child(newPostKey).setValue(i_Post);
+            onSuccessToCreatePost();
+        } catch (Exception exception) {
+            onFailureToCreatePost(exception);
+        }
     }
 
-    public boolean isUserLoggedIn()
-    {
-        return m_FirebaseAuth.getCurrentUser() != null;
+    @Override
+    public void onSuccessToCreatePost() {
+        ((IPostCreationResponseEventHandler)viewModel).onSuccessToCreatePost();
+    }
+
+    @Override
+    public void onFailureToCreatePost(Exception i_Reason) {
+        ((IPostCreationResponseEventHandler)viewModel).onFailureToCreatePost(i_Reason);
+    }
+
+
+
+    /*
+    ****************************************************************************************************
+                                             Common Functions
+    ****************************************************************************************************
+    */
+
+    public boolean isCurrentUserAnonymous() { return this.m_CurrentUser.isAnonymous(); }
+
+    public boolean isUserLoggedIn() { return m_FirebaseAuth.getCurrentUser() != null; }
+
+    public String getCurrentUserUID() {
+        return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid();
     }
 }
