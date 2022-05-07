@@ -160,7 +160,8 @@ public class RegisterFragment extends Fragment implements IView,
     @Override
     public void onSuccessToSignup()
     {
-        Toast.makeText(this.m_Context, "The user has been successfully registered !", Toast.LENGTH_SHORT).show();
+        getParentFragmentManager().popBackStack();
+        onRegisteredListener.onRegistered();
     }
 
     @Override

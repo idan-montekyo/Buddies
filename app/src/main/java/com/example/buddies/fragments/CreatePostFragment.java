@@ -41,6 +41,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.time.MonthDay;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+
 public class CreatePostFragment extends Fragment implements IView,
                                                             ILocationSelect_EventHandler,
                                                             OnMapReadyCallback,
@@ -99,6 +104,7 @@ public class CreatePostFragment extends Fragment implements IView,
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -190,11 +196,15 @@ public class CreatePostFragment extends Fragment implements IView,
                 } else {
 
                     // TODO: save post to DataBase and notify to refresh adapter.
-                    Post newPost = new Post(userUID, cityInput, streetInput, timeInput,
-                                            m_SelectedLocation, contentInput);
-                    m_ViewModel.onRequestToCreatePost(requireContext(), newPost);
 
-                    getParentFragmentManager().popBackStack();
+                    ZoneId zoneId = ZoneId.of("Israel");
+                    int year = (Year.now(zoneId)).getValue();
+                    int month = (YearMonth.now(zoneId)).getMonthValue();
+                    int day = (MonthDay.now(zoneId)).getDayOfMonth();
+
+                    Post newPost = new Post(userUID, cityInput, streetInput, timeInput,
+                                            m_SelectedLocation, contentInput, year, month, day);
+                    m_ViewModel.onRequestToCreatePost(requireContext(), newPost);
                 }
             }
         });
@@ -276,6 +286,7 @@ public class CreatePostFragment extends Fragment implements IView,
 
     @Override
     public void onSuccessToCreatePost() {
+        getParentFragmentManager().popBackStack();
         onUploadListener.onUpload();
     }
 

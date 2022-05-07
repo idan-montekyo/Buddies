@@ -1,17 +1,12 @@
 package com.example.buddies.common;
 
-import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Date;
 
 public class Post {
 
@@ -21,22 +16,45 @@ public class Post {
     String meetingTime;
     LatLng meetingLocation;
     String postContent;
-    // TODO: add postCreationDate. (LocalDate won't work with FireBase)
     LocalTime postCreationTime;
+    PostCreationDate postCreationDate;
+    long postCreationDateTimeAsLong;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Post(String creatorUserUID, String meetingCity, String meetingStreet,
-                String meetingTime, LatLng meetingLocation, String postContent) {
+    public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
+                String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent,
+                int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay) {
 
-        this.creatorUserUID = creatorUserUID;
-        this.meetingCity = meetingCity;
-        this.meetingStreet = meetingStreet;
-        this.meetingTime = meetingTime;
-        this.meetingLocation = meetingLocation;
-        this.postContent = postContent;
-
-        // TODO: add postCreationDate. (LocalDate won't work with FireBase)
+        this.creatorUserUID = i_CreatorUserUID;
+        this.meetingCity = i_MeetingCity;
+        this.meetingStreet = i_MeetingStreet;
+        this.meetingTime = i_MeetingTime;
+        this.meetingLocation = i_MeetingLocation;
+        this.postContent = i_PostContent;
+        // Gets current time based on user's current location.
         this.postCreationTime = LocalTime.now();
+        // Initialize date holder class.
+        this.postCreationDate = new PostCreationDate(i_PostCreationYear, i_PostCreationMonth,
+                                                     i_PostCreationDay);
+
+        // Creating a long representing YYYY-MM-DD-HH-MM-SS for more convenient comparisons.
+        // Meaning - newer posts will have higher value, and older posts will have lower value.
+        String yearAsString = String.valueOf(i_PostCreationYear);
+        String monthAsString = i_PostCreationMonth > 10 ?
+                String.valueOf(i_PostCreationMonth) : "0" + String.valueOf(i_PostCreationMonth);
+        String dayAsString = i_PostCreationDay > 10 ?
+                String.valueOf(i_PostCreationDay) : "0" + String.valueOf(i_PostCreationDay);
+        String hourAsString = this.postCreationTime.getHour() > 10 ?
+                String.valueOf(this.postCreationTime.getHour()) :
+                "0" + String.valueOf(this.postCreationTime.getHour());
+        String minuteAsString = this.postCreationTime.getMinute() > 10 ?
+                String.valueOf(this.postCreationTime.getMinute()) :
+                "0" + String.valueOf(this.postCreationTime.getMinute());
+        String secondAsString = this.postCreationTime.getSecond() > 10 ?
+                String.valueOf(this.postCreationTime.getSecond()) :
+                "0" + String.valueOf(this.postCreationTime.getSecond());
+        this.postCreationDateTimeAsLong = Long.parseLong(yearAsString + monthAsString + dayAsString
+                                                         + hourAsString + minuteAsString + secondAsString);
     }
 
     // Getters
@@ -47,6 +65,8 @@ public class Post {
     public LatLng getMeetingLocation() { return meetingLocation; }
     public String getPostContent() { return postContent; }
     public LocalTime getPostCreationTime() { return postCreationTime; }
+    public PostCreationDate getPostCreationDate() { return postCreationDate; }
+    public long getPostCreationDateTimeAsLong() { return postCreationDateTimeAsLong; }
 
     // Setters
     public void setMeetingCity(String meetingCity) { this.meetingCity = meetingCity; }
