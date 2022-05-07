@@ -1,5 +1,6 @@
 package com.example.buddies.fragments;
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -37,13 +38,14 @@ public class RegisterFragment extends Fragment implements IView,
     }
 
     public IOnRegisteredListener onRegisteredListener;
+    private Context m_Context = null;
 
     // Initialize onRegisteredListener.
     @Override
-    public void onAttach(@NonNull Context context) {
+    public void onAttach(@NonNull Context context)
+    {
+        this.m_Context = context;
         super.onAttach(context);
-
-        this.m_ViewModel.registerForEvents((IView) this);
 
         Fragment loginFragment = getParentFragmentManager().findFragmentByTag(LOGIN_FRAGMENT_TAG);
         try {
@@ -60,6 +62,13 @@ public class RegisterFragment extends Fragment implements IView,
 
         View view = inflater.inflate(R.layout.fragment_register, container, false);
         return view;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        this.m_ViewModel.registerForEvents((IView) this);
+        super.onCreate(savedInstanceState);
     }
 
     // Confirm all fields are filled, Confirm username not taken, Add new user to DataBase.
@@ -135,7 +144,7 @@ public class RegisterFragment extends Fragment implements IView,
                 */
 
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "calling onRequestToSignup()");
-                ViewModel.getInstance().onRequestToSignup(requireContext(), usernameInput, passwordInput, fullNameInput, tempAgeInput, dogGenderInput);
+                ViewModel.getInstance().onRequestToSignup(RegisterFragment.this.m_Context, usernameInput, passwordInput, fullNameInput, tempAgeInput, dogGenderInput);
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "returned from onRequestToSignup()");
             }
         });
@@ -144,13 +153,20 @@ public class RegisterFragment extends Fragment implements IView,
     @Override
     public void onSuccessToSignup()
     {
-        Toast.makeText(requireContext(), "The user has been successfully registered !", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.m_Context, "The user has been successfully registered !", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onFailureToSignup(Exception i_Reason)
     {
         AppUtils.printDebugToLogcat("RegisterFragment", "onFailureToSignup", i_Reason.toString());
-        Toast.makeText(requireContext(), i_Reason.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(this.m_Context, i_Reason.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        this.m_ViewModel.unregisterForEvents((IView) this);
+        super.onDestroy();
     }
 }

@@ -21,6 +21,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
@@ -67,7 +68,7 @@ public class HomeFragment extends Fragment implements IView,
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-        // Source (Tash Pemhiwa) - https://stackoverflow.com/questions/18133443/fragments-onoptionsitemselected-doesnt-get-called
+        // (Source: https://stackoverflow.com/questions/18133443/fragments-onoptionsitemselected-doesnt-get-called)
         setHasOptionsMenu(true);
         actionBar.setTitle("");
 
@@ -80,7 +81,15 @@ public class HomeFragment extends Fragment implements IView,
 
         m_drawerLayout = view.findViewById(R.id.home_drawer_layout);
         m_navigationView = view.findViewById(R.id.home_navigation_view);
+
         m_coordinatorLayout = view.findViewById(R.id.home_coordinator_layout);
+
+        if (Model.getInstance().isCurrentUserAnonymous() == true)
+        {
+            m_navigationView.getMenu().removeItem(R.id.menu_my_posts);
+            m_navigationView.getMenu().removeItem(R.id.menu_posts_i_commented_on);
+            m_navigationView.getMenu().removeItem(R.id.menu_my_profile);
+        }
 
         m_navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @SuppressLint("NonConstantResourceId")

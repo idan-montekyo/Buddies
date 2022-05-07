@@ -19,7 +19,7 @@
     <string name="new_post">פוסט חדש</string>
     <string name="city">עיר</string>
     <string name="street">רחוב</string>
-    <string name="time">זמן</string>
+    <string name="pick_time">בחר זמן</string>
     <string name="content">תוכן</string>
     <string name="upload">העלה</string>
     <string name="options">אפשרויות</string>
@@ -30,4 +30,5 @@
     <string name="log_out">התנתקות</string>
     <string name="pick_location">בחר מיקום</string>
     <string name="pick">בחר</string>
+    <string name="time">זמן</string>
 </resources>

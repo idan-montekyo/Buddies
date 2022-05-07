@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.buddies.R;
+import com.google.firebase.auth.FirebaseUser;
 
 public class AppUtils
 {
@@ -99,6 +100,8 @@ public class AppUtils
                 reader.close();
 
                 final JSONObject jObj = new JSONObject(buffer.toString());
+
+                // Read the data from the google maps response (Source: https://stackoverflow.com/questions/29439754/parsing-json-from-the-google-maps-distancematrix-api-in-android)
                 JSONArray items = jObj.getJSONArray("results");
                 JSONObject firstAddress = items.getJSONObject(0);
                 JSONArray addressComponentsAsJsonArray = firstAddress.getJSONArray("address_components");

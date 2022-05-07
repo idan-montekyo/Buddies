@@ -1,6 +1,8 @@
 package com.example.buddies.fragments;
 
+import android.app.TimePickerDialog;
 import android.content.Context;
+import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,8 +38,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class CreatePostFragment extends Fragment implements IView,
-                                                            ILocationSelect_EventHandler,
-                                                            OnMapReadyCallback {
+        ILocationSelect_EventHandler,
+        OnMapReadyCallback, TimePickerDialog.OnTimeSetListener {
 
     public final String HOME_FRAGMENT_TAG = "home_fragment";
     public final String CREATE_POST_FRAGMENT_TAG = "create_post_fragment";
@@ -50,6 +53,7 @@ public class CreatePostFragment extends Fragment implements IView,
 
     TextView m_cityTv;
     TextView m_streetTv;
+    TextView m_timeTv;
 
     GoogleMap m_GoogleMap;
     Marker m_CurrMarker;
@@ -131,9 +135,27 @@ public class CreatePostFragment extends Fragment implements IView,
             }
         });
 
+        Button pickTimeBtn = (Button) view.findViewById(R.id.create_post_pick_time_button);
+        pickTimeBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v)
+            {
+                Calendar c = Calendar.getInstance();
+                int hour = c.get(Calendar.HOUR_OF_DAY);
+                int minute = c.get(Calendar.MINUTE);
+
+                TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(), android.R.style.Theme_Holo_Light_Dialog_NoActionBar, CreatePostFragment.this, hour, minute, true);
+                timePickerDialog.setTitle(R.string.pick_time);
+                timePickerDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                timePickerDialog.show();
+            }
+        });
+
         m_cityTv = view.findViewById(R.id.create_post_city_output);
         m_streetTv = view.findViewById(R.id.create_post_street_output);
-        EditText timeEt = view.findViewById(R.id.create_post_time_input);
+        m_timeTv = (TextView) view.findViewById(R.id.create_post_time_output);
         EditText contentEt = view.findViewById(R.id.create_post_content_input);
 
         Button uploadBtn = view.findViewById(R.id.create_post_upload_button);
@@ -143,7 +165,7 @@ public class CreatePostFragment extends Fragment implements IView,
 
                 String cityInput = m_cityTv.getText().toString();
                 String streetInput = m_streetTv.getText().toString();
-                String timeInput = timeEt.getText().toString();
+                String timeInput = m_timeTv.getText().toString();
                 String contentInput = contentEt.getText().toString();
 
                 if(cityInput.equals("") || streetInput.equals("") ||
@@ -161,8 +183,8 @@ public class CreatePostFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onLocationSelected(LatLng i_SelectedLocation) {
-
+    public void onLocationSelected(LatLng i_SelectedLocation)
+    {
         m_SelectedLocation = i_SelectedLocation;
 
         new Thread(new Runnable() {
@@ -175,7 +197,6 @@ public class CreatePostFragment extends Fragment implements IView,
 
                 // Update the Activity's TextView
                 m_MainActivityHandlerFromRemoteThreads.post(new Runnable() {
-
                     @Override
                     public void run() {
 
@@ -212,5 +233,11 @@ public class CreatePostFragment extends Fragment implements IView,
 
         // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
         m_GoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(m_SelectedLocation, 14f));
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute)
+    {
+        m_timeTv.setText(String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
     }
 }

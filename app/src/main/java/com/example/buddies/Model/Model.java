@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
+import com.example.buddies.enums.eOnAuthStateChangedCaller;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutRequestEventHandler;
@@ -19,6 +20,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -34,11 +36,13 @@ public class Model implements IModel,
     IViewModel viewModel = null;
 
     private FirebaseAuth m_FirebaseAuth;
+    private FirebaseUser m_CurrentUser = null;
     FirebaseAuth.AuthStateListener m_AuthStateListener;
-    FirebaseAuth.AuthStateListener m_LogoutListener;
 
     FirebaseDatabase m_DatabaseReference = null;
     DatabaseReference m_UsersTable = null;
+
+    eOnAuthStateChangedCaller m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
 
     private Model()
     {
@@ -49,7 +53,31 @@ public class Model implements IModel,
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
             {
-                AppUtils.printDebugToLogcat("", "", "breakpoint");
+                Model.this.m_CurrentUser = Model.this.m_FirebaseAuth.getCurrentUser();
+
+                switch (Model.this.m_OnAuthStateChangedCaller)
+                {
+                    case SIGN_UP:
+                        Model.this.m_CurrentUser = null;
+                        break;
+                    case LOG_IN:
+                        Model.this.onSuccessToLogin();
+                        break;
+                    case LOG_IN_ANONYMOUSLY:
+                        Model.this.onSuccessToAnonymousLogin();
+                        break;
+                    case LOG_OUT:
+                        Model.this.onSuccessToLogout();
+                        break;
+                    case UNINITIALIZED:
+                    default:
+                        break;
+                }
+
+                // TODO: Think if we need the user name...
+                // String currentUserName = Model.this.m_CurrentUser.getDisplayName();
+                AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "current user is: " + m_CurrentUser);
+                Model.this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
             }
         };
 
@@ -91,7 +119,9 @@ public class Model implements IModel,
     {
         try
         {
+            this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.SIGN_UP;
             AppUtils.printDebugToLogcat("Model", "onRequestToSignup", "trying to sign up the desired user ...");
+
             Task<AuthResult> signupHandler = this.m_FirebaseAuth.createUserWithEmailAndPassword(i_UserName + "@Buddies.com", i_Password);
             signupHandler.addOnCompleteListener(new OnCompleteListener<AuthResult>()
             {
@@ -108,6 +138,9 @@ public class Model implements IModel,
 
                             // Save the extra details of the user in the database too.
                             Model.this.m_UsersTable.child(currentUserId).setValue(currentUserProfile);
+
+                            // Logout in order to force the user to re-enter it's credentials in order to sign in
+                            Model.this.m_FirebaseAuth.signOut();
 
                             // Notify that the signup process has been successfully accomplished.
                             Model.this.onSuccessToSignup();
@@ -155,19 +188,15 @@ public class Model implements IModel,
         // firebase code here
         try
         {
+            this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_IN;
             Task<AuthResult> loginHandler = this.m_FirebaseAuth.signInWithEmailAndPassword(i_UserName + "@Buddies.com", i_Password);
             loginHandler.addOnCompleteListener(new OnCompleteListener<AuthResult>()
             {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task)
                 {
-                    if (task.isSuccessful() == true)
+                    if (task.isSuccessful() == false)
                     {
-                        Model.this.onSuccessToLogin();
-                    }
-                    else
-                    {
-                        // Model.this.onFailureToLogin(new Exception("An error occured while trying to login to the system.\nPlease retry or contact our support."));
                         Model.this.onFailureToLogin(task.getException());
                     }
                 }
@@ -205,8 +234,8 @@ public class Model implements IModel,
         // firebase code here
         try
         {
+            this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_IN_ANONYMOUSLY;
             this.m_FirebaseAuth.signInAnonymously();
-            this.onSuccessToAnonymousLogin();
         }
         catch (Exception err)
         {
@@ -239,35 +268,11 @@ public class Model implements IModel,
     {
         // TODO: Decide later what to do with the use case of logging out when the WiFi and either the Mobile Data
         //       both turned off.
-        /*
-        if (this.m_LogoutListener == null)
-        {
-            // Initialize the listener
-            this.m_LogoutListener = new FirebaseAuth.AuthStateListener()
-            {
-                @Override
-                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
-                {
-                    if (firebaseAuth.getCurrentUser() == null)
-                    {
-                        Model.this.onSuccessToLogout();
-                    }
-                    else
-                    {
-                        Model.this.onFailureToLogout(new Exception("Couldn't log you out"));
-                    }
-                }
-            };
-
-            // Register the listener
-            this.m_FirebaseAuth.addAuthStateListener(this.m_LogoutListener);
-        }
-        */
-
         try
         {
+            this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_OUT;
             this.m_FirebaseAuth.signOut();
-            this.onSuccessToLogout();
+            // anonymousLoginHasBeenRequested = null;
         }
         catch (Exception err)
         {
@@ -286,5 +291,15 @@ public class Model implements IModel,
     {
         // if firebase logout failed
         ((ILogoutResponsesEventHandler)this.viewModel).onFailureToLogout(i_Reason);
+    }
+
+    public boolean isCurrentUserAnonymous()
+    {
+        return this.m_CurrentUser.isAnonymous();
+    }
+
+    public boolean isUserLoggedIn()
+    {
+        return m_FirebaseAuth.getCurrentUser() != null;
     }
 }
