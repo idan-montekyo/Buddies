@@ -84,11 +84,31 @@ public class HomeFragment extends Fragment implements IView,
 
         m_coordinatorLayout = view.findViewById(R.id.home_coordinator_layout);
 
+        FloatingActionButton createPostFAB = view.findViewById(R.id.home_fab);
+        createPostFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
+                assert thisFragment != null;
+                getParentFragmentManager().beginTransaction()
+                        .setCustomAnimations(
+                                R.anim.slide_in,  // enter
+                                R.anim.fade_out,  // exit
+                                R.anim.fade_in,   // popEnter
+                                R.anim.slide_out) // popExit
+                        .hide(thisFragment)
+                        .add(R.id.root_main_activity, new CreatePostFragment(), CREATE_POST_FRAGMENT_TAG)
+                        .addToBackStack(null).commit();
+            }
+        });
+
         if (Model.getInstance().isCurrentUserAnonymous() == true)
         {
             m_navigationView.getMenu().removeItem(R.id.menu_my_posts);
             m_navigationView.getMenu().removeItem(R.id.menu_posts_i_commented_on);
             m_navigationView.getMenu().removeItem(R.id.menu_my_profile);
+
+            createPostFAB.setVisibility(View.GONE);
         }
 
         m_navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -138,24 +158,6 @@ public class HomeFragment extends Fragment implements IView,
                 } else { // Some string in SearchEt
                     Toast.makeText(requireContext(), searchEt.getText().toString(), Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-
-        FloatingActionButton createPostFAB = view.findViewById(R.id.home_fab);
-        createPostFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
-                assert thisFragment != null;
-                getParentFragmentManager().beginTransaction()
-                        .setCustomAnimations(
-                                R.anim.slide_in,  // enter
-                                R.anim.fade_out,  // exit
-                                R.anim.fade_in,   // popEnter
-                                R.anim.slide_out) // popExit
-                        .hide(thisFragment)
-                        .add(R.id.root_main_activity, new CreatePostFragment(), CREATE_POST_FRAGMENT_TAG)
-                        .addToBackStack(null).commit();
             }
         });
     }
