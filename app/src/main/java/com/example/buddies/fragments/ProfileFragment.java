@@ -48,7 +48,7 @@ import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
 
-    public final String HOME_FRAGMENT_TAG = "home_fragment";
+    public  static final String PROFILE_FRAGMENT_TAG = "profile_fragment";
 
     ActivityResultLauncher<Intent> takePictureActivityResultLauncher;
     ActivityResultLauncher<String> pickFromGalleryActivityResultLauncher;
@@ -76,7 +76,7 @@ public class ProfileFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
-        Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
+        Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HomeFragment.HOME_FRAGMENT_TAG);
         try {
             onSaveListener = (IOnSaveListener) homeFragment;
         } catch (ClassCastException ex) {

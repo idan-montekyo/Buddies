@@ -24,9 +24,7 @@ public class LoginFragment extends Fragment implements IView,
                                                        RegisterFragment.IOnRegisteredListener,
                                                        ILoginResponsesEventHandler
 {
-    public final String LOGIN_FRAGMENT_TAG = "login_fragment";
-    public final String REGISTER_FRAGMENT_TAG = "register_fragment";
-    public final String HOME_FRAGMENT_TAG = "home_fragment";
+    public static final String LOGIN_FRAGMENT_TAG = "login_fragment";
 
     CoordinatorLayout loginCoordinatorLayout;
     ViewModel m_ViewModel = ViewModel.getInstance();
@@ -70,7 +68,7 @@ public class LoginFragment extends Fragment implements IView,
                                 R.anim.fade_in,   // popEnter
                                 R.anim.slide_out) // popExit
                         .hide(thisFragment)
-                        .add(R.id.root_main_activity, new RegisterFragment(), REGISTER_FRAGMENT_TAG)
+                        .add(R.id.root_main_activity, new RegisterFragment(), RegisterFragment.REGISTER_FRAGMENT_TAG)
                         .addToBackStack(null).commit();
             }
         });
@@ -140,7 +138,7 @@ public class LoginFragment extends Fragment implements IView,
                         R.anim.fade_out,  // exit
                         R.anim.fade_in,   // popEnter
                         R.anim.slide_out) // popExit
-                .replace(R.id.root_main_activity, new HomeFragment(), HOME_FRAGMENT_TAG)
+                .replace(R.id.root_main_activity, new HomeFragment(), HomeFragment.HOME_FRAGMENT_TAG)
                 .commit();
     }
 

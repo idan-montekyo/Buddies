@@ -1,6 +1,7 @@
 package com.example.buddies.Model;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -49,6 +50,7 @@ public class Model implements IModel,
 
     FirebaseDatabase m_DatabaseReference = null;
     DatabaseReference m_UsersTable = null;
+    boolean m_IsFirstLoad = true;
     DatabaseReference m_PostsTable = null;
 
     eOnAuthStateChangedCaller m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
@@ -63,6 +65,16 @@ public class Model implements IModel,
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
             {
                 Model.this.m_CurrentUser = Model.this.m_FirebaseAuth.getCurrentUser();
+
+                // If this is the first load of the application
+                if (m_IsFirstLoad == true)
+                {
+                    AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "This is the first load of the \"Model\" component.\nAt this point, the current user is \"" + Model.this.m_CurrentUser + "\"");
+
+                    // Do not notify anyone (whether a user is signed in or not) and just return
+                    m_IsFirstLoad = !m_IsFirstLoad;
+                    return;
+                }
 
                 switch (Model.this.m_OnAuthStateChangedCaller)
                 {
@@ -86,6 +98,7 @@ public class Model implements IModel,
                 // TODO: Think if we need the user name...
                 // String currentUserName = Model.this.m_CurrentUser.getDisplayName();
                 AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "current user is: " + m_CurrentUser);
+                AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "traceback: " + Log.getStackTraceString(new Exception()));
                 Model.this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
             }
         };
@@ -333,17 +346,20 @@ public class Model implements IModel,
         ((IPostCreationResponseEventHandler)viewModel).onFailureToCreatePost(i_Reason);
     }
 
+    public boolean isUserLoggedIn() {
+        return this.m_CurrentUser != null;
+    }
 
+    public boolean isCurrentUserAnonymous()
+    {
+        return this.m_CurrentUser.isAnonymous();
+    }
 
     /*
     ****************************************************************************************************
                                              Common Functions
     ****************************************************************************************************
     */
-
-    public boolean isCurrentUserAnonymous() { return this.m_CurrentUser.isAnonymous(); }
-
-    public boolean isUserLoggedIn() { return m_FirebaseAuth.getCurrentUser() != null; }
 
     public String getCurrentUserUID() {
         return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid();

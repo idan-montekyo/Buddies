@@ -27,7 +27,7 @@ import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 public class RegisterFragment extends Fragment implements IView,
                                                           ISignupResponsesEventHandler
 {
-    public final String LOGIN_FRAGMENT_TAG = "login_fragment";
+    public static final String REGISTER_FRAGMENT_TAG = "register_fragment";
     private final ViewModel m_ViewModel = ViewModel.getInstance();
 
     RadioGroup m_radioGroup;
@@ -47,7 +47,7 @@ public class RegisterFragment extends Fragment implements IView,
         this.m_Context = context;
         super.onAttach(context);
 
-        Fragment loginFragment = getParentFragmentManager().findFragmentByTag(LOGIN_FRAGMENT_TAG);
+        Fragment loginFragment = getParentFragmentManager().findFragmentByTag(LoginFragment.LOGIN_FRAGMENT_TAG);
         try {
             onRegisteredListener = (IOnRegisteredListener)loginFragment;
         } catch (ClassCastException ex) {

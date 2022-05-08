@@ -35,11 +35,7 @@ public class HomeFragment extends Fragment implements IView,
                                                       ProfileFragment.IOnSaveListener,
                                                       ILogoutResponsesEventHandler
 {
-    public final String LOGIN_FRAGMENT_TAG = "login_fragment";
-    public final String REGISTER_FRAGMENT_TAG = "register_fragment";
-    public final String PROFILE_FRAGMENT_TAG = "profile_fragment";
-    public final String HOME_FRAGMENT_TAG = "home_fragment";
-    public final String CREATE_POST_FRAGMENT_TAG = "create_post_fragment";
+    public static final String HOME_FRAGMENT_TAG = "home_fragment";
 
     DrawerLayout m_drawerLayout;
     NavigationView m_navigationView;
@@ -68,6 +64,7 @@ public class HomeFragment extends Fragment implements IView,
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
         // (Source: https://stackoverflow.com/questions/18133443/fragments-onoptionsitemselected-doesnt-get-called)
         setHasOptionsMenu(true);
         actionBar.setTitle("");
@@ -97,7 +94,7 @@ public class HomeFragment extends Fragment implements IView,
                                 R.anim.fade_in,   // popEnter
                                 R.anim.slide_out) // popExit
                         .hide(thisFragment)
-                        .add(R.id.root_main_activity, new CreatePostFragment(), CREATE_POST_FRAGMENT_TAG)
+                        .add(R.id.root_main_activity, new CreatePostFragment(), CreatePostFragment.CREATE_POST_FRAGMENT_TAG)
                         .addToBackStack(null).commit();
             }
         });
@@ -130,7 +127,7 @@ public class HomeFragment extends Fragment implements IView,
                                         R.anim.fade_in,   // popEnter
                                         R.anim.slide_out) // popExit
                                 .hide(thisFragment)
-                                .add(R.id.root_main_activity, new ProfileFragment(), PROFILE_FRAGMENT_TAG)
+                                .add(R.id.root_main_activity, new ProfileFragment(), ProfileFragment.PROFILE_FRAGMENT_TAG)
                                 .addToBackStack(null).commit();
                         break;
                     case R.id.menu_my_posts:
@@ -193,7 +190,7 @@ public class HomeFragment extends Fragment implements IView,
     {
         getParentFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.slide_out, R.anim.fade_out)
-                .replace(R.id.root_main_activity, new LoginFragment(), LOGIN_FRAGMENT_TAG)
+                .replace(R.id.root_main_activity, new LoginFragment(), LoginFragment.LOGIN_FRAGMENT_TAG)
                 .commit();
     }
 

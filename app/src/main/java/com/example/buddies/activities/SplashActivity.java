@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.buddies.R;
+import com.example.buddies.ViewModel.ViewModel;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
@@ -32,7 +33,13 @@ public class SplashActivity extends AppCompatActivity {
         new Thread() {
             @Override
             public void run() {
-                try { sleep(2500); }
+                try
+                {
+                    // Start Initializing the ViewModel and the Model
+                    ViewModel.getInstance();
+
+                    sleep(2500);
+                }
                 catch (InterruptedException e) { e.printStackTrace(); }
                 finally {
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);

@@ -9,24 +9,39 @@ import android.os.Looper;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.buddies.Model.Model;
 import com.example.buddies.R;
+import com.example.buddies.ViewModel.ViewModel;
+import com.example.buddies.fragments.HomeFragment;
 import com.example.buddies.fragments.LoginFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    public final String LOGIN_FRAGMENT_TAG = "login_fragment";
-
     boolean m_doubleBackToExitPressedOnce = false;
     Toast m_backToast;
+    private ViewModel m_ViewModel = ViewModel.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Add Login-Fragment.
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.root_main_activity, new LoginFragment(), LOGIN_FRAGMENT_TAG).commit();
+        if (Model.getInstance().isUserLoggedIn() == true)
+        {
+            // Add Login-Fragment.
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.root_main_activity, new HomeFragment(), HomeFragment.HOME_FRAGMENT_TAG)
+                    .commit();
+        }
+        else
+        {
+            // Add Login-Fragment.
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.root_main_activity, new LoginFragment(), LoginFragment.LOGIN_FRAGMENT_TAG)
+                    .commit();
+        }
     }
 
     // Requires double-back-press to exit while in Login/Home fragments.

@@ -53,8 +53,7 @@ public class CreatePostFragment extends Fragment implements IView,
                                                             IPostCreationResponseEventHandler
 {
 
-    public final String HOME_FRAGMENT_TAG = "home_fragment";
-    public final String CREATE_POST_FRAGMENT_TAG = "create_post_fragment";
+    public static final String CREATE_POST_FRAGMENT_TAG = "create_post_fragment";
 
     ViewModel m_ViewModel = ViewModel.getInstance();
 
@@ -82,7 +81,7 @@ public class CreatePostFragment extends Fragment implements IView,
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
-        Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
+        Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HomeFragment.HOME_FRAGMENT_TAG);
         try {
             onUploadListener = (IOnUploadListener) homeFragment;
         } catch (ClassCastException ex) {

@@ -38,7 +38,7 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     Marker currMarker;
     LatLng currentLatLng = null;
 
-    public static final String SELECT_LOCATION_FRAGMENT_TAG = "Fragment_SelectLocation";
+    public static final String SELECT_LOCATION_FRAGMENT_TAG = "select_location_fragment";
 
     @Override
     public void onAttach(@NonNull Context context)
