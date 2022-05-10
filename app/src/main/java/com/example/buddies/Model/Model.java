@@ -105,8 +105,6 @@ public class Model implements IModel,
                         break;
                 }
 
-                // TODO: Think if we need the user name...
-                // String currentUserName = Model.this.m_CurrentUser.getDisplayName();
                 AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "current user is: " + m_CurrentUser);
                 AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "traceback: " + Log.getStackTraceString(new Exception()));
                 Model.this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
@@ -171,6 +169,11 @@ public class Model implements IModel,
     {
         try
         {
+            if (this.areRegisterDetailsValid(i_UserName, i_Password, i_FullName, i_Age, i_DogGender) == false) {
+                throw new Exception("Fill in all required details");
+            } else if (AppUtils.isNetworkAvailable(i_Context) == false) {
+                throw new Exception("No internet access");
+            }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.SIGN_UP;
             AppUtils.printDebugToLogcat("Model", "onRequestToSignup", "trying to sign up the desired user ...");
 
@@ -235,11 +238,14 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToLogin(String i_UserName, String i_Password)
+    public void onRequestToLogin(Context i_Context, String i_UserName, String i_Password)
     {
         // firebase code here
         try
         {
+            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+                throw new Exception("No internet access");
+            }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_IN;
             Task<AuthResult> loginHandler = this.m_FirebaseAuth.signInWithEmailAndPassword(i_UserName + "@Buddies.com", i_Password);
             loginHandler.addOnCompleteListener(new OnCompleteListener<AuthResult>()
@@ -281,11 +287,14 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToAnonymousLogin()
+    public void onRequestToAnonymousLogin(Context i_Context)
     {
         // firebase code here
         try
         {
+            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+                throw new Exception("No internet access");
+            }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_IN_ANONYMOUSLY;
             this.m_FirebaseAuth.signInAnonymously();
         }
@@ -316,12 +325,15 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToLogout()
+    public void onRequestToLogout(Context i_Context)
     {
         // TODO: Decide later what to do with the use case of logging out when the WiFi and either the Mobile Data
         //       both turned off.
         try
         {
+            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+                throw new Exception("No internet access");
+            }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_OUT;
             this.m_FirebaseAuth.signOut();
         }
@@ -442,5 +454,14 @@ public class Model implements IModel,
 
     public String getCurrentUserUID() {
         return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid();
+    }
+
+    public boolean areRegisterDetailsValid(String i_UserName, String i_Password,
+                                           String i_FullName, String i_age, eDogGender i_DogGender) {
+        if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("") || i_age.equals("")
+         || i_DogGender == eDogGender.UNINITIALIZED) {
+            return false;
+        }
+        return true;
     }
 }

@@ -10,8 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -156,7 +154,7 @@ public class HomeFragment extends Fragment implements IView,
                     case R.id.menu_settings:
                         break;
                     case R.id.menu_log_out:
-                        HomeFragment.this.m_ViewModel.onRequestToLogout();
+                        HomeFragment.this.m_ViewModel.onRequestToLogout(m_Context);
                         break;
                 }
 

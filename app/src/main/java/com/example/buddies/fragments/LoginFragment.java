@@ -1,5 +1,6 @@
 package com.example.buddies.fragments;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -28,6 +29,14 @@ public class LoginFragment extends Fragment implements IView,
 
     CoordinatorLayout loginCoordinatorLayout;
     ViewModel m_ViewModel = ViewModel.getInstance();
+
+    Context m_Context;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        m_Context = context;
+        super.onAttach(context);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -82,7 +91,7 @@ public class LoginFragment extends Fragment implements IView,
                 String i_UserName = usernameEt.getText().toString();
                 String i_Password = passwordEt.getText().toString();
 
-                LoginFragment.this.m_ViewModel.onRequestToLogin(i_UserName, i_Password);
+                LoginFragment.this.m_ViewModel.onRequestToLogin(m_Context, i_UserName, i_Password);
             }
         });
 
@@ -91,7 +100,7 @@ public class LoginFragment extends Fragment implements IView,
         {
             @Override
             public void onClick(View v) {
-                LoginFragment.this.m_ViewModel.onRequestToAnonymousLogin();
+                LoginFragment.this.m_ViewModel.onRequestToAnonymousLogin(m_Context);
             }
         });
     }

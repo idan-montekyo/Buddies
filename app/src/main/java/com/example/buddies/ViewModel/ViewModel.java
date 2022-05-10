@@ -91,9 +91,9 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToLogin(String i_UserName, String i_Password)
+    public void onRequestToLogin(Context i_Context, String i_UserName, String i_Password)
     {
-        this.m_Model.onRequestToLogin(i_UserName, i_Password);
+        this.m_Model.onRequestToLogin(i_Context, i_UserName, i_Password);
     }
 
     @Override
@@ -127,7 +127,9 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToAnonymousLogin() { this.m_Model.onRequestToAnonymousLogin(); }
+    public void onRequestToAnonymousLogin(Context i_Context) {
+        this.m_Model.onRequestToAnonymousLogin(i_Context);
+    }
 
     @Override
     public void onSuccessToAnonymousLogin()
@@ -160,9 +162,9 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToLogout()
+    public void onRequestToLogout(Context i_Context)
     {
-        this.m_Model.onRequestToLogout();
+        this.m_Model.onRequestToLogout(i_Context);
     }
 
     @Override

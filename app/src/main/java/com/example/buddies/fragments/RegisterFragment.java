@@ -120,29 +120,6 @@ public class RegisterFragment extends Fragment implements IView,
                     dogGenderInput = eDogGender.valueOf(dogGenderLabel.toUpperCase());
                 }
 
-                /*
-
-                // TODO: The code below should be changed / moved from here to viewmodel / model / other locations.
-
-                if(usernameInput.equals("") || passwordInput.equals("")
-                        || fullNameInput.equals("") || tempAgeInput.equals("")) {
-
-                    Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                }
-                // TODO: confirm 'username' field is not already taken.
-                // else if(usernameInput *ALREADY IN DB*) {
-                //     Toast.makeText(requireContext(), "Username already taken", Toast.LENGTH_LONG).show();
-                // }
-                else {
-
-                    int ageInput = Integer.parseInt(tempAgeInput);
-                    // TODO: add username, password, full-name, age info to DataBase.
-
-                    getParentFragmentManager().popBackStack();
-                    onRegisteredListener.onRegistered();
-                }
-                */
-
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "calling onRequestToSignup()");
                 m_ViewModel.onRequestToSignup(RegisterFragment.this.m_Context, usernameInput, passwordInput, fullNameInput, tempAgeInput, dogGenderInput);
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "returned from onRequestToSignup()");
