@@ -3,6 +3,8 @@ package com.example.buddies.common;
 import android.content.Context;
 import android.content.res.Resources;
 import android.icu.text.SimpleDateFormat;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
@@ -207,5 +209,24 @@ public class AppUtils
         RadioButton selectedRadioButton = (RadioButton) i_OwnerView.findViewById(radioId);
 
         return selectedRadioButton;
+    }
+
+    /**
+     * Check if there is an available network connection (Source: https://stackoverflow.com/a/4239019/2196301)
+     * @param i_Context
+     * @return
+     */
+    public static boolean isNetworkAvailable(Context i_Context)
+    {
+        ConnectivityManager connectivityManager = (ConnectivityManager) i_Context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+
+        // If there is a connection available
+        if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnected()))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

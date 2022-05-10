@@ -17,6 +17,8 @@ import com.example.buddies.interfaces.SignupEvent.ISignupRequestEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
 import com.example.buddies.interfaces.MVVM.IViewModel;
+import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListRequestEventHandler;
+import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListResponsesEventHandler;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -31,7 +33,9 @@ public class ViewModel implements IViewModel,
                                   ISignupRequestEventHandler,
                                   ISignupResponsesEventHandler,
                                   IPostCreationRequestEventHandler,
-                                  IPostCreationResponseEventHandler
+                                  IPostCreationResponseEventHandler,
+                                  IUpdateCitiesAutocompleteListRequestEventHandler,
+                                  IUpdateCitiesAutocompleteListResponsesEventHandler
 {
     private static ViewModel _instance = null;
     // private LatLng location;
@@ -248,10 +252,42 @@ public class ViewModel implements IViewModel,
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason) {
+    public void onFailureToCreatePost(Exception i_Reason)
+    {
         for (IView view : views) {
-            if (view instanceof IPostCreationResponseEventHandler) {
+            if (view instanceof IPostCreationResponseEventHandler)
+            {
                 ((IPostCreationResponseEventHandler)view).onFailureToCreatePost(i_Reason);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestToUpdateListOfCities()
+    {
+        ((IUpdateCitiesAutocompleteListRequestEventHandler)this.m_Model).onRequestToUpdateListOfCities();
+    }
+
+    @Override
+    public void onSuccessToUpdateListOfCities(ArrayList<String> i_UpdatedListOfCities)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof IUpdateCitiesAutocompleteListResponsesEventHandler)
+            {
+                ((IUpdateCitiesAutocompleteListResponsesEventHandler)view).onSuccessToUpdateListOfCities(i_UpdatedListOfCities);
+            }
+        }
+    }
+
+    @Override
+    public void onFailureToUpdateListOfCities(Exception i_Reason)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof IUpdateCitiesAutocompleteListResponsesEventHandler)
+            {
+                ((IUpdateCitiesAutocompleteListResponsesEventHandler)view).onFailureToUpdateListOfCities(i_Reason);
             }
         }
     }

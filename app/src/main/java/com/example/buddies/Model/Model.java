@@ -20,6 +20,8 @@ import com.example.buddies.interfaces.PostCreationEvent.IPostCreationResponseEve
 import com.example.buddies.interfaces.SignupEvent.ISignupRequestEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IViewModel;
+import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListRequestEventHandler;
+import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListResponsesEventHandler;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -32,7 +34,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class Model implements IModel,
@@ -43,7 +44,9 @@ public class Model implements IModel,
                               ISignupRequestEventHandler,
                               ISignupResponsesEventHandler,
                               IPostCreationRequestEventHandler,
-                              IPostCreationResponseEventHandler
+                              IPostCreationResponseEventHandler,
+                              IUpdateCitiesAutocompleteListRequestEventHandler,
+                              IUpdateCitiesAutocompleteListResponsesEventHandler
 {
     private static Model _instance = null;
     IViewModel viewModel = null;
@@ -57,7 +60,8 @@ public class Model implements IModel,
     DatabaseReference m_UsersTable = null;
     DatabaseReference m_PostsTable = null;
     DatabaseReference m_CitiesTable = null;
-    public List<String> m_CitiesList = null;
+    DataSnapshot m_CurrentSnapshotOfCitiesTable = null;
+    ArrayList<String> m_ListOfCities = null;
 
     eOnAuthStateChangedCaller m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
 
@@ -115,19 +119,22 @@ public class Model implements IModel,
         this.m_UsersTable = m_DatabaseReference.getReference("users");
         this.m_PostsTable = m_DatabaseReference.getReference("posts");
         this.m_CitiesTable = m_DatabaseReference.getReference("cities");
-        // Load all cities in m_CitiesTable to m_CitiesList. (Source: https://www.youtube.com/watch?v=XactTKR0Wfc)
-        m_CitiesTable.addValueEventListener(new ValueEventListener() {
+
+        // Load all cities in m_CitiesTable to m_ListOfCities. (Source: https://www.youtube.com/watch?v=XactTKR0Wfc)
+        this.m_CitiesTable.addValueEventListener(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                m_CitiesList = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    m_CitiesList.add(snapshot.getKey());
-                }
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+
+                Model.this.m_CurrentSnapshotOfCitiesTable = dataSnapshot;
+                Model.this.onRequestToUpdateListOfCities();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+                ((IUpdateCitiesAutocompleteListResponsesEventHandler)Model.this.viewModel).onFailureToUpdateListOfCities(databaseError.toException());
             }
         });
     }
@@ -317,7 +324,6 @@ public class Model implements IModel,
         {
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_OUT;
             this.m_FirebaseAuth.signOut();
-            // anonymousLoginHasBeenRequested = null;
         }
         catch (Exception err)
         {
@@ -345,32 +351,78 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToCreatePost(Context i_Context, Post i_Post) {
+    public void onRequestToCreatePost(Context i_Context, Post i_Post)
+    {
         AppUtils.printDebugToLogcat("Model", "onRequestToCreatePost", "trying to save post details to FireBase...");
 
-        try {
+        try
+        {
             // Save post under the current user at FireBase -> posts.
             String newPostKey = m_PostsTable.child(getCurrentUserUID()).push().getKey();
             m_PostsTable.child(getCurrentUserUID()).child(newPostKey).setValue(i_Post);
             // Save city at FireBase -> cities (if the city does not exist already).
             String desiredCity = i_Post.getMeetingCity();
-            if (!m_CitiesList.contains(desiredCity)) {
+            if (!this.m_ListOfCities.contains(desiredCity)) {
                 m_CitiesTable.child(desiredCity).setValue(true);
             }
             onSuccessToCreatePost();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             onFailureToCreatePost(exception);
         }
     }
 
     @Override
-    public void onSuccessToCreatePost() {
+    public void onSuccessToCreatePost()
+    {
         ((IPostCreationResponseEventHandler)viewModel).onSuccessToCreatePost();
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason) {
+    public void onFailureToCreatePost(Exception i_Reason)
+    {
         ((IPostCreationResponseEventHandler)viewModel).onFailureToCreatePost(i_Reason);
+    }
+
+    /*
+    ****************************************************************************************************
+                                     TASK: Update list of cities
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToUpdateListOfCities()
+    {
+        String currentCity = null;
+        m_ListOfCities = new ArrayList<String>();
+
+        try
+        {
+            for (DataSnapshot currentRecord : this.m_CurrentSnapshotOfCitiesTable.getChildren())
+            {
+                currentCity = currentRecord.getKey(); // currentRecord.getValue(String.class);
+                m_ListOfCities.add(currentCity);
+            }
+
+            this.onSuccessToUpdateListOfCities(m_ListOfCities);
+        }
+        catch (Exception err)
+        {
+            this.onFailureToUpdateListOfCities(err);
+        }
+    }
+
+    @Override
+    public void onSuccessToUpdateListOfCities(ArrayList<String> i_UpdatedListOfCities)
+    {
+        ((IUpdateCitiesAutocompleteListResponsesEventHandler)Model.this.viewModel).onSuccessToUpdateListOfCities(i_UpdatedListOfCities);
+    }
+
+    @Override
+    public void onFailureToUpdateListOfCities(Exception i_Reason)
+    {
+        ((IUpdateCitiesAutocompleteListResponsesEventHandler)Model.this.viewModel).onFailureToUpdateListOfCities(i_Reason);
     }
 
     /*
@@ -379,9 +431,14 @@ public class Model implements IModel,
     ****************************************************************************************************
     */
 
-    public boolean isUserLoggedIn() { return this.m_CurrentUser != null; }
+    public boolean isUserLoggedIn() {
+        return this.m_CurrentUser != null;
+    }
 
-    public boolean isCurrentUserAnonymous() { return this.m_CurrentUser.isAnonymous(); }
+    public boolean isCurrentUserAnonymous()
+    {
+        return this.m_CurrentUser.isAnonymous();
+    }
 
     public String getCurrentUserUID() {
         return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid();

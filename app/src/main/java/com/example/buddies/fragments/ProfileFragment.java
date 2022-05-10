@@ -64,6 +64,7 @@ public class ProfileFragment extends Fragment {
     RadioGroup m_radioGroup;
     RadioButton m_radioButton;
     eDogGender m_dogGender = eDogGender.UNINITIALIZED;
+    Context m_Context = null;
 
     interface IOnSaveListener {
         void onSave();
@@ -73,7 +74,9 @@ public class ProfileFragment extends Fragment {
 
     // Initialize both ActivityResultLaunchers.
     @Override
-    public void onAttach(@NonNull Context context) {
+    public void onAttach(@NonNull Context context)
+    {
+        this.m_Context = context;
         super.onAttach(context);
 
         Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HomeFragment.HOME_FRAGMENT_TAG);
@@ -92,7 +95,7 @@ public class ProfileFragment extends Fragment {
                     public void onActivityResult(ActivityResult result) {
                         // Check condition. In case camera opened and closed.
                         if (result.getResultCode() == Activity.RESULT_OK) {
-                            Glide.with(Objects.requireNonNull(getContext())).
+                            Glide.with(Objects.requireNonNull(ProfileFragment.this.m_Context)).
                                     load(currentPhotoPath).circleCrop().into(imageView);
                             imgUri = currentPhotoPath;
                         }
@@ -108,7 +111,7 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onActivityResult(Uri result) {
                         if (result != null) {
-                            Glide.with(Objects.requireNonNull(getContext())).
+                            Glide.with(Objects.requireNonNull(ProfileFragment.this.m_Context)).
                                     load(result).circleCrop().into(imageView);
                             imgUri = result.toString();
                         }
@@ -142,13 +145,13 @@ public class ProfileFragment extends Fragment {
         imageView = view.findViewById(R.id.profile_image_view);
 
         // Request for camera permission.
-        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.CAMERA) !=
+        if (ContextCompat.checkSelfPermission(Objects.requireNonNull(this.m_Context), Manifest.permission.CAMERA) !=
                 PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(Objects.requireNonNull(getActivity()),
                     new String[] { Manifest.permission.CAMERA }, 100);
         }
         // Request for gallery permission.
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
+        if (ContextCompat.checkSelfPermission(this.m_Context, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(),
                     new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
@@ -172,7 +175,7 @@ public class ProfileFragment extends Fragment {
 
                     // Continue only if the File was successfully created
                     if (photoFile != null) {
-                        Uri photoURI = FileProvider.getUriForFile(Objects.requireNonNull(getContext()),
+                        Uri photoURI = FileProvider.getUriForFile(Objects.requireNonNull(ProfileFragment.this.m_Context),
                                 "com.example.android.fileprovider" + BuildConfig.APPLICATION_ID,
                                 photoFile);
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
@@ -214,7 +217,7 @@ public class ProfileFragment extends Fragment {
                 String tempAgeInput = ageEt.getText().toString();
 
                 if(fullNameInput.equals("") || tempAgeInput.equals("")) {
-                    Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileFragment.this.m_Context, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
                 // TODO: add option to change image & select gender. Also show image using Glide (circle).
                 else {

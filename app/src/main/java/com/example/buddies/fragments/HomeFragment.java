@@ -1,6 +1,7 @@
 package com.example.buddies.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -8,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -26,14 +29,21 @@ import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
+import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListRequestEventHandler;
+import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListResponsesEventHandler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment implements IView,
                                                       CreatePostFragment.IOnUploadListener,
                                                       ProfileFragment.IOnSaveListener,
-                                                      ILogoutResponsesEventHandler
+                                                      ILogoutResponsesEventHandler,
+                                                      IUpdateCitiesAutocompleteListRequestEventHandler,
+                                                      IUpdateCitiesAutocompleteListResponsesEventHandler
 {
     public static final String HOME_FRAGMENT_TAG = "home_fragment";
 
@@ -41,6 +51,15 @@ public class HomeFragment extends Fragment implements IView,
     NavigationView m_navigationView;
     CoordinatorLayout m_coordinatorLayout;
     ViewModel m_ViewModel = ViewModel.getInstance();
+    MaterialAutoCompleteTextView m_MaterialAutoCompleteTextView_SearchPostsByCity = null;
+    Context m_Context = null;
+
+    @Override
+    public void onAttach(@NonNull Context context)
+    {
+        this.m_Context = context;
+        super.onAttach(context);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
@@ -145,15 +164,31 @@ public class HomeFragment extends Fragment implements IView,
             }
         });
 
-        EditText searchEt = view.findViewById(R.id.home_search_edit_text);
+        // EditText searchEt = view.findViewById(R.id.home_search_edit_text);
+        this.m_MaterialAutoCompleteTextView_SearchPostsByCity = (MaterialAutoCompleteTextView) view.findViewById(R.id.home_search_edit_text);
+
+        // Make the dropdown to be white with "setDropDownBackgroundDrawable" / "setDropDownBackgroundResource"
+        // (Source: https://stackoverflow.com/a/62764533/2196301)
+        this.m_MaterialAutoCompleteTextView_SearchPostsByCity.setDropDownBackgroundResource(R.color.white);
+        this.m_ViewModel.onRequestToUpdateListOfCities();
+
         ImageButton searchBtn = view.findViewById(R.id.home_search_image_button);
-        searchBtn.setOnClickListener(new View.OnClickListener() {
+        searchBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                if (searchEt.getText().toString().equals("")) { // Search bar is empty.
-                    Toast.makeText(requireContext(), "No city was searched for", Toast.LENGTH_SHORT).show();
-                } else { // Some string in SearchEt
-                    Toast.makeText(requireContext(), searchEt.getText().toString(), Toast.LENGTH_SHORT).show();
+            public void onClick(View v)
+            {
+                String selectedCity = HomeFragment.this.m_MaterialAutoCompleteTextView_SearchPostsByCity.getText().toString();
+
+                // Search bar is empty.
+                if (selectedCity.equals(""))
+                {
+                    Toast.makeText(HomeFragment.this.m_Context, "No city was searched for", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    // TODO: retrieve from the firebase all the posts in that city
+                    Toast.makeText(HomeFragment.this.m_Context, selectedCity, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -206,5 +241,33 @@ public class HomeFragment extends Fragment implements IView,
     {
         this.m_ViewModel.unregisterForEvents((IView) this);
         super.onDestroy();
+    }
+
+    @Override
+    public void onRequestToUpdateListOfCities()
+    {
+        this.m_ViewModel.onRequestToUpdateListOfCities();
+    }
+
+    @Override
+    public void onSuccessToUpdateListOfCities(ArrayList<String> i_UpdatedListOfCities)
+    {
+        // Create the new adapter which will be linked to the AutocompleteTextView
+        ArrayAdapter<String> autocompleteArrayAdapter = new ArrayAdapter<String>(this.m_Context, android.R.layout.simple_dropdown_item_1line, i_UpdatedListOfCities);
+
+        // Order that the user have to insert at least 1 char in order to see the relevant suggestions.
+        this.m_MaterialAutoCompleteTextView_SearchPostsByCity.setThreshold(1);
+
+        // Link between the AutocompleteTextView and it's Strings adapter.
+        this.m_MaterialAutoCompleteTextView_SearchPostsByCity.setAdapter(autocompleteArrayAdapter);
+
+        autocompleteArrayAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFailureToUpdateListOfCities(Exception i_Reason)
+    {
+        Snackbar.make(m_coordinatorLayout, "Update of list of cities failed: " + i_Reason.getMessage(), Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.BLACK).show();
     }
 }
