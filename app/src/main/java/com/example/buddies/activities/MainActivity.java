@@ -19,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
 
     boolean m_doubleBackToExitPressedOnce = false;
     Toast m_backToast;
-    private ViewModel m_ViewModel = ViewModel.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Model.getInstance().isUserLoggedIn() == true)
         {
-            // Add Login-Fragment.
+            // Inflate Home-Fragment.
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.root_main_activity, new HomeFragment(), HomeFragment.HOME_FRAGMENT_TAG)
@@ -36,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-            // Add Login-Fragment.
+            // Inflate Login-Fragment.
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.root_main_activity, new LoginFragment(), LoginFragment.LOGIN_FRAGMENT_TAG)

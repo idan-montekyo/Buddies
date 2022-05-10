@@ -1,7 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/gray50">
+
+    <ImageButton
+        android:id="@+id/view_post_back_image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        app:tint="@color/white"
+        android:background="@null"
+        android:layout_gravity="top|start"
+        android:layout_margin="20dp"
+        android:contentDescription="@null" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:id="@+id/view_post_creator_image_view"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:src="@drawable/dog_default_profile_rounded"
+            android:layout_marginEnd="15dp"
+            android:contentDescription="@null"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            tools:ignore="UseCompoundDrawables">
+
+            <TextView
+                android:id="@+id/view_post_creator_full_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/full_name"
+                android:textColorHint="@color/faded_white"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:id="@+id/view_post_creator_dog_gender_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/dogs_gender"
+                android:textColorHint="@color/faded_white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:weightSum="3"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/view_post_city_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:hint="@string/city"
+            android:textColorHint="@color/faded_white"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/view_post_street_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:hint="@string/street"
+            android:textColorHint="@color/faded_white"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/view_post_time_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:hint="@string/time"
+            android:textColorHint="@color/faded_white"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/view_post_location_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/show_location"
+        android:textAllCaps="false"/>
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/view_post_map_view"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/view_post_content_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/content"
+        android:textColorHint="@color/faded_white"
+        android:textSize="25sp"
+        android:textColor="@color/white"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/view_post_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="25dp">
+
+        <ImageView
+            android:id="@+id/view_post_user_image_view"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/dog_default_profile_rounded"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="bottom"
+            android:contentDescription="@null"/>
+
+        <EditText
+            android:id="@+id/view_post_add_comment_edit_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="@string/add_a_comment"
+            android:textColorHint="@color/faded_white"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:layout_marginEnd="10dp"
+            android:background="@null"/>
+
+        <ImageButton
+            android:id="@+id/view_post_send_comment_image_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@android:drawable/ic_menu_send"
+            app:tint="@color/white"
+            android:background="@null"
+            android:layout_gravity="bottom"
+            android:contentDescription="@null"/>
+
+    </LinearLayout>
+
+
+
 
 </LinearLayout>

@@ -41,6 +41,7 @@ dependencies {
     // MapView
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'com.google.android.gms:play-services-places:17.0.0'
+    // FireBase
     implementation 'com.google.firebase:firebase-auth:21.0.3'
     implementation 'com.google.firebase:firebase-database:20.0.4'
     testImplementation 'junit:junit:4.+'

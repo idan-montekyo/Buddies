@@ -31,4 +31,7 @@
     <string name="pick_location">בחר מיקום</string>
     <string name="pick">בחר</string>
     <string name="time">זמן</string>
+    <string name="add_a_comment">הוסף תגובה...</string>
+    <string name="show_location">הצג מיקום</string>
+    <string name="hide_location">הסתר מיקום</string>
 </resources>

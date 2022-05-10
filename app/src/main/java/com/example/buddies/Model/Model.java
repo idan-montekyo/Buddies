@@ -25,10 +25,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Model implements IModel,
@@ -48,10 +52,12 @@ public class Model implements IModel,
     private FirebaseUser m_CurrentUser = null;
     FirebaseAuth.AuthStateListener m_AuthStateListener;
 
+    boolean m_IsFirstLoad = true;
     FirebaseDatabase m_DatabaseReference = null;
     DatabaseReference m_UsersTable = null;
-    boolean m_IsFirstLoad = true;
     DatabaseReference m_PostsTable = null;
+    DatabaseReference m_CitiesTable = null;
+    public List<String> m_CitiesList = null;
 
     eOnAuthStateChangedCaller m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
 
@@ -108,6 +114,22 @@ public class Model implements IModel,
         this.m_DatabaseReference = FirebaseDatabase.getInstance();
         this.m_UsersTable = m_DatabaseReference.getReference("users");
         this.m_PostsTable = m_DatabaseReference.getReference("posts");
+        this.m_CitiesTable = m_DatabaseReference.getReference("cities");
+        // Load all cities in m_CitiesTable to m_CitiesList. (Source: https://www.youtube.com/watch?v=XactTKR0Wfc)
+        m_CitiesTable.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                m_CitiesList = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    m_CitiesList.add(snapshot.getKey());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public static Model getInstance()
@@ -330,6 +352,11 @@ public class Model implements IModel,
             // Save post under the current user at FireBase -> posts.
             String newPostKey = m_PostsTable.child(getCurrentUserUID()).push().getKey();
             m_PostsTable.child(getCurrentUserUID()).child(newPostKey).setValue(i_Post);
+            // Save city at FireBase -> cities (if the city does not exist already).
+            String desiredCity = i_Post.getMeetingCity();
+            if (!m_CitiesList.contains(desiredCity)) {
+                m_CitiesTable.child(desiredCity).setValue(true);
+            }
             onSuccessToCreatePost();
         } catch (Exception exception) {
             onFailureToCreatePost(exception);
@@ -346,20 +373,15 @@ public class Model implements IModel,
         ((IPostCreationResponseEventHandler)viewModel).onFailureToCreatePost(i_Reason);
     }
 
-    public boolean isUserLoggedIn() {
-        return this.m_CurrentUser != null;
-    }
-
-    public boolean isCurrentUserAnonymous()
-    {
-        return this.m_CurrentUser.isAnonymous();
-    }
-
     /*
     ****************************************************************************************************
                                              Common Functions
     ****************************************************************************************************
     */
+
+    public boolean isUserLoggedIn() { return this.m_CurrentUser != null; }
+
+    public boolean isCurrentUserAnonymous() { return this.m_CurrentUser.isAnonymous(); }
 
     public String getCurrentUserUID() {
         return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid();

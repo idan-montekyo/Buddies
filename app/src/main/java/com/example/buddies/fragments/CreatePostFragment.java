@@ -108,12 +108,10 @@ public class CreatePostFragment extends Fragment implements IView,
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ImageButton backBtn = view.findViewById(R.id.create_post_back_button);
+        ImageButton backBtn = view.findViewById(R.id.create_post_back_image_button);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                getParentFragmentManager().popBackStack();
-            }
+            public void onClick(View v) { getParentFragmentManager().popBackStack(); }
         });
 
         m_mapView = (MapView) view.findViewById(R.id.create_post_map_view);

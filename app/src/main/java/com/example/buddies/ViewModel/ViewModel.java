@@ -80,6 +80,12 @@ public class ViewModel implements IViewModel,
         }
     }
 
+    /*
+    ****************************************************************************************************
+                                            TASK: Login
+    ****************************************************************************************************
+    */
+
     @Override
     public void onRequestToLogin(String i_UserName, String i_Password)
     {
@@ -110,11 +116,14 @@ public class ViewModel implements IViewModel,
         }
     }
 
+    /*
+    ****************************************************************************************************
+                                        TASK: Anonymous Login
+    ****************************************************************************************************
+    */
+
     @Override
-    public void onRequestToAnonymousLogin()
-    {
-        this.m_Model.onRequestToAnonymousLogin();
-    }
+    public void onRequestToAnonymousLogin() { this.m_Model.onRequestToAnonymousLogin(); }
 
     @Override
     public void onSuccessToAnonymousLogin()
@@ -139,6 +148,12 @@ public class ViewModel implements IViewModel,
             }
         }
     }
+
+    /*
+    ****************************************************************************************************
+                                            TASK: Logout
+    ****************************************************************************************************
+    */
 
     @Override
     public void onRequestToLogout()
@@ -169,6 +184,12 @@ public class ViewModel implements IViewModel,
             }
         }
     }
+
+    /*
+    ****************************************************************************************************
+                                            TASK: Signup
+    ****************************************************************************************************
+    */
 
     @Override
     public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender)
@@ -201,6 +222,12 @@ public class ViewModel implements IViewModel,
             }
         }
     }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Create Post
+    ****************************************************************************************************
+    */
 
     @Override
     public void onRequestToCreatePost(Context i_Context, Post i_Post) {

@@ -32,4 +32,7 @@
     <string name="google_maps_key" translatable="false">AIzaSyBQlVeH6hzTYH1n8IK-ZF0xgvPMqUfK1QA</string>
     <string name="pick">pick</string>
     <string name="time">Time</string>
+    <string name="add_a_comment">Add a comment...</string>
+    <string name="show_location">Show Location</string>
+    <string name="hide_location">Hide Location</string>
 </resources>

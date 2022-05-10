@@ -3,14 +3,6 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_create_post.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_home.xml" value="0.13020833333333334" />
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_profile.xml" value="0.13020833333333334" />
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_register.xml" value="0.1" />
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_select_location.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_view_post.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/menu/home_drawer_menu.xml" value="0.13020833333333334" />
-        <entry key="..\:/Users/ahaav/AndroidStudioProjects/Buddies/app/src/main/res/menu/home_drawer_menu_anonymous.xml" value="0.13020833333333334" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1712962962962963" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1712962962962963" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/drawable/rounded_button.xml" value="0.18518518518518517" />
@@ -22,7 +14,7 @@
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_profile.xml" value="0.22" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_register.xml" value="0.22" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_select_location.xml" value="0.16621376811594202" />
-        <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_view_post.xml" value="0.16394927536231885" />
+        <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/layout/fragment_view_post.xml" value="0.22" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/layout/home_header_layout.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/layout/home_menu_header.xml" value="0.16394927536231885" />
         <entry key="..\:/Users/idan/AndroidStudioProjects/Buddies/app/src/main/res/menu/home_drawer_menu.xml" value="0.3333333333333333" />
