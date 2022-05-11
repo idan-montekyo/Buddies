@@ -74,7 +74,7 @@
             android:background="@null">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/profile_full_name_input"
+                android:id="@+id/profile_full_name_edit_text"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:textSize="25sp"
@@ -96,7 +96,7 @@
             android:textColorHint="@color/faded_white">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/profile_age_input"
+                android:id="@+id/profile_age_edit_text"
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
                 android:textSize="25sp"

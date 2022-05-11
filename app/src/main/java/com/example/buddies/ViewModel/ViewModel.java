@@ -5,7 +5,10 @@ import android.content.Context;
 import com.example.buddies.Model.Model;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
+import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
+import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileRequestEventHandler;
+import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.LocationSelectionEvent.ILocationSelect_EventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
@@ -35,7 +38,9 @@ public class ViewModel implements IViewModel,
                                   IPostCreationRequestEventHandler,
                                   IPostCreationResponseEventHandler,
                                   IUpdateCitiesAutocompleteListRequestEventHandler,
-                                  IUpdateCitiesAutocompleteListResponsesEventHandler
+                                  IUpdateCitiesAutocompleteListResponsesEventHandler,
+                                  ILoadUserProfileRequestEventHandler,
+                                  ILoadUserProfileResponseEventHandler
 {
     private static ViewModel _instance = null;
     // private LatLng location;
@@ -290,6 +295,35 @@ public class ViewModel implements IViewModel,
             if (view instanceof IUpdateCitiesAutocompleteListResponsesEventHandler)
             {
                 ((IUpdateCitiesAutocompleteListResponsesEventHandler)view).onFailureToUpdateListOfCities(i_Reason);
+            }
+        }
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Load Profile
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onLoadProfile() {
+        m_Model.onLoadProfile();
+    }
+
+    @Override
+    public void onSuccessToLoadProfile(UserProfile i_UserProfile) {
+        for (IView view : views) {
+            if (view instanceof ILoadUserProfileResponseEventHandler) {
+                ((ILoadUserProfileResponseEventHandler) view).onSuccessToLoadProfile(i_UserProfile);
+            }
+        }
+    }
+
+    @Override
+    public void onFailureToLoadProfile(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ILoadUserProfileResponseEventHandler) {
+                ((ILoadUserProfileResponseEventHandler) view).onFailureToLoadProfile(i_Reason);
             }
         }
     }

@@ -1,15 +1,19 @@
 package com.example.buddies.Model;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
 import com.example.buddies.enums.eOnAuthStateChangedCaller;
+import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileRequestEventHandler;
+import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutRequestEventHandler;
@@ -46,7 +50,9 @@ public class Model implements IModel,
                               IPostCreationRequestEventHandler,
                               IPostCreationResponseEventHandler,
                               IUpdateCitiesAutocompleteListRequestEventHandler,
-                              IUpdateCitiesAutocompleteListResponsesEventHandler
+                              IUpdateCitiesAutocompleteListResponsesEventHandler,
+                              ILoadUserProfileRequestEventHandler,
+                              ILoadUserProfileResponseEventHandler
 {
     private static Model _instance = null;
     IViewModel viewModel = null;
@@ -61,7 +67,10 @@ public class Model implements IModel,
     DatabaseReference m_PostsTable = null;
     DatabaseReference m_CitiesTable = null;
     DataSnapshot m_CurrentSnapshotOfCitiesTable = null;
+    DataSnapshot m_CurrentSnapshotOfUsersTable = null;
     ArrayList<String> m_ListOfCities = null;
+
+    UserProfile m_UserProfile = null;
 
     eOnAuthStateChangedCaller m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
 
@@ -124,7 +133,6 @@ public class Model implements IModel,
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot)
             {
-
                 Model.this.m_CurrentSnapshotOfCitiesTable = dataSnapshot;
                 Model.this.onRequestToUpdateListOfCities();
             }
@@ -133,6 +141,23 @@ public class Model implements IModel,
             public void onCancelled(@NonNull DatabaseError databaseError)
             {
                 ((IUpdateCitiesAutocompleteListResponsesEventHandler)Model.this.viewModel).onFailureToUpdateListOfCities(databaseError.toException());
+            }
+        });
+
+        this.m_UsersTable.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try {
+                    m_CurrentSnapshotOfUsersTable = snapshot;
+                } catch (Exception exception) {
+                    ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(exception);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(error.toException());
             }
         });
     }
@@ -327,8 +352,6 @@ public class Model implements IModel,
     @Override
     public void onRequestToLogout(Context i_Context)
     {
-        // TODO: Decide later what to do with the use case of logging out when the WiFi and either the Mobile Data
-        //       both turned off.
         try
         {
             if (AppUtils.isNetworkAvailable(i_Context) == false) {
@@ -439,6 +462,34 @@ public class Model implements IModel,
 
     /*
     ****************************************************************************************************
+                                         TASK: Load Profile
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onLoadProfile() {
+
+        m_UserProfile = m_CurrentSnapshotOfUsersTable.child(getCurrentUserUID())
+                .getValue(UserProfile.class);
+        if (m_UserProfile != null) {
+            onSuccessToLoadProfile(m_UserProfile);
+        } else {
+            onFailureToLoadProfile(new Exception("Model.m_UserProfile is null"));
+        }
+    }
+
+    @Override
+    public void onSuccessToLoadProfile(UserProfile i_UserProfile) {
+        ((ILoadUserProfileResponseEventHandler)viewModel).onSuccessToLoadProfile(i_UserProfile);
+    }
+
+    @Override
+    public void onFailureToLoadProfile(Exception i_Reason) {
+        ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(i_Reason);
+    }
+
+    /*
+    ****************************************************************************************************
                                              Common Functions
     ****************************************************************************************************
     */
@@ -459,7 +510,7 @@ public class Model implements IModel,
     public boolean areRegisterDetailsValid(String i_UserName, String i_Password,
                                            String i_FullName, String i_age, eDogGender i_DogGender) {
         if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("") || i_age.equals("")
-         || i_DogGender == eDogGender.UNINITIALIZED) {
+                || i_DogGender == eDogGender.UNINITIALIZED) {
             return false;
         }
         return true;

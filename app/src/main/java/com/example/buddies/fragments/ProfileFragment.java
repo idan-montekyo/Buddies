@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,15 +40,22 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.buddies.BuildConfig;
 import com.example.buddies.R;
+import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
+import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileRequestEventHandler;
+import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileResponseEventHandler;
+import com.example.buddies.interfaces.MVVM.IView;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements IView,
+                                                         ILoadUserProfileRequestEventHandler,
+                                                         ILoadUserProfileResponseEventHandler {
 
     public  static final String PROFILE_FRAGMENT_TAG = "profile_fragment";
 
@@ -56,6 +65,7 @@ public class ProfileFragment extends Fragment {
     private String imgUri = "";
     private String currentPhotoPath;
 
+    EditText m_FullNameEt, m_AgeEt;
     ImageButton cameraBtn, galleryBtn;
     Button resetImgBtn;
     ImageView imageView;
@@ -64,6 +74,10 @@ public class ProfileFragment extends Fragment {
     RadioGroup m_radioGroup;
     RadioButton m_radioButton;
     eDogGender m_dogGender = eDogGender.UNINITIALIZED;
+
+    Handler m_ProfileFragmentHandler = new Handler(Looper.getMainLooper());
+
+    ViewModel m_ViewModel = ViewModel.getInstance();
     Context m_Context = null;
 
     interface IOnSaveListener {
@@ -118,6 +132,12 @@ public class ProfileFragment extends Fragment {
                     }
                 }
         );
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        m_ViewModel.registerForEvents((IView)this);
+        super.onCreate(savedInstanceState);
     }
 
     // Inflate fragment_profile.
@@ -204,17 +224,19 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        EditText fullNameEt = view.findViewById(R.id.profile_full_name_input);
-        EditText ageEt = view.findViewById(R.id.profile_age_input);
+        m_FullNameEt = view.findViewById(R.id.profile_full_name_edit_text);
+        m_AgeEt = view.findViewById(R.id.profile_age_edit_text);
         m_radioGroup = view.findViewById(R.id.profile_radio_group);
+
+        onLoadProfile();
 
         Button saveBtn = view.findViewById(R.id.profile_save_button);
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String fullNameInput = fullNameEt.getText().toString();
-                String tempAgeInput = ageEt.getText().toString();
+                String fullNameInput = m_FullNameEt.getText().toString();
+                String tempAgeInput = m_AgeEt.getText().toString();
 
                 if(fullNameInput.equals("") || tempAgeInput.equals("")) {
                     Toast.makeText(ProfileFragment.this.m_Context, "Please fill in all fields", Toast.LENGTH_SHORT).show();
@@ -235,6 +257,34 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+    }
+
+    @Override
+    public void onDestroy() {
+        m_ViewModel.unregisterForEvents((IView)this);
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLoadProfile() {
+        m_ViewModel.onLoadProfile();
+    }
+
+    @Override
+    public void onSuccessToLoadProfile(UserProfile i_UserProfile) {
+
+        m_FullNameEt.setText(i_UserProfile.getFullName());
+        m_AgeEt.setText(String.valueOf(i_UserProfile.getAge()));
+        if(i_UserProfile.getDogGender() == eDogGender.MALE) {
+            m_radioGroup.check(R.id.profile_radio_button_male);
+        } else {
+            m_radioGroup.check(R.id.profile_radio_button_female);
+        }
+    }
+
+    @Override
+    public void onFailureToLoadProfile(Exception i_Reason) {
+        Toast.makeText(m_Context, i_Reason.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     // Source - https://developer.android.com/training/camera/photobasics

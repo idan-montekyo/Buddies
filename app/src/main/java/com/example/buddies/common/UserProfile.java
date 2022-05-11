@@ -7,6 +7,8 @@ public class UserProfile
     int m_Age;
     eDogGender m_DogGender;
 
+    public UserProfile() {}
+
     public UserProfile(String i_FullName, int i_Age, eDogGender i_DogGender)
     {
         this.m_FullName = i_FullName;
