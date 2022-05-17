@@ -1,4 +1,4 @@
-package com.example.buddies.interfaces.HandleUserProfileEvent;
+package com.example.buddies.interfaces.LoadUserProfileEvent;
 
 import com.example.buddies.common.UserProfile;
 

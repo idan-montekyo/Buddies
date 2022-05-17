@@ -106,6 +106,7 @@ public class RegisterFragment extends Fragment implements IView,
                 // If RadioButton selected
                 if(m_radioButton != null)
                 {
+                    /*
                     String dogGenderLabel = m_radioButton.getText().toString();
 
                     if (dogGenderLabel.equals("זכר"))
@@ -118,6 +119,9 @@ public class RegisterFragment extends Fragment implements IView,
                     }
 
                     dogGenderInput = eDogGender.valueOf(dogGenderLabel.toUpperCase());
+                    */
+
+                    dogGenderInput = AppUtils.resolveDogGender(m_radioButton);
                 }
 
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "calling onRequestToSignup()");

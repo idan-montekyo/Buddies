@@ -7,8 +7,8 @@ import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
-import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileRequestEventHandler;
-import com.example.buddies.interfaces.HandleUserProfileEvent.ILoadUserProfileResponseEventHandler;
+import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
+import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.LocationSelectionEvent.ILocationSelect_EventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
@@ -22,6 +22,8 @@ import com.example.buddies.interfaces.MVVM.IView;
 import com.example.buddies.interfaces.MVVM.IViewModel;
 import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListRequestEventHandler;
 import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListResponsesEventHandler;
+import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileRequestEventHandler;
+import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileResponsesEventHandler;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -39,6 +41,10 @@ public class ViewModel implements IViewModel,
                                   IPostCreationResponseEventHandler,
                                   IUpdateCitiesAutocompleteListRequestEventHandler,
                                   IUpdateCitiesAutocompleteListResponsesEventHandler,
+                                  // IUploadImageRequestEventHandler,
+                                  // IUploadImageResponsesEventHandler,
+                                  IUpdateProfileRequestEventHandler,
+                                  IUpdateProfileResponsesEventHandler,
                                   ILoadUserProfileRequestEventHandler,
                                   ILoadUserProfileResponseEventHandler
 {
@@ -324,6 +330,78 @@ public class ViewModel implements IViewModel,
         for (IView view : views) {
             if (view instanceof ILoadUserProfileResponseEventHandler) {
                 ((ILoadUserProfileResponseEventHandler) view).onFailureToLoadProfile(i_Reason);
+            }
+        }
+    }
+
+    /*
+    @Override
+    public void onRequestToUploadImage(Uri i_PathOfFileInFilesystem)
+    {
+        this.m_Model.onRequestToUploadImage(i_PathOfFileInFilesystem);
+    }
+    */
+
+    /*
+    TODO: NOTE: At any moment there could be only one view which handles the success or failure of uploading image.
+                In addition, the 2 fragments "HomeFragment" and "ProfileFragment" should implement the interface "IUploadImageResponsesEventHandler",
+                because we don't know which one of them will handle the success or failure of upload image request.
+    */
+
+    /*
+    @Override
+    public void onSuccessToUploadImage(Uri i_PathOfFileInCloud)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof IUploadImageResponsesEventHandler)
+            {
+                ((IUploadImageResponsesEventHandler)view).onSuccessToUploadImage(i_PathOfFileInCloud);
+            }
+        }
+    }
+    */
+
+    /*
+    @Override
+    public void onFailureToUploadImage(Exception i_Reason)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof IUploadImageResponsesEventHandler)
+            {
+                ((IUploadImageResponsesEventHandler)view).onFailureToUploadImage(i_Reason);
+            }
+        }
+    }
+    */
+
+    @Override
+    public void onRequestToUpdateProfile(Context i_Context, String i_FullName, String i_Age, eDogGender i_DogGender, String i_ProfileImage)
+    {
+        this.m_Model.onRequestToUpdateProfile(i_Context, i_FullName, i_Age, i_DogGender, i_ProfileImage);
+    }
+
+    @Override
+    public void onSuccessToUpdateProfile()
+    {
+        for (IView view : views)
+        {
+            if (view instanceof IUpdateProfileResponsesEventHandler)
+            {
+                ((IUpdateProfileResponsesEventHandler)view).onSuccessToUpdateProfile();
+            }
+        }
+    }
+
+    @Override
+    public void onFailureToUpdateProfile(Exception i_Reason)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof IUpdateProfileResponsesEventHandler)
+            {
+                ((IUpdateProfileResponsesEventHandler)view).onFailureToUpdateProfile(i_Reason);
             }
         }
     }

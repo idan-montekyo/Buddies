@@ -2,12 +2,15 @@ package com.example.buddies.common;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.icu.text.SimpleDateFormat;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -15,7 +18,12 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestListener;
 import com.example.buddies.Model.Model;
+import com.example.buddies.enums.eDogGender;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -23,7 +31,11 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +48,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class AppUtils
 {
-
     Model m_Model = Model.getInstance();
 
     public static String GetResourceStringValueByStringName(String i_StringName, Context i_Context)
@@ -47,6 +58,14 @@ public class AppUtils
         int stringId = res.getIdentifier(i_StringName, "string", packageName);
 
         return i_Context.getString(stringId);
+    }
+
+    public double convertExponentialNumberToDecimalNumber()
+    {
+        String str = "6.151536E-8";
+        BigDecimal bd = new BigDecimal(str);
+        bd = bd.round(new MathContext(2, RoundingMode.HALF_UP));
+        return bd.doubleValue();
     }
 
     /*
@@ -209,6 +228,86 @@ public class AppUtils
         RadioButton selectedRadioButton = (RadioButton) i_OwnerView.findViewById(radioId);
 
         return selectedRadioButton;
+    }
+
+    public static eDogGender resolveDogGender(RadioButton i_RadioButton)
+    {
+        eDogGender m_dogGender = eDogGender.UNINITIALIZED;
+        String dogGenderLabel = i_RadioButton.getText().toString();
+
+        if (dogGenderLabel.equals("זכר"))
+        {
+            dogGenderLabel = "MALE";
+        }
+        else if (dogGenderLabel.equals("נקבה"))
+        {
+            dogGenderLabel = "FEMALE";
+        }
+
+        m_dogGender = eDogGender.valueOf(dogGenderLabel.toUpperCase());
+
+        return m_dogGender;
+    }
+
+    /**
+     * loadImageUsingGlide()
+     *     Purpose: Load a given image to imageview, and apply the requested settings.
+     * @param i_Context - The context which will be used in order to load the image.
+     * @param i_AddressOfPhoto - A Uri object which holds the path of the image to load.
+     * @param i_Width - An Integer object. If there's no need to resize, this value should be null.
+     * @param i_Height - An Integer object. If there's no need to resize, this value should be null.
+     * @param isCircleCropNeeded - A boolean which indicates if there's a need to circleCrop or not
+     * @param listener - A listener which handles the load process of the image. This parameter is optional and can be null
+     * @param i_TargetImageView - The ImageView which will finally contains the requested image.
+     */
+    public static void loadImageUsingGlide(Context i_Context, Uri i_AddressOfPhoto, Integer i_Width, Integer i_Height, boolean isCircleCropNeeded, RequestListener<Drawable> listener, ImageView i_TargetImageView)
+    {
+        RequestBuilder glideLoader = Glide.with(i_Context).load(i_AddressOfPhoto);
+
+        // any placeholder to load at start
+        glideLoader.placeholder(R.drawable.dog_default_profile_rounded);
+
+        // any Photo in case of error
+        glideLoader.error(R.drawable.dog_default_profile_rounded);
+
+        // resizing
+        if (i_Width != null && i_Height != null)
+        {
+            glideLoader.override(i_Width, i_Height);
+        }
+
+        if (isCircleCropNeeded == true)
+        {
+            glideLoader.circleCrop();
+        }
+
+        // Attach listener to the load process (Source: https://stackoverflow.com/a/53314724/2196301)
+        if (listener != null)
+        {
+            glideLoader.listener(listener);
+        }
+
+        // imageview object
+        glideLoader.into(i_TargetImageView);
+
+        /*
+                Glide.with(i_Context)
+                .load(i_AddressOfPhoto)                     // Photo url
+                .placeholder(R.drawable.dog_default_profile_rounded) // any placeholder to load at start
+                .error(R.drawable.dog_default_profile_rounded)         // any Photo in case of error
+                // .override(i_Width, i_Height)                // resizing
+                .into(i_TargetImageView);                   // imageview object
+        */
+    }
+
+    public static Uri getUriOfMipmap(String i_MipmapName, Context i_Context)
+    {
+        return Uri.parse("android.resource://" + i_Context.getPackageName() + "/mipmap/" + i_MipmapName);
+    }
+
+    public static Uri getUriOfDrawable(String i_DrawableName, Context i_Context)
+    {
+        return Uri.parse("android.resource://" + i_Context.getPackageName() + "/drawable/" + i_DrawableName);
     }
 
     /**

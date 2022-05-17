@@ -38,7 +38,7 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment implements IView,
                                                       CreatePostFragment.IOnUploadListener,
-                                                      ProfileFragment.IOnSaveListener,
+                                                      // ProfileFragment.IOnSaveListener,
                                                       ILogoutResponsesEventHandler,
                                                       IUpdateCitiesAutocompleteListRequestEventHandler,
                                                       IUpdateCitiesAutocompleteListResponsesEventHandler
@@ -204,12 +204,14 @@ public class HomeFragment extends Fragment implements IView,
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     @Override
     public void onSave()
     {
         Snackbar.make(m_coordinatorLayout, "profile info successfully saved", Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
+    */
 
     @Override
     public void onUpload()

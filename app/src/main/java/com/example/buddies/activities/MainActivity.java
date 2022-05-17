@@ -3,10 +3,12 @@ package com.example.buddies.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.buddies.Model.Model;
@@ -14,16 +16,27 @@ import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.fragments.HomeFragment;
 import com.example.buddies.fragments.LoginFragment;
+import com.example.buddies.interfaces.MVVM.IView;
+import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileResponsesEventHandler;
+import com.google.android.material.snackbar.Snackbar;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity implements IView,
+                                                               IUpdateProfileResponsesEventHandler
+{
     boolean m_doubleBackToExitPressedOnce = false;
     Toast m_backToast;
+    View m_RootMainActivity;
+    ViewModel m_ViewModel = ViewModel.getInstance();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        this.m_ViewModel.registerForEvents((IView) this);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        m_RootMainActivity = this.findViewById(R.id.root_main_activity);
 
         if (Model.getInstance().isUserLoggedIn() == true)
         {
@@ -45,13 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
     // Requires double-back-press to exit while in Login/Home fragments.
     @Override
-    public void onBackPressed() {
-
+    public void onBackPressed()
+    {
         int backStackCount = getSupportFragmentManager().getBackStackEntryCount();
-        if(backStackCount > 0) { // Not on Login / Home fragment.
+
+        // Not on Login / Home fragment.
+        if(backStackCount > 0)
+        {
             super.onBackPressed();
-        } else { // On Login / Home fragment.
-            if (m_doubleBackToExitPressedOnce) { // In case back button has already been pressed.
+        }
+        // On Login / Home fragment.
+        else
+        {
+            // In case back button has already been pressed.
+            if (m_doubleBackToExitPressedOnce)
+            {
                 m_backToast.cancel();
                 super.onBackPressed();
                 return;
@@ -66,4 +87,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onSuccessToUpdateProfile()
+    {
+        Snackbar.make(this.m_RootMainActivity, "Profile has been successfully updated.", Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.BLACK).show();
+    }
+
+    @Override
+    public void onFailureToUpdateProfile(Exception i_Reason)
+    {
+        Snackbar.make(this.m_RootMainActivity, i_Reason.getMessage(), Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.BLACK).show();
+    }
 }
