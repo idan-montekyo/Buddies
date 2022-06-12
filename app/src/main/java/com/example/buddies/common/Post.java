@@ -2,13 +2,14 @@ package com.example.buddies.common;
 
 import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.time.LocalTime;
 
-public class Post {
+public class Post implements Comparable<Post> {
 
     String creatorUserUID;
     String meetingCity;
@@ -19,6 +20,8 @@ public class Post {
     LocalTime postCreationTime;
     PostCreationDate postCreationDate;
     long postCreationDateTimeAsLong;
+
+    public Post() { }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
@@ -57,6 +60,25 @@ public class Post {
                                                          + hourAsString + minuteAsString + secondAsString);
     }
 
+    // Constructor for existing posts, loaded from FireBase.
+    public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
+                String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent,
+                LocalTime i_PostCreationTime, long i_PostCreationDateTimeAsLong,
+                int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay) {
+
+        this.creatorUserUID = i_CreatorUserUID;
+        this.meetingCity = i_MeetingCity;
+        this.meetingStreet = i_MeetingStreet;
+        this.meetingTime = i_MeetingTime;
+        this.meetingLocation = i_MeetingLocation;
+        this.postContent = i_PostContent;
+        this.postCreationTime = i_PostCreationTime;
+        // Initialize date holder class.
+        this.postCreationDate = new PostCreationDate(i_PostCreationYear, i_PostCreationMonth,
+                i_PostCreationDay);
+        this.postCreationDateTimeAsLong = i_PostCreationDateTimeAsLong;
+    }
+
     // Getters
     public String getCreatorUserUID() { return creatorUserUID; }
     public String getMeetingCity() { return meetingCity; }
@@ -74,4 +96,25 @@ public class Post {
     public void setMeetingTime(String meetingTime) { this.meetingTime = meetingTime; }
     public void setMeetingLocation(LatLng meetingLocation) { this.meetingLocation = meetingLocation; }
     public void setPostContent(String postContent) { this.postContent = postContent; }
+
+    @Override
+    public int compareTo(Post other) {
+        long comparison = other.getPostCreationDateTimeAsLong() - this.getPostCreationDateTimeAsLong();
+        return (int)comparison;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "creatorUserUID='" + creatorUserUID + '\'' +
+                ", meetingCity='" + meetingCity + '\'' +
+                ", meetingStreet='" + meetingStreet + '\'' +
+                ", meetingTime='" + meetingTime + '\'' +
+                ", meetingLocation=" + meetingLocation +
+                ", postContent='" + postContent + '\'' +
+                ", postCreationTime=" + postCreationTime +
+                ", postCreationDate=" + postCreationDate +
+                ", postCreationDateTimeAsLong=" + postCreationDateTimeAsLong +
+                '}';
+    }
 }

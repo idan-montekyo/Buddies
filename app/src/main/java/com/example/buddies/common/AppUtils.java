@@ -1,5 +1,6 @@
 package com.example.buddies.common;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -260,6 +261,7 @@ public class AppUtils
      * @param listener - A listener which handles the load process of the image. This parameter is optional and can be null
      * @param i_TargetImageView - The ImageView which will finally contains the requested image.
      */
+    @SuppressLint("CheckResult")
     public static void loadImageUsingGlide(Context i_Context, Uri i_AddressOfPhoto, Integer i_Width, Integer i_Height, boolean isCircleCropNeeded, RequestListener<Drawable> listener, ImageView i_TargetImageView)
     {
         RequestBuilder glideLoader = Glide.with(i_Context).load(i_AddressOfPhoto);

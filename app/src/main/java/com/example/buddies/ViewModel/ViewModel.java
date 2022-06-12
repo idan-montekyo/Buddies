@@ -1,12 +1,21 @@
 package com.example.buddies.ViewModel;
 
 import android.content.Context;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.buddies.Model.Model;
+import com.example.buddies.adapters.PostAdapter;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
+import com.example.buddies.enums.ePostType;
+import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardResponseEventHandler;
+import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsResponseEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.LocationSelectionEvent.ILocationSelect_EventHandler;
@@ -46,7 +55,11 @@ public class ViewModel implements IViewModel,
                                   IUpdateProfileRequestEventHandler,
                                   IUpdateProfileResponsesEventHandler,
                                   ILoadUserProfileRequestEventHandler,
-                                  ILoadUserProfileResponseEventHandler
+                                  ILoadUserProfileResponseEventHandler,
+                                  ILoadPostsRequestEventHandler,
+                                  ILoadPostsResponseEventHandler,
+                                  ILoadPostCardRequestEventHandler,
+                                  ILoadPostCardResponseEventHandler
 {
     private static ViewModel _instance = null;
     // private LatLng location;
@@ -404,5 +417,56 @@ public class ViewModel implements IViewModel,
                 ((IUpdateProfileResponsesEventHandler)view).onFailureToUpdateProfile(i_Reason);
             }
         }
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Load Posts
+    ****************************************************************************************************
+    */
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onLoadPosts(ePostType type) {
+        m_Model.onLoadPosts(type);
+    }
+
+    @Override
+    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
+        for (IView view : views) {
+            if (view instanceof ILoadPostsResponseEventHandler) {
+                ((ILoadPostsResponseEventHandler)view).onSuccessToLoadPosts(i_PostsList);
+            }
+        }
+    }
+
+    @Override
+    public void onFailureToLoadPosts(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ILoadPostsResponseEventHandler) {
+                ((ILoadPostsResponseEventHandler)view).onFailureToLoadPosts(i_Reason);
+            }
+        }
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Load Post Cards
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
+        m_Model.onLoadPostCard(i_CreatorUserUID, i_PostAdapterToUpdate);
+    }
+
+    @Override
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
+        ((ILoadPostCardResponseEventHandler)i_PostAdapterToUpdate).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
+    }
+
+    @Override
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
+        ((ILoadPostCardResponseEventHandler)i_PostAdapterToUpdate).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
     }
 }

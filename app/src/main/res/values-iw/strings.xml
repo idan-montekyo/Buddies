@@ -34,4 +34,5 @@
     <string name="add_a_comment">הוסף תגובה...</string>
     <string name="show_location">הצג מיקום</string>
     <string name="hide_location">הסתר מיקום</string>
+    <string name="created_on">"תאריך פרסום "</string>
 </resources>

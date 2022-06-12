@@ -9,12 +9,18 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.example.buddies.adapters.PostAdapter;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.ProgressNotification;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
 import com.example.buddies.enums.eOnAuthStateChangedCaller;
+import com.example.buddies.enums.ePostType;
+import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardResponseEventHandler;
+import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsResponseEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.LoginEvent.ILoginRequestEventHandler;
@@ -31,6 +37,7 @@ import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateC
 import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListResponsesEventHandler;
 import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileRequestEventHandler;
 import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileResponsesEventHandler;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -53,7 +60,10 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class Model implements IModel,
@@ -72,7 +82,11 @@ public class Model implements IModel,
                               // IUploadImageRequestEventHandler,
                               // IUploadImageResponsesEventHandler,
                               IUpdateProfileRequestEventHandler,
-                              IUpdateProfileResponsesEventHandler
+                              IUpdateProfileResponsesEventHandler,
+                              ILoadPostsRequestEventHandler,
+                              ILoadPostsResponseEventHandler,
+                              ILoadPostCardRequestEventHandler,
+                              ILoadPostCardResponseEventHandler
 {
     private static Model _instance = null;
     IViewModel viewModel = null;
@@ -92,9 +106,11 @@ public class Model implements IModel,
     DatabaseReference m_CitiesTable = null;
     DataSnapshot m_CurrentSnapshotOfCitiesTable = null;
     DataSnapshot m_CurrentSnapshotOfUsersTable = null;
+    DataSnapshot m_CurrentSnapshotOfPostsTable = null;
     ArrayList<String> m_ListOfCities = null;
 
     UserProfile m_UserProfile = null;
+    List<Post> m_PostsList = null;
 
     eOnAuthStateChangedCaller m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
 
@@ -187,6 +203,22 @@ public class Model implements IModel,
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(error.toException());
+            }
+        });
+
+        this.m_PostsTable.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                try {
+                    m_CurrentSnapshotOfPostsTable = snapshot;
+                } catch (Exception exception) {
+                    ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(exception);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(error.toException());
             }
         });
     }
@@ -772,6 +804,108 @@ public class Model implements IModel,
     @Override
     public void onFailureToLoadProfile(Exception i_Reason) {
         ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(i_Reason);
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Load Posts
+    ****************************************************************************************************
+    */
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onLoadPosts(ePostType type) {
+
+        try {
+            m_PostsTable = m_CurrentSnapshotOfPostsTable.getRef();
+            m_PostsList = new ArrayList<>();
+
+            switch (type) {
+                case ALL:
+                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
+                        for (DataSnapshot post : UserUIDs.getChildren()) {
+                            LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
+                                    (double) post.child("meetingLocation").child("longitude").getValue());
+
+                            Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
+                            Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
+                            Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
+                            Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
+
+                            LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
+                                    localSecond.intValue(), localNano.intValue());
+
+                            Long creationYear = (long) post.child("postCreationDate").child("postCreationYear").getValue();
+                            Long creationMonth = (long) post.child("postCreationDate").child("postCreationMonth").getValue();
+                            Long creationDay = (long) post.child("postCreationDate").child("postCreationDay").getValue();
+                            Long creationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
+
+                            Post newPost = new Post((String) post.child("creatorUserUID").getValue(),
+                                    (String) post.child("meetingCity").getValue(),
+                                    (String) post.child("meetingStreet").getValue(),
+                                    (String) post.child("meetingTime").getValue(),
+                                    latLng,
+                                    (String) post.child("postContent").getValue(),
+                                    localTime, creationDateTimeAsLong,
+                                    creationYear.intValue(), creationMonth.intValue(), creationDay.intValue());
+                            m_PostsList.add(newPost);
+                        }
+                    }
+                    break;
+                case MY_POSTS:
+                case POSTS_I_COMMENTED_ON:
+                    break;
+            }
+
+            Collections.sort(m_PostsList);
+            Model.this.onSuccessToLoadPosts(m_PostsList);
+
+        } catch (Exception exception) {
+            Model.this.onFailureToLoadPosts(exception);
+        }
+    }
+
+    @Override
+    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
+        ((ILoadPostsResponseEventHandler)viewModel).onSuccessToLoadPosts(i_PostsList);
+    }
+
+    @Override
+    public void onFailureToLoadPosts(Exception i_Reason) {
+        ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(i_Reason);
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Load Post Cards
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
+
+        try {
+
+            m_UserProfile = m_CurrentSnapshotOfUsersTable.child(i_CreatorUserUID).getValue(UserProfile.class);
+            if (m_UserProfile != null) {
+                onSuccessToLoadPostCard(m_UserProfile, i_PostAdapterToUpdate);
+            } else {
+                onFailureToLoadPostCard(new Exception("Model.m_UserProfile is null"), i_PostAdapterToUpdate);
+            }
+
+        } catch (Exception exception) {
+            onFailureToLoadPostCard(exception, i_PostAdapterToUpdate);
+        }
+    }
+
+    @Override
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
+        ((ILoadPostCardResponseEventHandler)viewModel).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
+    }
+
+    @Override
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
+        ((ILoadPostCardResponseEventHandler)viewModel).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
     }
 
     /*
