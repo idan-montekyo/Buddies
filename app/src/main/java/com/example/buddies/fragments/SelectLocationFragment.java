@@ -1,10 +1,23 @@
 package com.example.buddies.fragments;
 
+import static android.content.Context.LOCATION_SERVICE;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,39 +39,125 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.List;
+
 /*
 This Fragment is used to allow the user to select a location from the map
 */
 
 public class SelectLocationFragment extends Fragment implements OnMapReadyCallback,
-                                                                GoogleMap.OnMapClickListener {
-
+                                                                GoogleMap.OnMapClickListener
+{
     GoogleMap m_Map;
     MapView m_MapHolder;
     Marker currMarker;
     LatLng currentLatLng = null;
+    private ActivityResultLauncher<String> requestLocationPermissionLauncher;
+    Context m_Context = null;
+    LatLng startingCoordinates = null;
+    AlertDialog alertDialog;
+
+    LocationListener m_LocationListener = null;
+
+    int LOCATION_REFRESH_TIME = 15000; // 15 seconds to update
+    int LOCATION_REFRESH_DISTANCE = 500; // 500 meters to update
 
     public static final String SELECT_LOCATION_FRAGMENT_TAG = "select_location_fragment";
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onAttach(@NonNull Context context)
     {
-        super.onAttach(context);
-//        FragmentsCenter.isSelectLocationFragmentAlive = true;
+        this.m_Context = context;
+        this.initializeActivityResultLaunchers();
+        super.onAttach(this.m_Context);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void initializeActivityResultLaunchers()
+    {
+        // Request location permission with contracts (Source: https://stackoverflow.com/a/63546099/2196301)
+        this.requestLocationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->
+        {
+            if (isGranted)
+            {
+                Intent intent=new Intent("android.location.GPS_ENABLED_CHANGE");
+                intent.putExtra("enabled", true);
+                SelectLocationFragment.this.m_Context.sendBroadcast(intent);
+
+                // Do this dummy permission check because the code doesn't recognize that we are inside a code block that means the location
+                // permission is actually granted (Source: https://www.gool.co.il/MyCourses/Chapter/86423#83994)
+                int hasLocationPermission = this.m_Context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+                if (hasLocationPermission == PackageManager.PERMISSION_GRANTED) {
+                    LocationManager manager = (LocationManager) SelectLocationFragment.this.m_Context.getSystemService(LOCATION_SERVICE);
+
+                    SelectLocationFragment.this.m_LocationListener = new LocationListener() {
+                        @Override
+                        public void onLocationChanged(@NonNull Location location) {
+                            SelectLocationFragment.this.startingCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
+
+                            // After the first location has been granted, stop getting more location updates - we don't need them.
+                            manager.removeUpdates(SelectLocationFragment.this.m_LocationListener);
+
+                            // Start load the map
+                            m_MapHolder.getMapAsync(SelectLocationFragment.this);
+                        }
+                    };
+
+                    if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false)
+                    {
+                        // Create a dialog for ordering the user to turn on the gps
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.m_Context);
+                        alertDialogBuilder.setTitle("Location Access Alert");
+                        alertDialogBuilder.setMessage("You will be now redirected to the settings page in order to turn on gps location.\nAfter the location access confirmation, please wait a few seconds in order the app will recognize your location.");
+                        alertDialogBuilder.setCancelable(false);
+                        alertDialogBuilder.setPositiveButton("Take me there !", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                            }
+                        });
+
+                        alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                    }
+
+                    manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, SelectLocationFragment.this.m_LocationListener);
+                }
+            }
+            else
+            {
+                // Explain to the user that the feature is unavailable because the
+                // features requires a permission that the user has denied. At the
+                // same time, respect the user's decision. Don't link to system
+                // settings in an effort to convince the user to change their
+                // decision.
+                SelectLocationFragment.this.startingCoordinates = new LatLng(31.881417, 34.709998);
+
+                // Start load the map
+                m_MapHolder.getMapAsync(this);
+            }
+        });
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        boolean isTheInflatedLayoutShouldBeTheRootLayout = false;
+        final boolean isTheInflatedLayoutShouldBeTheRootLayout = false;
         View rootView = inflater.inflate(R.layout.fragment_select_location, container, isTheInflatedLayoutShouldBeTheRootLayout);
+
+        AppUtils.printDebugToLogcat("SelectLocationFragment", "onCreateView", "Requesting permission ...");
+        this.requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
 
         m_MapHolder = (MapView) rootView.findViewById(R.id.select_location_map_view);
         m_MapHolder.onCreate(savedInstanceState);
         m_MapHolder.onResume();
 
-        m_MapHolder.getMapAsync(this);
+        AppUtils.printDebugToLogcat("SelectLocationFragment", "onCreateView", "Loading the map");
+        // Start load the map
+        // m_MapHolder.getMapAsync(this);
 
         Button sendLocation = (Button) rootView.findViewById(R.id.select_location_pick_button);
         sendLocation.setOnClickListener(new View.OnClickListener()
@@ -78,9 +177,7 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                     {
                         public void onClick(DialogInterface dialog, int which)
                         {
-                            // ViewModel.getInstance().setLocation(currentLatLng);
                             AppUtils.closeFragmentsByFragmentsTags(getActivity().getSupportFragmentManager(), SELECT_LOCATION_FRAGMENT_TAG);
-//                            FragmentsCenter.isSelectLocationFragmentAlive = false;
                             ViewModel.getInstance().onLocationSelected(currentLatLng);
                             getParentFragmentManager().popBackStack();
                         }
@@ -99,9 +196,17 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    {
+
+
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
     public void onDestroy()
     {
-//        FragmentsCenter.isSelectLocationFragmentAlive = false;
+        // FragmentsCenter.isSelectLocationFragmentAlive = false;
         super.onDestroy();
     }
 
@@ -110,43 +215,33 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     {
         m_Map = googleMap;
         m_Map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        LatLng coordinates = new LatLng(31.881417, 34.709998);
-        currMarker = m_Map.addMarker(new MarkerOptions().position(coordinates).title("Title").snippet("Description"));
+
+        // currMarker = m_Map.addMarker(new MarkerOptions().position(this.startingCoordinates).title("Title").snippet("Description"));
         m_Map.setOnMapClickListener(this);
 
         // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
-        m_Map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14f));
+        m_Map.moveCamera(CameraUpdateFactory.newLatLngZoom(this.startingCoordinates, 14f));
     }
 
     private void setMarkerPosition(LatLng latLng)
     {
         currentLatLng = latLng;
-        currMarker.setPosition(latLng);
-        Toast.makeText(getContext(), latLng.toString(), Toast.LENGTH_SHORT).show();
 
-        /*
-        if (m_IsMapGesturesDisabled == false)
+        if (currMarker == null)
+        {
+            currMarker = m_Map.addMarker(new MarkerOptions().position(this.currentLatLng).title("Title").snippet("Description"));
+        }
+        else
         {
             currMarker.setPosition(latLng);
-            Toast.makeText(getContext(), latLng.toString(), Toast.LENGTH_SHORT).show();
         }
-        */
+
+        // Toast.makeText(getContext(), latLng.toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onMapClick(LatLng latLng)
     {
-        /*
-        new GoogleMap.OnMapClickListener()
-        {
-            @Override
-            public void onMapClick(LatLng latLng)
-            {
-                Fragment_SelectLocation.this.setMarkerPosition(latLng);
-            }
-        });
-        */
-
         this.setMarkerPosition(latLng);
     }
 }
