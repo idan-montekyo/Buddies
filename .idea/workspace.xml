@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="debug" />
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="No Filters" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e73e638c-9a6d-4026-b94a-58ea89e9e224" name="Default Changelist" comment="Changes:&#10;1. Feed updated right after creating a new post." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[R5CRC10ENCN]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="valueResourceFile" />
+        <option value="layoutResourceFile_vertical" />
+        <option value="navigationResourceFile" />
+        <option value="resourceFile" />
+        <option value="layoutResourceFile" />
+        <option value="Class" />
+        <option value="Enum" />
+        <option value="Interface" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="27moQijSnFopMIEK7rezRpY5qkb" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="android-custom-viewC:/Users/idan/AppData/Local/Android/Sdk/sources/android-31/android/view/View.java_SELECTED" value="View" />
+    <property name="android-custom-viewC:/Users/idan/AppData/Local/Android/Sdk/sources/android-31/android/widget/Button.java_SELECTED" value="Button" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/app/src/main/res/drawable" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/drawable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.example.buddies.fragments" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\idan\AndroidStudioProjects\Buddies\app\src\main\res\drawable" />
+      <recent name="C:\Users\idan\AndroidStudioProjects\Buddies\app\src\main\res\xml" />
+      <recent name="C:\Users\idan\AndroidStudioProjects\Buddies\app\src\main\res\transition" />
+      <recent name="C:\Users\idan\AndroidStudioProjects\Buddies\app\src\main\res\layout" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.example.buddies" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.buddies.activities" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
+      <module name="Buddies.app" />
+      <option name="DEPLOY" value="true" />
+      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
+      <option name="DEPLOY_AS_INSTANT" value="false" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ALL_USERS" value="false" />
+      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
+      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Hybrid>
+      <Java />
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Sample Java Methods" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
+      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e73e638c-9a6d-4026-b94a-58ea89e9e224" name="Default Changelist" comment="" />
+      <created>1649934608130</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1649934608130</updated>
+    </task>
+    <task id="LOCAL‎00001" summary="Initial Commit.">
+      <created>1650461590053</created>
+      <option name="number" value="LOCAL‎00001" />
+      <option name="presentableId" value="LOCAL‎00001" />
+      <updated>1650461590053</updated>
+    </task>
+    <task id="LOCAL‎00002" summary="Added AppUtils, ViewModel, location mechanism.">
+      <created>1650467423211</created>
+      <option name="number" value="LOCAL‎00002" />
+      <option name="presentableId" value="LOCAL‎00002" />
+      <updated>1650467423211</updated>
+    </task>
+    <task id="LOCAL‎00003" summary="Changes:&#10;1. Added Posts class.&#10;2. Added post creation handlers interfaces.&#10;3. New posts can now be saved to FireBase.&#10;* postCreationDate field missing in Posts due to LocalDate not working with FireBase.">
+      <created>1651939784314</created>
+      <option name="number" value="LOCAL‎00003" />
+      <option name="presentableId" value="LOCAL‎00003" />
+      <updated>1651939784314</updated>
+    </task>
+    <task id="LOCAL‎00004" summary="Changes:&#10;1. Added PostCreationDate class.&#10;2. Added creationDate to Post class.&#10;3. After registering a new user, sends back to Login page.">
+      <created>1651958133544</created>
+      <option name="number" value="LOCAL‎00004" />
+      <option name="presentableId" value="LOCAL‎00004" />
+      <updated>1651958133544</updated>
+    </task>
+    <task id="LOCAL‎00005" summary="Changes:&#10;1. Added ViewPostFragment class, fragment_view_post layout.&#10;2. Save desired city to 'cities' array in FireBase, after creating new posts.">
+      <created>1652191900136</created>
+      <option name="number" value="LOCAL‎00005" />
+      <option name="presentableId" value="LOCAL‎00005" />
+      <updated>1652191900137</updated>
+    </task>
+    <task id="LOCAL‎00006" summary="Changes:&#10;1. Internet connection validation in the functions that are responsible for sign-up, sign-in, sign-out.&#10;2. Added input validation before registration.">
+      <created>1652196261825</created>
+      <option name="number" value="LOCAL‎00006" />
+      <option name="presentableId" value="LOCAL‎00006" />
+      <updated>1652196261825</updated>
+    </task>
+    <task id="LOCAL‎00007" summary="Changes:&#10;1. Loading UserProfile data from FireBase to ProfileFragment programmatically.">
+      <created>1652274564071</created>
+      <option name="number" value="LOCAL‎00007" />
+      <option name="presentableId" value="LOCAL‎00007" />
+      <updated>1652274564071</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Changes:&#10;1. Added Post-cards, PostAdapter.&#10;2. Home fragment loads all posts from FireBase and displays on feed. (so far only the entire database is available, no filtering by city/user).&#10;3. Post implements Comparable, sorting by postCreationDateTimeAsLong.&#10;&#10;TODO:&#10;1. notify/update feed right after creating a new post.&#10;2. create refresh-feed mechanism (roll page down or a simple refresh button).">
+      <created>1655050134741</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1655050134741</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Changes:&#10;1. Feed updated right after creating a new post.">
+      <created>1655142513394</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1655142513394</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial Commit." />
+    <MESSAGE value="Added AppUtils, ViewModel, location mechanism." />
+    <MESSAGE value="Changes:&#10;1. Added Posts class.&#10;2. Added post creation handlers interfaces.&#10;3. New posts can now be saved to FireBase.&#10;* postCreationDate field missing in Posts due to LocalDate not working with FireBase." />
+    <MESSAGE value="Changes:&#10;1. Added PostCreationDate class.&#10;2. Added creationDate to Post class.&#10;3. After registering a new user, sends back to Login page." />
+    <MESSAGE value="Changes:&#10;1. Added ViewPostFragment class, fragment_view_post layout.&#10;2. Save desired city to 'cities' array in FireBase, after creating new posts." />
+    <MESSAGE value="Changes:&#10;1. Internet connection validation in the functions that are responsible for sign-up, sign-in, sign-out.&#10;2. Added input validation before registration." />
+    <MESSAGE value="Changes:&#10;1. Loading UserProfile data from FireBase to ProfileFragment programmatically." />
+    <MESSAGE value="Changes:&#10;1. Added Post-cards, PostAdapter.&#10;2. Home fragment loads all posts from FireBase and displays on feed. (so far only the entire database is available, no filtering by city/user).&#10;3. Post implements Comparable, sorting by postCreationDateTimeAsLong.&#10;&#10;TODO:&#10;1. notify/update feed right after creating a new post.&#10;2. create refresh-feed mechanism (roll page down or a simple refresh button)." />
+    <MESSAGE value="Changes:&#10;1. Feed updated right after creating a new post." />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes:&#10;1. Feed updated right after creating a new post." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/buddies/Model/Model.java</url>
+          <line>212</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">515573904255-berbusvn4dt19fkrf5ofnm0uv2n2dl5o.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">515573904255</string>
+    <string name="google_api_key" translatable="false">AIzaSyD4-Gv0BdS-hBMY7rHjAeJK6NygcZikfj0</string>
+    <string name="google_app_id" translatable="false">1:515573904255:android:f11b83b4bb156fa54e604a</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD4-Gv0BdS-hBMY7rHjAeJK6NygcZikfj0</string>
+    <string name="google_storage_bucket" translatable="false">leafy-firmament-349212.appspot.com</string>
+    <string name="project_id" translatable="false">leafy-firmament-349212</string>
+</resources>
