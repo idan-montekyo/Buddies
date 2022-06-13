@@ -124,7 +124,7 @@ public class CreatePostFragment extends Fragment implements IView,
             public void onClick(View v) {
                 // If a location has not been already selected
                 if (m_CurrMarker == null) {
-                    m_mapView.setVisibility(View.GONE);
+                    // m_mapView.setVisibility(View.GONE);
                 }
 
                 // FragmentsCenter.m_Fragment_AddNewSong = new Fragment_AddNewSong();
@@ -147,8 +147,6 @@ public class CreatePostFragment extends Fragment implements IView,
                 transaction.addToBackStack(null);
 
                 transaction.commit();
-
-
             }
         });
 
@@ -239,7 +237,7 @@ public class CreatePostFragment extends Fragment implements IView,
                         m_cityTv.setText(m_LocationDetails[2]);
                         m_streetTv.setText(m_LocationDetails[1]);
 
-                        m_mapView.setVisibility(View.VISIBLE);
+                        // m_mapView.setVisibility(View.VISIBLE);
                         m_mapView.getMapAsync(CreatePostFragment.this);
                     }
                 });
