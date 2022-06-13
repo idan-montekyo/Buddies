@@ -91,7 +91,7 @@ public class CreatePostFragment extends Fragment implements IView,
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        this.m_ViewModel.registerForEvents((IView) this);
+        this.m_ViewModel.registerForEventsAtIndex0((IView) this);
         super.onCreate(savedInstanceState);
     }
 

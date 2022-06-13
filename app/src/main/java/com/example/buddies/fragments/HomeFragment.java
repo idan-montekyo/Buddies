@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -61,12 +62,13 @@ public class HomeFragment extends Fragment implements IView,
 {
     public static final String HOME_FRAGMENT_TAG = "home_fragment";
 
+    Context m_Context = null;
+    Handler m_Handler = new Handler();
     DrawerLayout m_drawerLayout;
     NavigationView m_navigationView;
     CoordinatorLayout m_coordinatorLayout;
     ViewModel m_ViewModel = ViewModel.getInstance();
     MaterialAutoCompleteTextView m_MaterialAutoCompleteTextView_SearchPostsByCity = null;
-    Context m_Context = null;
     RecyclerView m_RecyclerView;
 
     public static List<Post> m_Posts = new ArrayList<>();
@@ -343,16 +345,17 @@ public class HomeFragment extends Fragment implements IView,
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onSuccessToCreatePost() {
-        onLoadPosts(ePostType.ALL);
-        // TODO: needs to change to notifyItemInserted with pos 0 only when relevant!
-        //       for example, if we search Haifa and Ashdod was added, it's not relevant to us.
-        Objects.requireNonNull(this.m_RecyclerView.getAdapter()).notifyDataSetChanged();
-        this.m_RecyclerView.invalidate();
+
+        m_Handler.post(new Runnable() {
+            @Override
+            public void run() {
+                onLoadPosts(ePostType.ALL);
+                Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
+            }
+        });
 
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason) {
-        // irrelevant.
-    }
+    public void onFailureToCreatePost(Exception i_Reason) { } // Irrelevant.
 }
