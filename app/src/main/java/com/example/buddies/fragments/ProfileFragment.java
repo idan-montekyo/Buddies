@@ -351,7 +351,7 @@ public class ProfileFragment extends Fragment implements IView,
                 // initialize DB.image to null.
                 imageView.setImageResource(R.drawable.dog_default_profile_rounded);
 
-                if (imgUri.toString().equals(AppUtils.getUriOfDrawable("dog_default_profile_rounded", ProfileFragment.this.m_Context).toString()) == false)
+                if (!imgUri.toString().equals(AppUtils.getUriOfDrawable("dog_default_profile_rounded", ProfileFragment.this.m_Context).toString()))
                 {
                     ProfileFragment.this.saveBtn.setEnabled(true);
                 }
@@ -476,7 +476,7 @@ public class ProfileFragment extends Fragment implements IView,
         this.m_CurrentUserProfile = i_UserProfile;
         Uri uriToLoad;
 
-        if  (this.m_CurrentUserProfile.getProfileImageUri().equals("") == false)
+        if  (!this.m_CurrentUserProfile.getProfileImageUri().equals(""))
         {
             uriToLoad = Uri.parse(i_UserProfile.getProfileImageUri());
         }

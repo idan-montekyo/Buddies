@@ -17,4 +17,13 @@ public class PostCreationDate {
     public int getPostCreationYear() { return postCreationYear; }
     public int getPostCreationMonth() { return postCreationMonth; }
     public int getPostCreationDay() { return postCreationDay; }
+
+    @Override
+    public String toString() {
+        return "PostCreationDate{" +
+                "postCreationYear=" + postCreationYear +
+                ", postCreationMonth=" + postCreationMonth +
+                ", postCreationDay=" + postCreationDay +
+                '}';
+    }
 }

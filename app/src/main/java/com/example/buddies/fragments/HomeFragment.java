@@ -3,6 +3,7 @@ package com.example.buddies.fragments;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -15,18 +16,27 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
+import com.example.buddies.adapters.PostAdapter;
+import com.example.buddies.common.Post;
+import com.example.buddies.enums.ePostType;
+import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsResponseEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
+import com.example.buddies.interfaces.PostCreationEvent.IPostCreationResponseEventHandler;
 import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListRequestEventHandler;
 import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListResponsesEventHandler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -34,14 +44,20 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class HomeFragment extends Fragment implements IView,
                                                       CreatePostFragment.IOnUploadListener,
                                                       // ProfileFragment.IOnSaveListener,
                                                       ILogoutResponsesEventHandler,
                                                       IUpdateCitiesAutocompleteListRequestEventHandler,
-                                                      IUpdateCitiesAutocompleteListResponsesEventHandler
+                                                      IUpdateCitiesAutocompleteListResponsesEventHandler,
+                                                      ILoadPostsRequestEventHandler,
+                                                      ILoadPostsResponseEventHandler,
+                                                      IPostCreationResponseEventHandler
 {
     public static final String HOME_FRAGMENT_TAG = "home_fragment";
 
@@ -51,6 +67,10 @@ public class HomeFragment extends Fragment implements IView,
     ViewModel m_ViewModel = ViewModel.getInstance();
     MaterialAutoCompleteTextView m_MaterialAutoCompleteTextView_SearchPostsByCity = null;
     Context m_Context = null;
+    RecyclerView m_RecyclerView;
+
+    public static List<Post> m_Posts = new ArrayList<>();
+    public static PostAdapter m_PostAdapter;
 
     @Override
     public void onAttach(@NonNull Context context)
@@ -89,6 +109,7 @@ public class HomeFragment extends Fragment implements IView,
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -97,6 +118,34 @@ public class HomeFragment extends Fragment implements IView,
         m_navigationView = view.findViewById(R.id.home_navigation_view);
 
         m_coordinatorLayout = view.findViewById(R.id.home_coordinator_layout);
+
+        m_RecyclerView = view.findViewById(R.id.home_recycler_view);
+        m_RecyclerView.setHasFixedSize(true);
+        m_RecyclerView.setLayoutManager(new GridLayoutManager(m_Context, 1));
+
+        onLoadPosts(ePostType.ALL);
+
+        m_PostAdapter = new PostAdapter(m_Posts);
+
+        m_PostAdapter.setListener(new PostAdapter.MyPostListener() {
+            @Override
+            public void onPostClicked(int index, View view) throws IOException {
+
+                Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
+                assert thisFragment != null;
+                getParentFragmentManager().beginTransaction()
+                        .setCustomAnimations(
+                                R.anim.slide_in,  // enter
+                                R.anim.fade_out,  // exit
+                                R.anim.fade_in,   // popEnter
+                                R.anim.slide_out) // popExit
+                        .hide(thisFragment)
+                        .add(R.id.root_main_activity, new ViewPostFragment(), ViewPostFragment.VIEW_POST_FRAGMENT_TAG)
+                        .addToBackStack(null).commit();
+            }
+        });
+
+        m_RecyclerView.setAdapter(m_PostAdapter);
 
         FloatingActionButton createPostFAB = view.findViewById(R.id.home_fab);
         createPostFAB.setOnClickListener(new View.OnClickListener() {
@@ -269,5 +318,41 @@ public class HomeFragment extends Fragment implements IView,
     {
         Snackbar.make(m_coordinatorLayout, "Update of list of cities failed: " + i_Reason.getMessage(), Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onLoadPosts(ePostType type) {
+        m_ViewModel.onLoadPosts(type);
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    @Override
+    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
+        m_Posts.clear();
+        m_Posts.addAll(i_PostsList);
+    }
+
+    @Override
+    public void onFailureToLoadPosts(Exception i_Reason) {
+        Snackbar.make(m_coordinatorLayout, Objects.requireNonNull(i_Reason.getMessage()), Snackbar.LENGTH_LONG)
+                .setBackgroundTint(Color.BLACK).show();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onSuccessToCreatePost() {
+        onLoadPosts(ePostType.ALL);
+        // TODO: needs to change to notifyItemInserted with pos 0 only when relevant!
+        //       for example, if we search Haifa and Ashdod was added, it's not relevant to us.
+        Objects.requireNonNull(this.m_RecyclerView.getAdapter()).notifyDataSetChanged();
+        this.m_RecyclerView.invalidate();
+
+    }
+
+    @Override
+    public void onFailureToCreatePost(Exception i_Reason) {
+        // irrelevant.
     }
 }
