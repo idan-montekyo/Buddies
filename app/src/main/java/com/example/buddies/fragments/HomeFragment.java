@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
@@ -51,14 +53,14 @@ import java.util.List;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment implements IView,
-                                                      CreatePostFragment.IOnUploadListener,
-                                                      // ProfileFragment.IOnSaveListener,
-                                                      ILogoutResponsesEventHandler,
-                                                      IUpdateCitiesAutocompleteListRequestEventHandler,
-                                                      IUpdateCitiesAutocompleteListResponsesEventHandler,
-                                                      ILoadPostsRequestEventHandler,
-                                                      ILoadPostsResponseEventHandler,
-                                                      IPostCreationResponseEventHandler
+        CreatePostFragment.IOnUploadListener,
+        // ProfileFragment.IOnSaveListener,
+        ILogoutResponsesEventHandler,
+        IUpdateCitiesAutocompleteListRequestEventHandler,
+        IUpdateCitiesAutocompleteListResponsesEventHandler,
+        ILoadPostsRequestEventHandler,
+        ILoadPostsResponseEventHandler,
+        IPostCreationResponseEventHandler
 {
     public static final String HOME_FRAGMENT_TAG = "home_fragment";
 
@@ -70,6 +72,7 @@ public class HomeFragment extends Fragment implements IView,
     ViewModel m_ViewModel = ViewModel.getInstance();
     MaterialAutoCompleteTextView m_MaterialAutoCompleteTextView_SearchPostsByCity = null;
     RecyclerView m_RecyclerView;
+    SwipeRefreshLayout m_SwipeRefreshLayout;
 
     public static List<Post> m_Posts = new ArrayList<>();
     public static PostAdapter m_PostAdapter;
@@ -120,6 +123,29 @@ public class HomeFragment extends Fragment implements IView,
         m_navigationView = view.findViewById(R.id.home_navigation_view);
 
         m_coordinatorLayout = view.findViewById(R.id.home_coordinator_layout);
+
+        m_SwipeRefreshLayout = view.findViewById(R.id.home_swipe_refresh_layout);
+        m_SwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                String currentSearch = m_MaterialAutoCompleteTextView_SearchPostsByCity.getText().toString();
+
+                m_Handler.postDelayed(new Runnable() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void run() {
+                        if (currentSearch.equals("")) {
+                            onLoadPosts(ePostType.ALL);
+                        } else {
+                            onLoadPostsByCity(currentSearch);
+                        }
+                        Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
+                        m_SwipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 1500);
+            }
+        });
 
         m_RecyclerView = view.findViewById(R.id.home_recycler_view);
         m_RecyclerView.setHasFixedSize(true);
@@ -213,7 +239,6 @@ public class HomeFragment extends Fragment implements IView,
             }
         });
 
-        // EditText searchEt = view.findViewById(R.id.home_search_edit_text);
         this.m_MaterialAutoCompleteTextView_SearchPostsByCity = (MaterialAutoCompleteTextView) view.findViewById(R.id.home_search_edit_text);
 
         // Make the dropdown to be white with "setDropDownBackgroundDrawable" / "setDropDownBackgroundResource"
@@ -224,21 +249,20 @@ public class HomeFragment extends Fragment implements IView,
         ImageButton searchBtn = view.findViewById(R.id.home_search_image_button);
         searchBtn.setOnClickListener(new View.OnClickListener()
         {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View v)
             {
                 String selectedCity = HomeFragment.this.m_MaterialAutoCompleteTextView_SearchPostsByCity.getText().toString();
 
                 // Search bar is empty.
-                if (selectedCity.equals(""))
-                {
-                    Toast.makeText(HomeFragment.this.m_Context, "No city was searched for", Toast.LENGTH_SHORT).show();
+                if (selectedCity.equals("")) {
+                    onLoadPosts(ePostType.ALL);
+                } else {
+                    onLoadPostsByCity(selectedCity);
                 }
-                else
-                {
-                    // TODO: retrieve from the firebase all the posts in that city
-                    Toast.makeText(HomeFragment.this.m_Context, selectedCity, Toast.LENGTH_SHORT).show();
-                }
+                Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
+                m_SwipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -326,6 +350,11 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public void onLoadPosts(ePostType type) {
         m_ViewModel.onLoadPosts(type);
+    }
+
+    @Override
+    public void onLoadPostsByCity(String i_SearchedCity) {
+        m_ViewModel.onLoadPostsByCity(i_SearchedCity);
     }
 
     @SuppressLint("NotifyDataSetChanged")

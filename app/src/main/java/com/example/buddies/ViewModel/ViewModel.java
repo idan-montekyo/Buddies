@@ -428,9 +428,10 @@ public class ViewModel implements IViewModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) {
-        m_Model.onLoadPosts(type);
-    }
+    public void onLoadPosts(ePostType type) { m_Model.onLoadPosts(type); }
+
+    @Override
+    public void onLoadPostsByCity(String i_SearchedCity) { m_Model.onLoadPostsByCity(i_SearchedCity); }
 
     @Override
     public void onSuccessToLoadPosts(List<Post> i_PostsList) {

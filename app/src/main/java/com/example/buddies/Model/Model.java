@@ -37,7 +37,6 @@ import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateC
 import com.example.buddies.interfaces.UpdateCitiesAutocompleteListEvent.IUpdateCitiesAutocompleteListResponsesEventHandler;
 import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileRequestEventHandler;
 import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileResponsesEventHandler;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -60,33 +59,32 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class Model implements IModel,
-                              ILoginRequestEventHandler,
-                              ILoginResponsesEventHandler,
-                              ILogoutRequestEventHandler,
-                              ILogoutResponsesEventHandler,
-                              ISignupRequestEventHandler,
-                              ISignupResponsesEventHandler,
-                              IPostCreationRequestEventHandler,
-                              IPostCreationResponseEventHandler,
-                              IUpdateCitiesAutocompleteListRequestEventHandler,
-                              IUpdateCitiesAutocompleteListResponsesEventHandler,
-                              ILoadUserProfileRequestEventHandler,
-                              ILoadUserProfileResponseEventHandler,
-                              // IUploadImageRequestEventHandler,
-                              // IUploadImageResponsesEventHandler,
-                              IUpdateProfileRequestEventHandler,
-                              IUpdateProfileResponsesEventHandler,
-                              ILoadPostsRequestEventHandler,
-                              ILoadPostsResponseEventHandler,
-                              ILoadPostCardRequestEventHandler,
-                              ILoadPostCardResponseEventHandler
+        ILoginRequestEventHandler,
+        ILoginResponsesEventHandler,
+        ILogoutRequestEventHandler,
+        ILogoutResponsesEventHandler,
+        ISignupRequestEventHandler,
+        ISignupResponsesEventHandler,
+        IPostCreationRequestEventHandler,
+        IPostCreationResponseEventHandler,
+        IUpdateCitiesAutocompleteListRequestEventHandler,
+        IUpdateCitiesAutocompleteListResponsesEventHandler,
+        ILoadUserProfileRequestEventHandler,
+        ILoadUserProfileResponseEventHandler,
+        // IUploadImageRequestEventHandler,
+        // IUploadImageResponsesEventHandler,
+        IUpdateProfileRequestEventHandler,
+        IUpdateProfileResponsesEventHandler,
+        ILoadPostsRequestEventHandler,
+        ILoadPostsResponseEventHandler,
+        ILoadPostCardRequestEventHandler,
+        ILoadPostCardResponseEventHandler
 {
     private static Model _instance = null;
     IViewModel viewModel = null;
@@ -817,37 +815,15 @@ public class Model implements IModel,
     public void onLoadPosts(ePostType type) {
 
         try {
-            m_PostsTable = m_CurrentSnapshotOfPostsTable.getRef();
+//            m_PostsTable = m_CurrentSnapshotOfPostsTable.getRef();
             m_PostsList = new ArrayList<>();
 
             switch (type) {
                 case ALL:
                     for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
                         for (DataSnapshot post : UserUIDs.getChildren()) {
-                            LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
-                                    (double) post.child("meetingLocation").child("longitude").getValue());
 
-                            Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
-                            Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
-                            Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
-                            Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
-
-                            LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
-                                    localSecond.intValue(), localNano.intValue());
-
-                            Long creationYear = (long) post.child("postCreationDate").child("postCreationYear").getValue();
-                            Long creationMonth = (long) post.child("postCreationDate").child("postCreationMonth").getValue();
-                            Long creationDay = (long) post.child("postCreationDate").child("postCreationDay").getValue();
-                            Long creationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
-
-                            Post newPost = new Post((String) post.child("creatorUserUID").getValue(),
-                                    (String) post.child("meetingCity").getValue(),
-                                    (String) post.child("meetingStreet").getValue(),
-                                    (String) post.child("meetingTime").getValue(),
-                                    latLng,
-                                    (String) post.child("postContent").getValue(),
-                                    localTime, creationDateTimeAsLong,
-                                    creationYear.intValue(), creationMonth.intValue(), creationDay.intValue());
+                            Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
                             m_PostsList.add(newPost);
                         }
                     }
@@ -859,6 +835,36 @@ public class Model implements IModel,
 
             Collections.sort(m_PostsList);
             Model.this.onSuccessToLoadPosts(m_PostsList);
+
+        } catch (Exception exception) {
+            Model.this.onFailureToLoadPosts(exception);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onLoadPostsByCity(String i_SearchedCity) {
+
+        try {
+            if (!this.m_ListOfCities.contains(i_SearchedCity)) {
+                this.onLoadPosts(ePostType.ALL);
+            } else {
+
+                m_PostsList = new ArrayList<>();
+
+                for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
+                    for (DataSnapshot post : UserUIDs.getChildren()) {
+
+                        Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
+                        if (newPost.getMeetingCity().equals(i_SearchedCity)) {
+                            m_PostsList.add(newPost);
+                        }
+                    }
+                }
+
+                Collections.sort(m_PostsList);
+                Model.this.onSuccessToLoadPosts(m_PostsList);
+            }
 
         } catch (Exception exception) {
             Model.this.onFailureToLoadPosts(exception);
@@ -914,25 +920,19 @@ public class Model implements IModel,
     ****************************************************************************************************
     */
 
-    public boolean isUserLoggedIn()
-    {
-        return this.m_CurrentUser != null;
-    }
+    public boolean isUserLoggedIn() { return this.m_CurrentUser != null; }
 
-    public boolean isCurrentUserAnonymous()
-    {
-        return this.m_CurrentUser.isAnonymous();
-    }
+    public boolean isCurrentUserAnonymous() { return this.m_CurrentUser.isAnonymous(); }
 
-    public String getCurrentUserUID()
-    {
+    public String getCurrentUserUID() {
         return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid();
     }
 
     public boolean areRegisterDetailsValid(String i_UserName, String i_Password,
                                            String i_FullName, String i_age, eDogGender i_DogGender) {
-        if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("") || i_age.equals("")
-                || i_DogGender == eDogGender.UNINITIALIZED) {
+
+        if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("")
+                || i_age.equals("") || i_DogGender == eDogGender.UNINITIALIZED) {
             return false;
         }
         return true;

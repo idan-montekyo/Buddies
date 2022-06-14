@@ -21,7 +21,6 @@ import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestListener;
 import com.example.buddies.Model.Model;
 import com.example.buddies.enums.eDogGender;
@@ -36,8 +35,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
-import java.net.Inet4Address;
 import java.net.URL;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -45,7 +44,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.buddies.R;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 
 public class AppUtils
 {
@@ -329,5 +328,36 @@ public class AppUtils
         }
 
         return false;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static Post ConvertDataSnapshotToPost(DataSnapshot post) {
+
+        LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
+                (double) post.child("meetingLocation").child("longitude").getValue());
+
+        Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
+        Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
+        Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
+        Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
+
+        LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
+                localSecond.intValue(), localNano.intValue());
+
+        Long creationYear = (long) post.child("postCreationDate").child("postCreationYear").getValue();
+        Long creationMonth = (long) post.child("postCreationDate").child("postCreationMonth").getValue();
+        Long creationDay = (long) post.child("postCreationDate").child("postCreationDay").getValue();
+        Long creationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
+
+        Post newPost = new Post((String) post.child("creatorUserUID").getValue(),
+                (String) post.child("meetingCity").getValue(),
+                (String) post.child("meetingStreet").getValue(),
+                (String) post.child("meetingTime").getValue(),
+                latLng,
+                (String) post.child("postContent").getValue(),
+                localTime, creationDateTimeAsLong,
+                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue());
+
+        return newPost;
     }
 }
