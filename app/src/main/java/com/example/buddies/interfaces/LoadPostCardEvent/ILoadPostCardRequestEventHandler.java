@@ -4,5 +4,5 @@ import com.example.buddies.adapters.PostAdapter;
 
 public interface ILoadPostCardRequestEventHandler {
 
-    void onLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate);
+    void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate);
 }

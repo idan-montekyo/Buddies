@@ -52,7 +52,6 @@ public class CreatePostFragment extends Fragment implements IView,
                                                             TimePickerDialog.OnTimeSetListener,
                                                             IPostCreationResponseEventHandler
 {
-
     public static final String CREATE_POST_FRAGMENT_TAG = "create_post_fragment";
 
     ViewModel m_ViewModel = ViewModel.getInstance();
@@ -71,45 +70,53 @@ public class CreatePostFragment extends Fragment implements IView,
     GoogleMap m_GoogleMap;
     Marker m_CurrMarker;
 
-    interface IOnUploadListener {
+    interface IOnUploadListener
+    {
         void onUpload();
     }
 
     public IOnUploadListener onUploadListener;
 
     @Override
-    public void onAttach(@NonNull Context context) {
+    public void onAttach(@NonNull Context context)
+    {
         super.onAttach(context);
 
         Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HomeFragment.HOME_FRAGMENT_TAG);
-        try {
+        try
+        {
             onUploadListener = (IOnUploadListener) homeFragment;
-        } catch (ClassCastException ex) {
+        }
+        catch (ClassCastException ex)
+        {
             throw new ClassCastException("Fragment must implement IOnUploadListener interface.");
         }
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
         this.m_ViewModel.registerForEvents((IView) this);
         super.onCreate(savedInstanceState);
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_create_post, container, false);
         return view;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
 
         ImageButton backBtn = view.findViewById(R.id.create_post_back_image_button);
-        backBtn.setOnClickListener(new View.OnClickListener() {
+        backBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v) { getParentFragmentManager().popBackStack(); }
         });
@@ -119,11 +126,14 @@ public class CreatePostFragment extends Fragment implements IView,
         m_mapView.onResume();
 
         Button pickLocationBtn = view.findViewById(R.id.create_post_pick_location_button);
-        pickLocationBtn.setOnClickListener(new View.OnClickListener() {
+        pickLocationBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 // If a location has not been already selected
-                if (m_CurrMarker == null) {
+                if (m_CurrMarker == null)
+                {
                     // m_mapView.setVisibility(View.GONE);
                 }
 
@@ -174,24 +184,26 @@ public class CreatePostFragment extends Fragment implements IView,
         EditText contentEt = view.findViewById(R.id.create_post_content_input);
 
         Button uploadBtn = view.findViewById(R.id.create_post_upload_button);
-        uploadBtn.setOnClickListener(new View.OnClickListener() {
+        uploadBtn.setOnClickListener(new View.OnClickListener()
+        {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onClick(View v) {
-
+            public void onClick(View v)
+            {
                 String userUID = Model.getInstance().getCurrentUserUID();
                 String cityInput = m_cityTv.getText().toString();
                 String streetInput = m_streetTv.getText().toString();
                 String timeInput = m_timeTv.getText().toString();
                 String contentInput = contentEt.getText().toString();
 
-                if(cityInput.equals("") || streetInput.equals("") ||
-                        timeInput.equals("") || contentInput.equals("")) {
+                if (cityInput.equals("") || streetInput.equals("") || timeInput.equals("") || contentInput.equals(""))
+                {
                     Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                } else {
+                }
+                else
+                    {
 
                     // TODO: save post to DataBase and notify to refresh adapter.
-
                     ZoneId zoneId = ZoneId.of("Israel");
                     int year = (Year.now(zoneId)).getValue();
                     int month = (YearMonth.now(zoneId)).getMonthValue();
@@ -216,23 +228,24 @@ public class CreatePostFragment extends Fragment implements IView,
     {
         m_SelectedLocation = i_SelectedLocation;
 
-        new Thread(new Runnable() {
-
+        new Thread(new Runnable()
+        {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void run() {
-
+            public void run()
+            {
                 // TODO: sometimes crashes! with exception:
                 //  " java.lang.IllegalStateException: Fragment CreatePostFragment{ce75c49}
                 //  (63531ab2-d50d-41b3-a78e-b38cc032b083) not attached to a context. "
                 m_LocationDetails = AppUtils.getStringValueFromJsonObject(requireContext(), i_SelectedLocation);
 
                 // Update the Activity's TextView
-                m_MainActivityHandlerFromRemoteThreads.post(new Runnable() {
+                m_MainActivityHandlerFromRemoteThreads.post(new Runnable()
+                {
                     @SuppressLint("SetTextI18n")
                     @Override
-                    public void run() {
-
+                    public void run()
+                    {
                         assert m_LocationDetails != null;
                         m_cityTv.setText(m_LocationDetails[2]);
                         m_streetTv.setText(m_LocationDetails[1]);
@@ -246,7 +259,8 @@ public class CreatePostFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap)
+    {
         m_GoogleMap = googleMap;
 
         // If we want to disable moving the map, uncomment this. (Source: https://stackoverflow.com/a/28452115/2196301)
@@ -272,21 +286,26 @@ public class CreatePostFragment extends Fragment implements IView,
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute)
     {
-        if (minute < 10) {
+        if (minute < 10)
+        {
             m_timeTv.setText(String.valueOf(hourOfDay) + ":0" + String.valueOf(minute));
-        } else {
+        }
+        else
+        {
             m_timeTv.setText(String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
         }
     }
 
     @Override
-    public void onSuccessToCreatePost() {
+    public void onSuccessToCreatePost()
+    {
         getParentFragmentManager().popBackStack();
         onUploadListener.onUpload();
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason) {
+    public void onFailureToCreatePost(Exception i_Reason)
+    {
         AppUtils.printDebugToLogcat("CreatePostFragment", "onFailureToCreatePost", i_Reason.toString());
         Toast.makeText(requireContext(), "Failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }

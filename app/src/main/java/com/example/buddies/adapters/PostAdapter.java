@@ -13,19 +13,27 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardResponseEventHandler;
+import com.example.buddies.interfaces.MVVM.IView;
+import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileRequestEventHandler;
+import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileResponsesEventHandler;
 
 import java.io.IOException;
 import java.util.List;
 
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder>
-        implements ILoadPostCardRequestEventHandler,
-                   ILoadPostCardResponseEventHandler {
+public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHolder>
+                         implements IView// ,
+                                    // ILoadPostCardRequestEventHandler,
+                                    // ILoadPostCardResponseEventHandler,
+                                    // IResolveUIDToUserProfileRequestEventHandler,
+                                    // IResolveUIDToUserProfileResponsesEventHandler
+{
 
     private final ViewModel m_ViewModel = ViewModel.getInstance();
 
@@ -34,9 +42,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     private PostViewHolder m_Holder;
     private Context m_Context;
+    PostAdapter i_PostAdapterToUpdate = null;
 
     // Interface for listeners
-    public interface MyPostListener {
+    public interface MyPostListener
+    {
         void onPostClicked(int index, View view) throws IOException;
     }
 
@@ -45,13 +55,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     // Constructor
     public PostAdapter(List<Post> m_Posts) { this.m_Posts = m_Posts; }
 
-    public class PostViewHolder extends RecyclerView.ViewHolder {
-
+    public class PostViewHolder extends RecyclerView.ViewHolder
+    {
         ImageView m_ImageIv;
         TextView m_NameTv, m_CityTv, m_DateTv, m_TimeTv, m_ContentTv;
 
         // Constructor
-        public PostViewHolder(@NonNull View itemView) {
+        public PostViewHolder(@NonNull View itemView)
+        {
             super(itemView);
 
             m_ImageIv = itemView.findViewById(R.id.card_post_image);
@@ -61,27 +72,32 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             m_TimeTv = itemView.findViewById(R.id.card_post_time);
             m_ContentTv = itemView.findViewById(R.id.card_post_content);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener()
+            {
                 @Override
-                public void onClick(View v) {
-
-                    if (m_Listener != null) {
-                        try {
+                public void onClick(View v)
+                {
+                    if (m_Listener != null)
+                    {
+                        try
+                        {
                             m_Listener.onPostClicked(getAdapterPosition(), v);
-                        } catch (IOException exception) {
+                        }
+                        catch (IOException exception)
+                        {
                             exception.printStackTrace();
                         }
                     }
                 }
             });
         }
-
     }
 
     // Add the first cards to fill up the screen
     @NonNull
     @Override
-    public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
+    {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_post, parent, false);
         return new PostViewHolder(view);
     }
@@ -89,52 +105,118 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
     // Loading data into cards + Recycles card when scrolling
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-
+    public void onBindViewHolder(@NonNull PostViewHolder holder, int position)
+    {
         m_Holder = holder;
         m_Context = holder.m_DateTv.getContext();
 
-        Post post = m_Posts.get(position);
+        Post m_CurrentPost = m_Posts.get(position);
 
-        holder.m_CityTv.setText(post.getMeetingCity());
-        holder.m_TimeTv.setText(post.getMeetingTime());
-        holder.m_ContentTv.setText(post.getPostContent());
+        holder.m_CityTv.setText(m_CurrentPost.getMeetingCity());
+        holder.m_TimeTv.setText(m_CurrentPost.getMeetingTime());
+        holder.m_ContentTv.setText(m_CurrentPost.getPostContent());
 
-        String creationDate = post.getPostCreationDate().getPostCreationDay() +
-                "/" + post.getPostCreationDate().getPostCreationMonth() +
-                "/" + post.getPostCreationDate().getPostCreationYear();
+        String creationDate = m_CurrentPost.getPostCreationDate().getPostCreationDay() +
+                "/" + m_CurrentPost.getPostCreationDate().getPostCreationMonth() +
+                "/" + m_CurrentPost.getPostCreationDate().getPostCreationYear();
         holder.m_DateTv.setText(m_Context.getString(R.string.created_on) +
                 " " + creationDate);
 
-        onLoadPostCard(post.getCreatorUserUID(), this);
+        // this.i_PostAdapterToUpdate = this;
+        UserProfile currentUserProfile = Model.getInstance().resolveUserProfileFromUID(m_CurrentPost.getCreatorUserUID());
+
+        if (currentUserProfile != null)
+        {
+            m_Holder.m_NameTv.setText(currentUserProfile.getFullName());
+
+            if ((currentUserProfile.getProfileImageUri() != null) && (!currentUserProfile.getProfileImageUri().equals("")))
+            {
+                // TODO: Use AppUtils method instead
+                Glide.with(m_Context).load(currentUserProfile.getProfileImageUri()).
+                        circleCrop().into(m_Holder.m_ImageIv);
+            }
+            else
+            {
+                // TODO: Use AppUtils method instead
+                Glide.with(m_Context).load(m_Context.getDrawable(R.drawable.dog_default_profile_rounded)).
+                        circleCrop().into(m_Holder.m_ImageIv);
+            }
+        }
+        else
+        {
+            Toast.makeText(m_Context, "Model.m_UserProfile is null", Toast.LENGTH_SHORT).show();
+        }
+        // onRequestToResolveUIDToUserProfile(m_CurrentPost.getCreatorUserUID(), (IView)this);
+        // onRequestToLoadPostCard(m_CurrentPost.getCreatorUserUID(), this);
     }
 
     @Override
     public int getItemCount() { return m_Posts.size(); }
 
+    /*
     @Override
-    public void onLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
-        m_ViewModel.onLoadPostCard(i_CreatorUserUID, i_PostAdapterToUpdate);
+    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate)
+    {
+        m_ViewModel.onRequestToLoadPostCard(i_CreatorUserUID, i_PostAdapterToUpdate);
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
-    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate)
+    {
+        // this.m_CreatorUserProfile = i_UserProfile;
 
         m_Holder.m_NameTv.setText(i_UserProfile.getFullName());
 
-        if ((i_UserProfile.getProfileImageUri() != null) && (!i_UserProfile.getProfileImageUri().equals(""))) {
+        if ((i_UserProfile.getProfileImageUri() != null) && (!i_UserProfile.getProfileImageUri().equals("")))
+        {
             Glide.with(m_Context).load(i_UserProfile.getProfileImageUri()).
                     circleCrop().into(m_Holder.m_ImageIv);
             System.out.println("TESTESTEST" + i_UserProfile.getProfileImageUri());
-        } else {
+        }
+        else
+        {
             Glide.with(m_Context).load(m_Context.getDrawable(R.drawable.dog_default_profile_rounded)).
                     circleCrop().into(m_Holder.m_ImageIv);
         }
     }
 
     @Override
-    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate)
+    {
         Toast.makeText(m_Context, i_Reason.getMessage(), Toast.LENGTH_SHORT).show();
     }
+    */
+
+    /*
+    @Override
+    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller)
+    {
+        m_ViewModel.onRequestToResolveUIDToUserProfile(i_UserIDToResolve, i_Caller);
+    }
+
+    @Override
+    public void onSuccessToResolveUIDToUserProfile(UserProfile i_ResolvedUserProfile, IView i_Caller)
+    {
+        m_Holder.m_NameTv.setText(i_ResolvedUserProfile.getFullName());
+
+        if ((i_ResolvedUserProfile.getProfileImageUri() != null) && (!i_ResolvedUserProfile.getProfileImageUri().equals("")))
+        {
+            Glide.with(m_Context).load(i_ResolvedUserProfile.getProfileImageUri()).
+                    circleCrop().into(m_Holder.m_ImageIv);
+            System.out.println("TESTESTEST" + i_ResolvedUserProfile.getProfileImageUri());
+        }
+        else
+        {
+            Glide.with(m_Context).load(m_Context.getDrawable(R.drawable.dog_default_profile_rounded)).
+                    circleCrop().into(m_Holder.m_ImageIv);
+        }
+    }
+
+    @Override
+    public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller)
+    {
+        Toast.makeText(m_Context, i_Reason.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+    */
 }

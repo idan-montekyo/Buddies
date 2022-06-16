@@ -30,7 +30,9 @@ import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.adapters.PostAdapter;
+import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
+import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.ePostType;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsResponseEventHandler;
@@ -43,6 +45,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -90,8 +94,8 @@ public class HomeFragment extends Fragment implements IView,
     @SuppressLint("WrongConstant")
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         Toolbar toolbar = view.findViewById(R.id.home_toolbar);
@@ -111,7 +115,8 @@ public class HomeFragment extends Fragment implements IView,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
 
         m_drawerLayout = view.findViewById(R.id.home_drawer_layout);
@@ -127,12 +132,28 @@ public class HomeFragment extends Fragment implements IView,
 
         m_PostAdapter = new PostAdapter(m_Posts);
 
-        m_PostAdapter.setListener(new PostAdapter.MyPostListener() {
+        m_PostAdapter.setListener(new PostAdapter.MyPostListener()
+        {
             @Override
-            public void onPostClicked(int index, View view) throws IOException {
-
+            public void onPostClicked(int index, View view) throws IOException
+            {
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
                 assert thisFragment != null;
+
+                Post        currentPost               = m_Posts.get(index);
+                UserProfile currentCreatorUserProfile = Model.getInstance().resolveUserProfileFromUID(currentPost.getCreatorUserUID()); // m_PostAdapter.getCreatorUserProfile();
+
+
+                String userProfileJsonString = AppUtils.getGsonParser().toJson(currentCreatorUserProfile);
+                String currentPostJsonString = AppUtils.getGsonParser().toJson(currentPost);
+
+                Bundle viewPostFragmentArguments = new Bundle();
+                viewPostFragmentArguments.putString("userProfileJsonString", userProfileJsonString);
+                viewPostFragmentArguments.putString("currentPostJsonString", currentPostJsonString);
+
+                ViewPostFragment postFragmentToLaunch = new ViewPostFragment();
+                postFragmentToLaunch.setArguments(viewPostFragmentArguments);
+
                 getParentFragmentManager().beginTransaction()
                         .setCustomAnimations(
                                 R.anim.slide_in,  // enter
@@ -140,7 +161,7 @@ public class HomeFragment extends Fragment implements IView,
                                 R.anim.fade_in,   // popEnter
                                 R.anim.slide_out) // popExit
                         .hide(thisFragment)
-                        .add(R.id.root_main_activity, new ViewPostFragment(), ViewPostFragment.VIEW_POST_FRAGMENT_TAG)
+                        .add(R.id.root_main_activity, postFragmentToLaunch, ViewPostFragment.VIEW_POST_FRAGMENT_TAG)
                         .addToBackStack(null).commit();
             }
         });
@@ -148,9 +169,11 @@ public class HomeFragment extends Fragment implements IView,
         m_RecyclerView.setAdapter(m_PostAdapter);
 
         FloatingActionButton createPostFAB = view.findViewById(R.id.home_fab);
-        createPostFAB.setOnClickListener(new View.OnClickListener() {
+        createPostFAB.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
                 assert thisFragment != null;
                 getParentFragmentManager().beginTransaction()
@@ -174,7 +197,8 @@ public class HomeFragment extends Fragment implements IView,
             createPostFAB.setVisibility(View.GONE);
         }
 
-        m_navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        m_navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
+        {
             @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item)
@@ -183,7 +207,8 @@ public class HomeFragment extends Fragment implements IView,
 
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
 
-                switch (item.getItemId()) {
+                switch (item.getItemId())
+                {
                     case R.id.menu_my_profile:
                         assert thisFragment != null;
                         getParentFragmentManager().beginTransaction()
@@ -245,7 +270,8 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item)
     {
-        if(item.getItemId() == android.R.id.home) {
+        if(item.getItemId() == android.R.id.home)
+        {
             m_drawerLayout.openDrawer(Gravity.START);
             return true;
         }
@@ -328,13 +354,15 @@ public class HomeFragment extends Fragment implements IView,
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
-    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
+    public void onSuccessToLoadPosts(List<Post> i_PostsList)
+    {
         m_Posts.clear();
         m_Posts.addAll(i_PostsList);
     }
 
     @Override
-    public void onFailureToLoadPosts(Exception i_Reason) {
+    public void onFailureToLoadPosts(Exception i_Reason)
+    {
         Snackbar.make(m_coordinatorLayout, Objects.requireNonNull(i_Reason.getMessage()), Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
@@ -342,7 +370,8 @@ public class HomeFragment extends Fragment implements IView,
     @SuppressLint("NotifyDataSetChanged")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onSuccessToCreatePost() {
+    public void onSuccessToCreatePost()
+    {
         onLoadPosts(ePostType.ALL);
         // TODO: needs to change to notifyItemInserted with pos 0 only when relevant!
         //       for example, if we search Haifa and Ashdod was added, it's not relevant to us.
@@ -352,7 +381,8 @@ public class HomeFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason) {
+    public void onFailureToCreatePost(Exception i_Reason)
+    {
         // irrelevant.
     }
 }

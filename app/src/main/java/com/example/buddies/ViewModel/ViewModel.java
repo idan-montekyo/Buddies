@@ -25,6 +25,8 @@ import com.example.buddies.interfaces.LogoutEvent.ILogoutRequestEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
 import com.example.buddies.interfaces.PostCreationEvent.IPostCreationRequestEventHandler;
 import com.example.buddies.interfaces.PostCreationEvent.IPostCreationResponseEventHandler;
+import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileRequestEventHandler;
+import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileResponsesEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupRequestEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
@@ -59,7 +61,9 @@ public class ViewModel implements IViewModel,
                                   ILoadPostsRequestEventHandler,
                                   ILoadPostsResponseEventHandler,
                                   ILoadPostCardRequestEventHandler,
-                                  ILoadPostCardResponseEventHandler
+                                  ILoadPostCardResponseEventHandler,
+                                  IResolveUIDToUserProfileRequestEventHandler,
+                                  IResolveUIDToUserProfileResponsesEventHandler
 {
     private static ViewModel _instance = null;
     // private LatLng location;
@@ -151,7 +155,8 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToAnonymousLogin(Context i_Context) {
+    public void onRequestToAnonymousLogin(Context i_Context)
+    {
         this.m_Model.onRequestToAnonymousLogin(i_Context);
     }
 
@@ -260,8 +265,8 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToCreatePost(Context i_Context, Post i_Post) {
-
+    public void onRequestToCreatePost(Context i_Context, Post i_Post)
+    {
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "calling onRequestToCreatePost()");
         this.m_Model.onRequestToCreatePost(i_Context, i_Post);
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "returned from onRequestToCreatePost()");
@@ -269,9 +274,12 @@ public class ViewModel implements IViewModel,
     }
 
     @Override
-    public void onSuccessToCreatePost() {
-        for (IView view : views) {
-            if (view instanceof IPostCreationResponseEventHandler) {
+    public void onSuccessToCreatePost()
+    {
+        for (IView view : views)
+        {
+            if (view instanceof IPostCreationResponseEventHandler)
+            {
                 ((IPostCreationResponseEventHandler)view).onSuccessToCreatePost();
             }
         }
@@ -280,7 +288,8 @@ public class ViewModel implements IViewModel,
     @Override
     public void onFailureToCreatePost(Exception i_Reason)
     {
-        for (IView view : views) {
+        for (IView view : views)
+        {
             if (view instanceof IPostCreationResponseEventHandler)
             {
                 ((IPostCreationResponseEventHandler)view).onFailureToCreatePost(i_Reason);
@@ -330,18 +339,24 @@ public class ViewModel implements IViewModel,
     }
 
     @Override
-    public void onSuccessToLoadProfile(UserProfile i_UserProfile) {
-        for (IView view : views) {
-            if (view instanceof ILoadUserProfileResponseEventHandler) {
+    public void onSuccessToLoadProfile(UserProfile i_UserProfile)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof ILoadUserProfileResponseEventHandler)
+            {
                 ((ILoadUserProfileResponseEventHandler) view).onSuccessToLoadProfile(i_UserProfile);
             }
         }
     }
 
     @Override
-    public void onFailureToLoadProfile(Exception i_Reason) {
-        for (IView view : views) {
-            if (view instanceof ILoadUserProfileResponseEventHandler) {
+    public void onFailureToLoadProfile(Exception i_Reason)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof ILoadUserProfileResponseEventHandler)
+            {
                 ((ILoadUserProfileResponseEventHandler) view).onFailureToLoadProfile(i_Reason);
             }
         }
@@ -432,18 +447,24 @@ public class ViewModel implements IViewModel,
     }
 
     @Override
-    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
-        for (IView view : views) {
-            if (view instanceof ILoadPostsResponseEventHandler) {
+    public void onSuccessToLoadPosts(List<Post> i_PostsList)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof ILoadPostsResponseEventHandler)
+            {
                 ((ILoadPostsResponseEventHandler)view).onSuccessToLoadPosts(i_PostsList);
             }
         }
     }
 
     @Override
-    public void onFailureToLoadPosts(Exception i_Reason) {
-        for (IView view : views) {
-            if (view instanceof ILoadPostsResponseEventHandler) {
+    public void onFailureToLoadPosts(Exception i_Reason)
+    {
+        for (IView view : views)
+        {
+            if (view instanceof ILoadPostsResponseEventHandler)
+            {
                 ((ILoadPostsResponseEventHandler)view).onFailureToLoadPosts(i_Reason);
             }
         }
@@ -456,17 +477,44 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
-        m_Model.onLoadPostCard(i_CreatorUserUID, i_PostAdapterToUpdate);
+    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate)
+    {
+        m_Model.onRequestToLoadPostCard(i_CreatorUserUID, i_PostAdapterToUpdate);
     }
 
     @Override
-    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate)
+    {
         ((ILoadPostCardResponseEventHandler)i_PostAdapterToUpdate).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
     }
 
     @Override
-    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate)
+    {
         ((ILoadPostCardResponseEventHandler)i_PostAdapterToUpdate).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Resolve UID To User Profile
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller)
+    {
+        this.m_Model.onRequestToResolveUIDToUserProfile(i_UserIDToResolve, i_Caller);
+    }
+
+    @Override
+    public void onSuccessToResolveUIDToUserProfile(UserProfile i_ResolvedUserProfile, IView i_Caller)
+    {
+        ((IResolveUIDToUserProfileResponsesEventHandler)i_Caller).onSuccessToResolveUIDToUserProfile(i_ResolvedUserProfile, i_Caller);
+    }
+
+    @Override
+    public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller)
+    {
+        ((IResolveUIDToUserProfileResponsesEventHandler)i_Caller).onFailureToResolveUIDToUserProfile(i_Reason, i_Caller);
     }
 }

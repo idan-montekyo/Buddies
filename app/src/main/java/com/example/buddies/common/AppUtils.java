@@ -21,7 +21,6 @@ import androidx.fragment.app.FragmentManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestListener;
 import com.example.buddies.Model.Model;
 import com.example.buddies.enums.eDogGender;
@@ -36,7 +35,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.net.HttpURLConnection;
-import java.net.Inet4Address;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,11 +43,13 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.buddies.R;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class AppUtils
 {
     Model m_Model = Model.getInstance();
+    private static Gson gson;
 
     public static String GetResourceStringValueByStringName(String i_StringName, Context i_Context)
     {
@@ -231,16 +231,16 @@ public class AppUtils
         return selectedRadioButton;
     }
 
-    public static eDogGender resolveDogGender(RadioButton i_RadioButton)
+    public static eDogGender resolveDogGender(RadioButton i_RadioButton, Context i_Context)
     {
         eDogGender m_dogGender = eDogGender.UNINITIALIZED;
         String dogGenderLabel = i_RadioButton.getText().toString();
 
-        if (dogGenderLabel.equals("זכר"))
+        if (dogGenderLabel.equals(AppUtils.GetResourceStringValueByStringName("male", i_Context)) == true)
         {
             dogGenderLabel = "MALE";
         }
-        else if (dogGenderLabel.equals("נקבה"))
+        else if (dogGenderLabel.equals(AppUtils.GetResourceStringValueByStringName("female", i_Context)) == true)
         {
             dogGenderLabel = "FEMALE";
         }
@@ -329,5 +329,16 @@ public class AppUtils
         }
 
         return false;
+    }
+
+    public static Gson getGsonParser()
+    {
+        if(null == gson)
+        {
+            GsonBuilder builder = new GsonBuilder();
+            gson = builder.create();
+        }
+
+        return gson;
     }
 }

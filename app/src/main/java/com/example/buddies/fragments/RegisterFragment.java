@@ -1,6 +1,5 @@
 package com.example.buddies.fragments;
 
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -106,22 +105,7 @@ public class RegisterFragment extends Fragment implements IView,
                 // If RadioButton selected
                 if(m_radioButton != null)
                 {
-                    /*
-                    String dogGenderLabel = m_radioButton.getText().toString();
-
-                    if (dogGenderLabel.equals("זכר"))
-                    {
-                        dogGenderLabel = "MALE";
-                    }
-                    else if (dogGenderLabel.equals("נקבה"))
-                    {
-                        dogGenderLabel = "FEMALE";
-                    }
-
-                    dogGenderInput = eDogGender.valueOf(dogGenderLabel.toUpperCase());
-                    */
-
-                    dogGenderInput = AppUtils.resolveDogGender(m_radioButton);
+                    dogGenderInput = AppUtils.resolveDogGender(m_radioButton, RegisterFragment.this.m_Context);
                 }
 
                 AppUtils.printDebugToLogcat("RegisterFragment", "onRequestToSignup", "calling onRequestToSignup()");

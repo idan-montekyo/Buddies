@@ -392,7 +392,7 @@ public class ProfileFragment extends Fragment implements IView,
                     m_dogGender = eDogGender.valueOf(dogGenderLabel.toUpperCase());
                     */
 
-                    m_dogGender = AppUtils.resolveDogGender(m_radioButton);
+                    m_dogGender = AppUtils.resolveDogGender(m_radioButton, ProfileFragment.this.m_Context);
                 }
 
                 ProfileFragment.this.compareCurrentDetailsToSavedUserProfileDetails();
@@ -444,7 +444,7 @@ public class ProfileFragment extends Fragment implements IView,
                         m_dogGender = eDogGender.valueOf(dogGenderLabel.toUpperCase());
                         */
 
-                        m_dogGender = AppUtils.resolveDogGender(m_radioButton);
+                        m_dogGender = AppUtils.resolveDogGender(m_radioButton, ProfileFragment.this.m_Context);
                     }
 
                     getParentFragmentManager().popBackStack();

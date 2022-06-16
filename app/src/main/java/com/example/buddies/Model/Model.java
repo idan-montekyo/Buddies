@@ -28,8 +28,11 @@ import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutRequestEventHandler;
 import com.example.buddies.interfaces.LogoutEvent.ILogoutResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IModel;
+import com.example.buddies.interfaces.MVVM.IView;
 import com.example.buddies.interfaces.PostCreationEvent.IPostCreationRequestEventHandler;
 import com.example.buddies.interfaces.PostCreationEvent.IPostCreationResponseEventHandler;
+import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileRequestEventHandler;
+import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileResponsesEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupRequestEventHandler;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IViewModel;
@@ -86,7 +89,9 @@ public class Model implements IModel,
                               ILoadPostsRequestEventHandler,
                               ILoadPostsResponseEventHandler,
                               ILoadPostCardRequestEventHandler,
-                              ILoadPostCardResponseEventHandler
+                              ILoadPostCardResponseEventHandler,
+                              IResolveUIDToUserProfileRequestEventHandler,
+                              IResolveUIDToUserProfileResponsesEventHandler
 {
     private static Model _instance = null;
     IViewModel viewModel = null;
@@ -785,8 +790,8 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onLoadProfile() {
-
+    public void onLoadProfile()
+    {
         m_UserProfile = m_CurrentSnapshotOfUsersTable.child(getCurrentUserUID())
                 .getValue(UserProfile.class);
         if (m_UserProfile != null) {
@@ -882,30 +887,76 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
-
-        try {
-
-            m_UserProfile = m_CurrentSnapshotOfUsersTable.child(i_CreatorUserUID).getValue(UserProfile.class);
-            if (m_UserProfile != null) {
+    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate)
+    {
+        try
+        {
+            m_UserProfile = this.resolveUserProfileFromUID(i_CreatorUserUID); // m_CurrentSnapshotOfUsersTable.child(i_CreatorUserUID).getValue(UserProfile.class);
+            if (m_UserProfile != null)
+            {
                 onSuccessToLoadPostCard(m_UserProfile, i_PostAdapterToUpdate);
-            } else {
+            }
+            else
+            {
                 onFailureToLoadPostCard(new Exception("Model.m_UserProfile is null"), i_PostAdapterToUpdate);
             }
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             onFailureToLoadPostCard(exception, i_PostAdapterToUpdate);
         }
     }
 
     @Override
-    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate)
+    {
         ((ILoadPostCardResponseEventHandler)viewModel).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
     }
 
     @Override
-    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate)
+    {
         ((ILoadPostCardResponseEventHandler)viewModel).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Resolve UID To User Profile
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller)
+    {
+        try
+        {
+            UserProfile currentResolvedUserProfile = this.resolveUserProfileFromUID(i_UserIDToResolve); // m_CurrentSnapshotOfUsersTable.child(i_CreatorUserUID).getValue(UserProfile.class);
+            if (currentResolvedUserProfile != null)
+            {
+                this.onSuccessToResolveUIDToUserProfile(currentResolvedUserProfile, i_Caller);
+            }
+            else
+            {
+                new Exception("Model.m_UserProfile is null");
+            }
+        }
+        catch (Exception err)
+        {
+            this.onFailureToResolveUIDToUserProfile(err, i_Caller);
+        }
+    }
+
+    @Override
+    public void onSuccessToResolveUIDToUserProfile(UserProfile i_ResolvedUserProfile, IView i_Caller)
+    {
+        ((IResolveUIDToUserProfileResponsesEventHandler)viewModel).onSuccessToResolveUIDToUserProfile(i_ResolvedUserProfile, i_Caller);
+    }
+
+    @Override
+    public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller)
+    {
+        ((IResolveUIDToUserProfileResponsesEventHandler)viewModel).onFailureToResolveUIDToUserProfile(i_Reason, i_Caller);
     }
 
     /*
@@ -936,5 +987,15 @@ public class Model implements IModel,
             return false;
         }
         return true;
+    }
+
+    public List<Post> getPostsList()
+    {
+        return m_PostsList;
+    }
+
+    public UserProfile resolveUserProfileFromUID(String i_UserID)
+    {
+        return m_CurrentSnapshotOfUsersTable.child(i_UserID).getValue(UserProfile.class);
     }
 }
