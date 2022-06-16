@@ -160,6 +160,8 @@ public class Model implements IModel,
                 }
 
                 AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "current user is: " + m_CurrentUser);
+
+                // Print the stack trace which led to here (Source: https://stackoverflow.com/a/7841448/2196301)
                 AppUtils.printDebugToLogcat("Model.java", "onAuthStateChanged()", "traceback: " + Log.getStackTraceString(new Exception()));
                 Model.this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.UNINITIALIZED;
             }
@@ -194,35 +196,47 @@ public class Model implements IModel,
             }
         });
 
-        this.m_UsersTable.addValueEventListener(new ValueEventListener() {
+        this.m_UsersTable.addValueEventListener(new ValueEventListener()
+        {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                try {
+            public void onDataChange(@NonNull DataSnapshot snapshot)
+            {
+                try
+                {
                     m_CurrentSnapshotOfUsersTable = snapshot;
-                } catch (Exception exception) {
+                }
+                catch (Exception exception)
+                {
                     ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(exception);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error)
+            {
                 ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(error.toException());
             }
         });
 
-        this.m_PostsTable.addValueEventListener(new ValueEventListener() {
+        this.m_PostsTable.addValueEventListener(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                try {
+            public void onDataChange(@NonNull DataSnapshot snapshot)
+            {
+                try
+                {
                     m_CurrentSnapshotOfPostsTable = snapshot;
-                } catch (Exception exception) {
+                }
+                catch (Exception exception)
+                {
                     ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(exception);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error)
+            {
                 ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(error.toException());
             }
         });
@@ -260,11 +274,15 @@ public class Model implements IModel,
     {
         try
         {
-            if (this.areRegisterDetailsValid(i_UserName, i_Password, i_FullName, i_Age, i_DogGender) == false) {
+            if (this.areRegisterDetailsValid(i_UserName, i_Password, i_FullName, i_Age, i_DogGender) == false)
+            {
                 throw new Exception("Fill in all required details");
-            } else if (AppUtils.isNetworkAvailable(i_Context) == false) {
+            }
+            else if (AppUtils.isNetworkAvailable(i_Context) == false)
+            {
                 throw new Exception("No internet access");
             }
+
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.SIGN_UP;
             AppUtils.printDebugToLogcat("Model", "onRequestToSignup", "trying to sign up the desired user ...");
 
@@ -330,7 +348,8 @@ public class Model implements IModel,
         // firebase code here
         try
         {
-            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+            if (AppUtils.isNetworkAvailable(i_Context) == false)
+            {
                 throw new Exception("No internet access");
             }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_IN;
@@ -417,7 +436,8 @@ public class Model implements IModel,
     {
         try
         {
-            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+            if (AppUtils.isNetworkAvailable(i_Context) == false)
+            {
                 throw new Exception("No internet access");
             }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_OUT;
@@ -461,7 +481,8 @@ public class Model implements IModel,
 
             // Save city at FireBase -> cities (if the city does not exist already).
             String desiredCity = i_Post.getMeetingCity();
-            if (!this.m_ListOfCities.contains(desiredCity)) {
+            if (!this.m_ListOfCities.contains(desiredCity))
+            {
                 m_CitiesTable.child(desiredCity).setValue(true);
             }
             onSuccessToCreatePost();
@@ -794,20 +815,25 @@ public class Model implements IModel,
     {
         m_UserProfile = m_CurrentSnapshotOfUsersTable.child(getCurrentUserUID())
                 .getValue(UserProfile.class);
-        if (m_UserProfile != null) {
+        if (m_UserProfile != null)
+        {
             onSuccessToLoadProfile(m_UserProfile);
-        } else {
+        }
+        else
+        {
             onFailureToLoadProfile(new Exception("Model.m_UserProfile is null"));
         }
     }
 
     @Override
-    public void onSuccessToLoadProfile(UserProfile i_UserProfile) {
+    public void onSuccessToLoadProfile(UserProfile i_UserProfile)
+    {
         ((ILoadUserProfileResponseEventHandler)viewModel).onSuccessToLoadProfile(i_UserProfile);
     }
 
     @Override
-    public void onFailureToLoadProfile(Exception i_Reason) {
+    public void onFailureToLoadProfile(Exception i_Reason)
+    {
         ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(i_Reason);
     }
 
@@ -819,16 +845,20 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) {
-
-        try {
+    public void onLoadPosts(ePostType type)
+    {
+        try
+        {
             m_PostsTable = m_CurrentSnapshotOfPostsTable.getRef();
             m_PostsList = new ArrayList<>();
 
-            switch (type) {
+            switch (type)
+            {
                 case ALL:
-                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
-                        for (DataSnapshot post : UserUIDs.getChildren()) {
+                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren())
+                    {
+                        for (DataSnapshot post : UserUIDs.getChildren())
+                        {
                             LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
                                     (double) post.child("meetingLocation").child("longitude").getValue());
 
@@ -836,6 +866,9 @@ public class Model implements IModel,
                             Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
                             Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
                             Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
+
+                            // Instead of the code below, this can be done too:
+                            // Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
 
                             LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
                                     localSecond.intValue(), localNano.intValue());
@@ -858,6 +891,12 @@ public class Model implements IModel,
                     }
                     break;
                 case MY_POSTS:
+                    for (DataSnapshot post : m_CurrentSnapshotOfPostsTable.child(getCurrentUserUID()).getChildren()) {
+
+                        Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
+                        m_PostsList.add(newPost);
+                    }
+                    break;
                 case POSTS_I_COMMENTED_ON:
                     break;
             }
@@ -865,18 +904,59 @@ public class Model implements IModel,
             Collections.sort(m_PostsList);
             Model.this.onSuccessToLoadPosts(m_PostsList);
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
+            Model.this.onFailureToLoadPosts(exception);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onLoadPostsByCity(String i_SearchedCity)
+    {
+        try
+        {
+            if (!this.m_ListOfCities.contains(i_SearchedCity))
+            {
+                this.onLoadPosts(ePostType.ALL);
+            }
+            else
+            {
+                m_PostsList = new ArrayList<>();
+
+                for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren())
+                {
+                    for (DataSnapshot post : UserUIDs.getChildren())
+                    {
+                        Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
+                        if (newPost.getMeetingCity().equals(i_SearchedCity))
+                        {
+                            m_PostsList.add(newPost);
+                        }
+                    }
+                }
+
+                Collections.sort(m_PostsList);
+                Model.this.onSuccessToLoadPosts(m_PostsList);
+            }
+
+        }
+        catch (Exception exception)
+        {
             Model.this.onFailureToLoadPosts(exception);
         }
     }
 
     @Override
-    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
+    public void onSuccessToLoadPosts(List<Post> i_PostsList)
+    {
         ((ILoadPostsResponseEventHandler)viewModel).onSuccessToLoadPosts(i_PostsList);
     }
 
     @Override
-    public void onFailureToLoadPosts(Exception i_Reason) {
+    public void onFailureToLoadPosts(Exception i_Reason)
+    {
         ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(i_Reason);
     }
 
@@ -965,20 +1045,11 @@ public class Model implements IModel,
     ****************************************************************************************************
     */
 
-    public boolean isUserLoggedIn()
-    {
-        return this.m_CurrentUser != null;
-    }
+    public boolean isUserLoggedIn() { return this.m_CurrentUser != null; }
 
-    public boolean isCurrentUserAnonymous()
-    {
-        return this.m_CurrentUser.isAnonymous();
-    }
+    public boolean isCurrentUserAnonymous() { return this.m_CurrentUser.isAnonymous(); }
 
-    public String getCurrentUserUID()
-    {
-        return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid();
-    }
+    public String getCurrentUserUID() { return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid(); }
 
     public boolean areRegisterDetailsValid(String i_UserName, String i_Password,
                                            String i_FullName, String i_age, eDogGender i_DogGender) {

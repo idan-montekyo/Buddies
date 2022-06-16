@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,6 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
@@ -65,15 +67,19 @@ public class HomeFragment extends Fragment implements IView,
 {
     public static final String HOME_FRAGMENT_TAG = "home_fragment";
 
-    DrawerLayout m_drawerLayout;
-    NavigationView m_navigationView;
-    CoordinatorLayout m_coordinatorLayout;
     ViewModel m_ViewModel = ViewModel.getInstance();
-    MaterialAutoCompleteTextView m_MaterialAutoCompleteTextView_SearchPostsByCity = null;
     Context m_Context = null;
+    Handler m_Handler = new Handler();
+
+    DrawerLayout m_DrawerLayout;
+    NavigationView m_NavigationView;
+    CoordinatorLayout m_CoordinatorLayout;
+    MaterialAutoCompleteTextView m_MaterialAutoCompleteTextView_SearchPostsByCity = null;
     RecyclerView m_RecyclerView;
+    SwipeRefreshLayout m_SwipeRefreshLayout;
 
     public static List<Post> m_Posts = new ArrayList<>();
+    @SuppressLint("StaticFieldLeak")
     public static PostAdapter m_PostAdapter;
 
     @Override
@@ -99,7 +105,7 @@ public class HomeFragment extends Fragment implements IView,
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         Toolbar toolbar = view.findViewById(R.id.home_toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
 
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         assert actionBar != null;
@@ -119,10 +125,39 @@ public class HomeFragment extends Fragment implements IView,
     {
         super.onViewCreated(view, savedInstanceState);
 
-        m_drawerLayout = view.findViewById(R.id.home_drawer_layout);
-        m_navigationView = view.findViewById(R.id.home_navigation_view);
+        m_DrawerLayout = view.findViewById(R.id.home_drawer_layout);
+        m_NavigationView = view.findViewById(R.id.home_navigation_view);
 
-        m_coordinatorLayout = view.findViewById(R.id.home_coordinator_layout);
+        m_CoordinatorLayout = view.findViewById(R.id.home_coordinator_layout);
+
+        m_SwipeRefreshLayout = view.findViewById(R.id.home_swipe_refresh_layout);
+        m_SwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+        {
+            @Override
+            public void onRefresh()
+            {
+                String currentSearch = m_MaterialAutoCompleteTextView_SearchPostsByCity.getText().toString();
+
+                m_Handler.postDelayed(new Runnable()
+                {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void run()
+                    {
+                        if (currentSearch.equals(""))
+                        {
+                            onLoadPosts(ePostType.ALL);
+                        }
+                        else
+                        {
+                            onLoadPostsByCity(currentSearch);
+                        }
+                        Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
+                        m_SwipeRefreshLayout.setRefreshing(false);
+                    }
+                }, 1500);
+            }
+        });
 
         m_RecyclerView = view.findViewById(R.id.home_recycler_view);
         m_RecyclerView.setHasFixedSize(true);
@@ -190,26 +225,27 @@ public class HomeFragment extends Fragment implements IView,
 
         if (Model.getInstance().isCurrentUserAnonymous() == true)
         {
-            m_navigationView.getMenu().removeItem(R.id.menu_my_posts);
-            m_navigationView.getMenu().removeItem(R.id.menu_posts_i_commented_on);
-            m_navigationView.getMenu().removeItem(R.id.menu_my_profile);
+            m_NavigationView.getMenu().removeItem(R.id.menu_my_posts);
+            m_NavigationView.getMenu().removeItem(R.id.menu_posts_i_commented_on);
+            m_NavigationView.getMenu().removeItem(R.id.menu_my_profile);
 
             createPostFAB.setVisibility(View.GONE);
         }
 
-        m_navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
+        m_NavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
         {
             @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item)
             {
-                m_drawerLayout.closeDrawers();
+                m_DrawerLayout.closeDrawers();
 
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
 
                 switch (item.getItemId())
                 {
                     case R.id.menu_my_profile:
+
                         assert thisFragment != null;
                         getParentFragmentManager().beginTransaction()
                                 .setCustomAnimations(
@@ -222,8 +258,43 @@ public class HomeFragment extends Fragment implements IView,
                                 .addToBackStack(null).commit();
                         break;
                     case R.id.menu_my_posts:
+
+                        Bundle bundleMyPosts = new Bundle();
+                        bundleMyPosts.putString(RecyclerViewFragment.ACTION_KEY, RecyclerViewFragment.ACTION_MY_POSTS);
+
+                        RecyclerViewFragment recyclerViewFragmentMyPosts = new RecyclerViewFragment();
+                        recyclerViewFragmentMyPosts.setArguments(bundleMyPosts);
+
+                        assert thisFragment != null;
+                        getParentFragmentManager().beginTransaction()
+                                .setCustomAnimations(
+                                        R.anim.slide_in,  // enter
+                                        R.anim.fade_out,  // exit
+                                        R.anim.fade_in,   // popEnter
+                                        R.anim.slide_out) // popExit
+                                .hide(thisFragment)
+                                .add(R.id.root_main_activity, recyclerViewFragmentMyPosts, RecyclerViewFragment.RECYCLER_VIEW_FRAGMENT_TAG)
+                                .addToBackStack(null).commit();
                         break;
                     case R.id.menu_posts_i_commented_on:
+
+                        Bundle bundlePostsICommentedOn = new Bundle();
+                        bundlePostsICommentedOn.putString(RecyclerViewFragment.ACTION_KEY,
+                                                          RecyclerViewFragment.ACTION_POSTS_I_COMMENTED_ON);
+
+                        RecyclerViewFragment recyclerViewFragmentPostsICommentedOn = new RecyclerViewFragment();
+                        recyclerViewFragmentPostsICommentedOn.setArguments(bundlePostsICommentedOn);
+
+                        assert thisFragment != null;
+                        getParentFragmentManager().beginTransaction()
+                                .setCustomAnimations(
+                                        R.anim.slide_in,  // enter
+                                        R.anim.fade_out,  // exit
+                                        R.anim.fade_in,   // popEnter
+                                        R.anim.slide_out) // popExit
+                                .hide(thisFragment)
+                                .add(R.id.root_main_activity, recyclerViewFragmentPostsICommentedOn, RecyclerViewFragment.RECYCLER_VIEW_FRAGMENT_TAG)
+                                .addToBackStack(null).commit();
                         break;
                     case R.id.menu_settings:
                         break;
@@ -247,6 +318,7 @@ public class HomeFragment extends Fragment implements IView,
         ImageButton searchBtn = view.findViewById(R.id.home_search_image_button);
         searchBtn.setOnClickListener(new View.OnClickListener()
         {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View v)
             {
@@ -255,13 +327,14 @@ public class HomeFragment extends Fragment implements IView,
                 // Search bar is empty.
                 if (selectedCity.equals(""))
                 {
-                    Toast.makeText(HomeFragment.this.m_Context, "No city was searched for", Toast.LENGTH_SHORT).show();
+                    onLoadPosts(ePostType.ALL);
                 }
                 else
                 {
-                    // TODO: retrieve from the firebase all the posts in that city
-                    Toast.makeText(HomeFragment.this.m_Context, selectedCity, Toast.LENGTH_SHORT).show();
+                    onLoadPostsByCity(selectedCity);
                 }
+                Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
+                m_SwipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -272,7 +345,7 @@ public class HomeFragment extends Fragment implements IView,
     {
         if(item.getItemId() == android.R.id.home)
         {
-            m_drawerLayout.openDrawer(Gravity.START);
+            m_DrawerLayout.openDrawer(Gravity.START);
             return true;
         }
 
@@ -291,7 +364,7 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public void onUpload()
     {
-        Snackbar.make(m_coordinatorLayout, "post successfully uploaded", Snackbar.LENGTH_LONG)
+        Snackbar.make(m_CoordinatorLayout, "post successfully uploaded", Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
 
@@ -307,7 +380,7 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public void onFailureToLogout(Exception i_Reason)
     {
-        Snackbar.make(m_coordinatorLayout, "Logout Failed: " + i_Reason.getMessage(), Snackbar.LENGTH_LONG)
+        Snackbar.make(m_CoordinatorLayout, "Logout Failed: " + i_Reason.getMessage(), Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
 
@@ -342,15 +415,16 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public void onFailureToUpdateListOfCities(Exception i_Reason)
     {
-        Snackbar.make(m_coordinatorLayout, "Update of list of cities failed: " + i_Reason.getMessage(), Snackbar.LENGTH_LONG)
+        Snackbar.make(m_CoordinatorLayout, "Update of list of cities failed: " + i_Reason.getMessage(), Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) {
-        m_ViewModel.onLoadPosts(type);
-    }
+    public void onLoadPosts(ePostType type) { m_ViewModel.onLoadPosts(type); }
+
+    @Override
+    public void onLoadPostsByCity(String i_SearchedCity) { m_ViewModel.onLoadPostsByCity(i_SearchedCity); }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -363,10 +437,11 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public void onFailureToLoadPosts(Exception i_Reason)
     {
-        Snackbar.make(m_coordinatorLayout, Objects.requireNonNull(i_Reason.getMessage()), Snackbar.LENGTH_LONG)
+        Snackbar.make(m_CoordinatorLayout, Objects.requireNonNull(i_Reason.getMessage()), Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
 
+    /*
     @SuppressLint("NotifyDataSetChanged")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -377,6 +452,24 @@ public class HomeFragment extends Fragment implements IView,
         //       for example, if we search Haifa and Ashdod was added, it's not relevant to us.
         Objects.requireNonNull(this.m_RecyclerView.getAdapter()).notifyDataSetChanged();
         this.m_RecyclerView.invalidate();
+    }
+    */
+
+    @SuppressLint("NotifyDataSetChanged")
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onSuccessToCreatePost()
+    {
+        m_Handler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                onLoadPosts(ePostType.ALL);
+                Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
+                // this.m_RecyclerView.invalidate();
+            }
+        });
 
     }
 

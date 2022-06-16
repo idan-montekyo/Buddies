@@ -90,23 +90,24 @@ public class ViewModel implements IViewModel,
     // public LatLng getLocation() { return this.location; }
 
     @Override
-    public void registerForEvents(IView i_NewVIew) { this.views.add(i_NewVIew); }
+    public void registerForEvents(IView i_NewView) { this.views.add(i_NewView); }
 
     @Override
-    public void unregisterForEvents(IView i_ViewToUnregister)
-    {
+    public void registerForEventsAtIndex0(IView i_ViewToRegisterAtIndex0) {
+        this.views.add(0, i_ViewToRegisterAtIndex0);
+    }
+
+    @Override
+    public void unregisterForEvents(IView i_ViewToUnregister) {
         this.views.remove(i_ViewToUnregister);
     }
 
     // public void setLocation(LatLng i_NewLocation) { this.location = i_NewLocation; }
 
     @Override
-    public void onLocationSelected(LatLng i_SelectedLocation)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILocationSelect_EventHandler)
-            {
+    public void onLocationSelected(LatLng i_SelectedLocation) {
+        for (IView view : views) {
+            if (view instanceof ILocationSelect_EventHandler) {
                 ((ILocationSelect_EventHandler)view).onLocationSelected(i_SelectedLocation);
             }
         }
@@ -442,9 +443,10 @@ public class ViewModel implements IViewModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) {
-        m_Model.onLoadPosts(type);
-    }
+    public void onLoadPosts(ePostType type) { m_Model.onLoadPosts(type); }
+
+    @Override
+    public void onLoadPostsByCity(String i_SearchedCity) { m_Model.onLoadPostsByCity(i_SearchedCity); }
 
     @Override
     public void onSuccessToLoadPosts(List<Post> i_PostsList)

@@ -88,12 +88,16 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                 // Do this dummy permission check because the code doesn't recognize that we are inside a code block that means the location
                 // permission is actually granted (Source: https://www.gool.co.il/MyCourses/Chapter/86423#83994)
                 int hasLocationPermission = this.m_Context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
-                if (hasLocationPermission == PackageManager.PERMISSION_GRANTED) {
+
+                if (hasLocationPermission == PackageManager.PERMISSION_GRANTED)
+                {
                     LocationManager manager = (LocationManager) SelectLocationFragment.this.m_Context.getSystemService(LOCATION_SERVICE);
 
-                    SelectLocationFragment.this.m_LocationListener = new LocationListener() {
+                    SelectLocationFragment.this.m_LocationListener = new LocationListener()
+                    {
                         @Override
-                        public void onLocationChanged(@NonNull Location location) {
+                        public void onLocationChanged(@NonNull Location location)
+                        {
                             SelectLocationFragment.this.startingCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
 
                             // After the first location has been granted, stop getting more location updates - we don't need them.
@@ -104,6 +108,7 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                         }
                     };
 
+                    // Check if the location service is enabled (Source: https://stackoverflow.com/a/54648795/2196301)
                     if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false)
                     {
                         // Create a dialog for ordering the user to turn on the gps
@@ -111,10 +116,12 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                         alertDialogBuilder.setTitle("Location Access Alert");
                         alertDialogBuilder.setMessage("You will be now redirected to the settings page in order to turn on gps location.\nAfter the location access confirmation, please wait a few seconds in order the app will recognize your location.");
                         alertDialogBuilder.setCancelable(false);
-                        alertDialogBuilder.setPositiveButton("Take me there !", new DialogInterface.OnClickListener() {
+                        alertDialogBuilder.setPositiveButton("Take me there !", new DialogInterface.OnClickListener()
+                        {
                             @Override
                             public void onClick(DialogInterface dialog, int which)
                             {
+                                // Open the GPS settings (Source: https://stackoverflow.com/a/23040461/2196301)
                                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                             }
                         });
@@ -128,11 +135,6 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
             }
             else
             {
-                // Explain to the user that the feature is unavailable because the
-                // features requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
                 SelectLocationFragment.this.startingCoordinates = new LatLng(31.881417, 34.709998);
 
                 // Start load the map
@@ -198,8 +200,6 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
-
-
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -229,14 +229,12 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
 
         if (currMarker == null)
         {
-            currMarker = m_Map.addMarker(new MarkerOptions().position(this.currentLatLng).title("Title").snippet("Description"));
+            currMarker = m_Map.addMarker(new MarkerOptions().position(this.currentLatLng).title("The place I chose").snippet(""));
         }
         else
         {
             currMarker.setPosition(latLng);
         }
-
-        // Toast.makeText(getContext(), latLng.toString(), Toast.LENGTH_SHORT).show();
     }
 
     @Override

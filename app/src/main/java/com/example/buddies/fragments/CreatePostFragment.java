@@ -201,8 +201,7 @@ public class CreatePostFragment extends Fragment implements IView,
                     Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
                 else
-                    {
-
+                {
                     // TODO: save post to DataBase and notify to refresh adapter.
                     ZoneId zoneId = ZoneId.of("Israel");
                     int year = (Year.now(zoneId)).getValue();
@@ -218,7 +217,8 @@ public class CreatePostFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy()
+    {
         this.m_ViewModel.unregisterForEvents((IView) this);
         super.onDestroy();
     }
