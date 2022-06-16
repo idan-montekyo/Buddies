@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/gray50"
+    android:id="@+id/recycler_view_coordinator_layout">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!--        Change res.values.themes parent to '...NoActionBar'-->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/recycler_view_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/gray30"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            app:layout_scrollFlags="enterAlways">
+
+            <ImageButton
+                android:id="@+id/recycler_view_back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="@color/white"
+                android:background="@null"
+                android:layout_gravity="top|start"
+                android:layout_margin="20dp"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/recycler_view_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/my_posts"
+                android:textColor="@color/faded_white"
+                android:textStyle="bold|italic"
+                android:textSize="25sp"
+                android:layout_gravity="center"/>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

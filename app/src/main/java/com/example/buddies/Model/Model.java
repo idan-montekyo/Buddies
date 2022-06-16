@@ -829,6 +829,12 @@ public class Model implements IModel,
                     }
                     break;
                 case MY_POSTS:
+                    for (DataSnapshot post : m_CurrentSnapshotOfPostsTable.child(getCurrentUserUID()).getChildren()) {
+
+                        Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
+                        m_PostsList.add(newPost);
+                    }
+                    break;
                 case POSTS_I_COMMENTED_ON:
                     break;
             }
