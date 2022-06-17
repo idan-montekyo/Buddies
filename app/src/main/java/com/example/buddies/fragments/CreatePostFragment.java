@@ -307,6 +307,6 @@ public class CreatePostFragment extends Fragment implements IView,
     public void onFailureToCreatePost(Exception i_Reason)
     {
         AppUtils.printDebugToLogcat("CreatePostFragment", "onFailureToCreatePost", i_Reason.toString());
-        Toast.makeText(requireContext(), "Failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(requireContext(), "Post failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }
 }

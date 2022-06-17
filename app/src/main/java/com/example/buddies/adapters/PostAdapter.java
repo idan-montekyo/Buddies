@@ -18,11 +18,7 @@ import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
-import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardRequestEventHandler;
-import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardResponseEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
-import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileRequestEventHandler;
-import com.example.buddies.interfaces.ResolveUIDToUserProfileEvent.IResolveUIDToUserProfileResponsesEventHandler;
 
 import java.io.IOException;
 import java.util.List;
@@ -116,9 +112,9 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
         holder.m_TimeTv.setText(m_CurrentPost.getMeetingTime());
         holder.m_ContentTv.setText(m_CurrentPost.getPostContent());
 
-        String creationDate = m_CurrentPost.getPostCreationDate().getPostCreationDay() +
-                "/" + m_CurrentPost.getPostCreationDate().getPostCreationMonth() +
-                "/" + m_CurrentPost.getPostCreationDate().getPostCreationYear();
+        String creationDate = m_CurrentPost.getPostCreationDate().getCreationDay() +
+                "/" + m_CurrentPost.getPostCreationDate().getCreationMonth() +
+                "/" + m_CurrentPost.getPostCreationDate().getCreationYear();
         holder.m_DateTv.setText(m_Context.getString(R.string.created_on) +
                 " " + creationDate);
 

@@ -11,15 +11,15 @@ import java.time.LocalTime;
 
 public class Post implements Comparable<Post> {
 
-    String creatorUserUID;
-    String meetingCity;
-    String meetingStreet;
-    String meetingTime;
-    LatLng meetingLocation;
-    String postContent;
-    LocalTime postCreationTime;
-    PostCreationDate postCreationDate;
-    long postCreationDateTimeAsLong;
+    private String creatorUserUID;
+    private String meetingCity;
+    private String meetingStreet;
+    private String meetingTime;
+    private LatLng meetingLocation;
+    private String postContent;
+    private LocalTime postCreationTime;
+    private MyCreationDate postCreationDate;
+    private long postCreationDateTimeAsLong;
 
     public Post() { }
 
@@ -37,8 +37,8 @@ public class Post implements Comparable<Post> {
         // Gets current time based on user's current location.
         this.postCreationTime = LocalTime.now();
         // Initialize date holder class.
-        this.postCreationDate = new PostCreationDate(i_PostCreationYear, i_PostCreationMonth,
-                                                     i_PostCreationDay);
+        this.postCreationDate = new MyCreationDate(i_PostCreationYear, i_PostCreationMonth,
+                                                   i_PostCreationDay);
 
         // Creating a long representing YYYY-MM-DD-HH-MM-SS for more convenient comparisons.
         // Meaning - newer posts will have higher value, and older posts will have lower value.
@@ -74,8 +74,8 @@ public class Post implements Comparable<Post> {
         this.postContent = i_PostContent;
         this.postCreationTime = i_PostCreationTime;
         // Initialize date holder class.
-        this.postCreationDate = new PostCreationDate(i_PostCreationYear, i_PostCreationMonth,
-                i_PostCreationDay);
+        this.postCreationDate = new MyCreationDate(i_PostCreationYear, i_PostCreationMonth,
+                                                   i_PostCreationDay);
         this.postCreationDateTimeAsLong = i_PostCreationDateTimeAsLong;
     }
 
@@ -87,7 +87,7 @@ public class Post implements Comparable<Post> {
     public LatLng getMeetingLocation() { return meetingLocation; }
     public String getPostContent() { return postContent; }
     public LocalTime getPostCreationTime() { return postCreationTime; }
-    public PostCreationDate getPostCreationDate() { return postCreationDate; }
+    public MyCreationDate getPostCreationDate() { return postCreationDate; }
     public long getPostCreationDateTimeAsLong() { return postCreationDateTimeAsLong; }
 
     // Setters
@@ -103,6 +103,7 @@ public class Post implements Comparable<Post> {
         return (int)comparison;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Post{" +

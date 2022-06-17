@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -423,6 +422,7 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public void onLoadPosts(ePostType type) { m_ViewModel.onLoadPosts(type); }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onLoadPostsByCity(String i_SearchedCity) { m_ViewModel.onLoadPostsByCity(i_SearchedCity); }
 

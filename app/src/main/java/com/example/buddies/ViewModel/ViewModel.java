@@ -8,10 +8,13 @@ import androidx.annotation.RequiresApi;
 import com.example.buddies.Model.Model;
 import com.example.buddies.adapters.PostAdapter;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.Comment;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
 import com.example.buddies.enums.ePostType;
+import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationRequestEventHandler;
+import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationResponseEventHandler;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardResponseEventHandler;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
@@ -63,7 +66,9 @@ public class ViewModel implements IViewModel,
                                   ILoadPostCardRequestEventHandler,
                                   ILoadPostCardResponseEventHandler,
                                   IResolveUIDToUserProfileRequestEventHandler,
-                                  IResolveUIDToUserProfileResponsesEventHandler
+                                  IResolveUIDToUserProfileResponsesEventHandler,
+                                  ICommentCreationRequestEventHandler,
+                                  ICommentCreationResponseEventHandler
 {
     private static ViewModel _instance = null;
     // private LatLng location;
@@ -445,6 +450,7 @@ public class ViewModel implements IViewModel,
     @Override
     public void onLoadPosts(ePostType type) { m_Model.onLoadPosts(type); }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onLoadPostsByCity(String i_SearchedCity) { m_Model.onLoadPostsByCity(i_SearchedCity); }
 
@@ -518,5 +524,32 @@ public class ViewModel implements IViewModel,
     public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller)
     {
         ((IResolveUIDToUserProfileResponsesEventHandler)i_Caller).onFailureToResolveUIDToUserProfile(i_Reason, i_Caller);
+    }
+
+    /*
+    ****************************************************************************************************
+                                         TASK: Create Comment
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToCreateComment(Comment i_Comment) { m_Model.onRequestToCreateComment(i_Comment); }
+
+    @Override
+    public void onSuccessToCreateComment() {
+        for (IView view : views) {
+            if (view instanceof ICommentCreationResponseEventHandler) {
+                ((ICommentCreationResponseEventHandler)view).onSuccessToCreateComment();
+            }
+        }
+    }
+
+    @Override
+    public void onFailureToCreateComment(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ICommentCreationResponseEventHandler) {
+                ((ICommentCreationResponseEventHandler)view).onFailureToCreateComment(i_Reason);
+            }
+        }
     }
 }
