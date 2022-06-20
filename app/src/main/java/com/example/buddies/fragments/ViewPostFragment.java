@@ -1,8 +1,10 @@
 package com.example.buddies.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,10 +32,14 @@ import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.adapters.CommentAdapter;
+import com.example.buddies.adapters.PostAdapter;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.Comment;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.eDogGender;
+import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationRequestEventHandler;
+import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationResponseEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
@@ -44,17 +51,31 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.time.MonthDay;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ViewPostFragment extends    Fragment
                               implements IView,
                                          ILoadUserProfileRequestEventHandler,
                                          ILoadUserProfileResponseEventHandler,
-                                         OnMapReadyCallback
-{
+                                         OnMapReadyCallback,
+                                         ICommentCreationRequestEventHandler,
+                                         ICommentCreationResponseEventHandler {
+
     public static final String VIEW_POST_FRAGMENT_TAG = "view_post_fragment";
 
     private UserProfile m_CurrentUserProfile = null;
     private Context m_Context = null;
     ViewModel m_ViewModel = ViewModel.getInstance();
+
+    // TODO: continue same as done with posts:
+//    public static List<Comment> m_Comments = new ArrayList<>();
+//    @SuppressLint("StaticFieldLeak")
+//    public static CommentAdapter m_commentAdapter;
 
     RecyclerView m_RecyclerView;
 
@@ -105,6 +126,9 @@ public class ViewPostFragment extends    Fragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+
+        final String SHOW_LOCATION = m_Context.getString(R.string.show_location);
+        final String HIDE_LOCATION = m_Context.getString(R.string.hide_location);
 
         ImageButton backBtn = view.findViewById(R.id.view_post_back_image_button);
         backBtn.setOnClickListener(new View.OnClickListener()
@@ -165,6 +189,7 @@ public class ViewPostFragment extends    Fragment
                 else
                 {
                     meetingLocationMapView.setVisibility(View.GONE);
+                    showHideLocationBtn.setText(SHOW_LOCATION);
                 }
             }
         });
@@ -317,5 +342,17 @@ public class ViewPostFragment extends    Fragment
 
         // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
         m_GoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPost.getMeetingLocation(), 14f));
+    }
+
+    @Override
+    public void onRequestToCreateComment(Comment i_Comment) { m_ViewModel.onRequestToCreateComment(i_Comment); }
+
+    @Override
+    public void onSuccessToCreateComment() { addCommentEt.setText(""); }
+
+    @Override
+    public void onFailureToCreateComment(Exception i_Reason) {
+        AppUtils.printDebugToLogcat("ViewPostFragment", "onFailureToCreateComment", i_Reason.toString());
+        Toast.makeText(m_Context, "Comment failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }
 }
