@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,6 +28,7 @@ import com.bumptech.glide.request.target.Target;
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
+import com.example.buddies.adapters.CommentAdapter;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
@@ -173,30 +175,61 @@ public class ViewPostFragment extends    Fragment
         //  + load comments from FireBase.
 
         userImageIv = view.findViewById(R.id.view_post_user_image_view);
-        // TODO: insert currentUser's image.
-        UserProfile currentLoggedOnUserProfile = Model.getInstance().resolveUserProfileFromUID(Model.getInstance().getCurrentUserUID());
-        AppUtils.loadImageUsingGlide(
-                this.m_Context,
-                Uri.parse(currentLoggedOnUserProfile.getProfileImageUri()),
-                null,
-                null,
-                true,
-                null,
-                userImageIv);
-
         addCommentEt = view.findViewById(R.id.view_post_add_comment_edit_text);
         sendCommentBtn = view.findViewById(R.id.view_post_send_comment_image_button);
-        sendCommentBtn.setOnClickListener(new View.OnClickListener()
+
+        if (Model.getInstance().isCurrentUserAnonymous() == false)
         {
-            @Override
-            public void onClick(View v)
+            // TODO: insert currentUser's image.
+            UserProfile currentLoggedOnUserProfile = Model.getInstance().resolveUserProfileFromUID(Model.getInstance().getCurrentUserUID());
+            AppUtils.loadImageUsingGlide(
+                    this.m_Context,
+                    Uri.parse(currentLoggedOnUserProfile.getProfileImageUri()),
+                    null,
+                    null,
+                    true,
+                    null,
+                    userImageIv);
+
+            sendCommentBtn.setOnClickListener(new View.OnClickListener()
             {
-                // TODO: if addCommentEt is not-empty:
-                //  1. save comment to FireBase
-                //  2. notify (refresh) m_RecyclerView
-                //  3. addCommentEt.settext("")
-            }
-        });
+                @Override
+                public void onClick(View v)
+                {
+                    // TODO: if addCommentEt is not-empty:
+                    //  1. save comment to FireBase
+                    //  2. notify (refresh) m_RecyclerView
+                    //  3. addCommentEt.settext("")
+                }
+            });
+        }
+        else
+        {
+            float alphaValue = 0.15f;
+
+            userImageIv.setEnabled(false);
+            userImageIv.setAlpha(alphaValue);
+
+            addCommentEt.setEnabled(false);
+            addCommentEt.setAlpha(alphaValue);
+
+            sendCommentBtn.setEnabled(false);
+            sendCommentBtn.setAlpha(alphaValue);
+        }
+
+        // TODO: Continue coding the recyclerview logic here !
+
+        RecyclerView recycler = view.findViewById(R.id.view_post_recycler_view);
+        RecyclerView.LayoutManager manager = new LinearLayoutManager(this.m_Context);
+        recycler.setLayoutManager(manager);
+
+        CommentAdapter commentAdapter = new CommentAdapter(/*getAllPostComments()*/);
+
+        /*
+        If needed, add here ItemTouchHelper or any other logic to handle events in the recycler view (like swipe, click or long click)
+        */
+
+        // recycler.setAdapter(commentAdapter);
     }
 
     @Override
