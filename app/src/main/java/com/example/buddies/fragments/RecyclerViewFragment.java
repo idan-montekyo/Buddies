@@ -106,12 +106,12 @@ public class RecyclerViewFragment extends Fragment implements IView,
         switch (m_Action) {
             case RecyclerViewFragment.ACTION_MY_POSTS:
                 titleTv.setText(m_Context.getString(R.string.my_posts));
-                onLoadPosts(ePostType.MY_POSTS);
+                onRequestToLoadPosts(ePostType.MY_POSTS);
                 break;
             case RecyclerViewFragment.ACTION_POSTS_I_COMMENTED_ON:
                 titleTv.setText(m_Context.getString(R.string.posts_i_commented_on));
                 // TODO: handle Model.onLoadPosts(ePostType.POSTS_I_COMMENTED_ON)
-//                onLoadPosts(ePostType.POSTS_I_COMMENTED_ON);
+                // onLoadPosts(ePostType.POSTS_I_COMMENTED_ON);
                 break;
         }
 
@@ -148,10 +148,10 @@ public class RecyclerViewFragment extends Fragment implements IView,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) { this.m_ViewModel.onLoadPosts(type); }
+    public void onRequestToLoadPosts(ePostType type) { this.m_ViewModel.onRequestToLoadPosts(type); }
 
     @Override
-    public void onLoadPostsByCity(String i_SearchedCity) { } // Irrelevant.
+    public void onRequestToLoadPostsByCity(String i_SearchedCity) { } // Irrelevant.
 
     @Override
     public void onSuccessToLoadPosts(List<Post> i_PostsList)

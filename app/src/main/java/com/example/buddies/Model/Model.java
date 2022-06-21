@@ -421,13 +421,16 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToCreatePost(Context i_Context, Post i_Post) {
+    public void onRequestToCreatePost(Context i_Context, Post i_Post)
+    {
         AppUtils.printDebugToLogcat("Model", "onRequestToCreatePost", "trying to save post details to FireBase...");
 
-        try {
+        try
+        {
             // Save post under the current user at FireBase -> posts.
             String newPostKey = m_PostsTable.child(getCurrentUserUID()).push().getKey();
             assert newPostKey != null;
+            i_Post.setPostID(newPostKey);
             m_PostsTable.child(getCurrentUserUID()).child(newPostKey).setValue(i_Post);
 
             // Save city at FireBase -> cities (if the city does not exist already).
@@ -437,7 +440,9 @@ public class Model implements IModel,
                 m_CitiesTable.child(desiredCity).setValue(true);
             }
             onSuccessToCreatePost();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             onFailureToCreatePost(exception);
         }
     }
@@ -729,7 +734,7 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onLoadProfile() {
+    public void onRequestToLoadProfile() {
         m_UserProfile = m_CurrentSnapshotOfUsersTable.child(getCurrentUserUID())
                 .getValue(UserProfile.class);
         if (m_UserProfile != null) {
@@ -757,7 +762,7 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) {
+    public void onRequestToLoadPosts(ePostType type) {
         try {
             m_PostsTable = m_CurrentSnapshotOfPostsTable.getRef();
             m_PostsList = new ArrayList<>();
@@ -780,10 +785,11 @@ public class Model implements IModel,
                             LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
                                     localSecond.intValue(), localNano.intValue());
 
-                            Long creationYear = (long) post.child("postCreationDate").child("postCreationYear").getValue();
-                            Long creationMonth = (long) post.child("postCreationDate").child("postCreationMonth").getValue();
-                            Long creationDay = (long) post.child("postCreationDate").child("postCreationDay").getValue();
+                            Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
+                            Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
+                            Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
                             Long creationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
+                            String postID = (String) post.child("postID").getValue();
 
                             Post newPost = new Post((String) post.child("creatorUserUID").getValue(),
                                     (String) post.child("meetingCity").getValue(),
@@ -793,6 +799,8 @@ public class Model implements IModel,
                                     (String) post.child("postContent").getValue(),
                                     localTime, creationDateTimeAsLong,
                                     creationYear.intValue(), creationMonth.intValue(), creationDay.intValue());
+
+                            newPost.setPostID(postID);
                             m_PostsList.add(newPost);
                         }
                     }
@@ -818,10 +826,10 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPostsByCity(String i_SearchedCity) {
+    public void onRequestToLoadPostsByCity(String i_SearchedCity) {
         try {
             if (!this.m_ListOfCities.contains(i_SearchedCity)) {
-                this.onLoadPosts(ePostType.ALL);
+                this.onRequestToLoadPosts(ePostType.ALL);
             } else {
                 m_PostsList = new ArrayList<>();
 
@@ -862,7 +870,7 @@ public class Model implements IModel,
     @Override
     public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
         try {
-            m_UserProfile = this.resolveUserProfileFromUID(i_CreatorUserUID); // m_CurrentSnapshotOfUsersTable.child(i_CreatorUserUID).getValue(UserProfile.class);
+            m_UserProfile = this.resolveUserProfileFromUID(i_CreatorUserUID);
             if (m_UserProfile != null) {
                 onSuccessToLoadPostCard(m_UserProfile, i_PostAdapterToUpdate);
             } else {
@@ -921,26 +929,34 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToCreateComment(Comment i_Comment) {
+    public void onRequestToCreateComment(Comment i_Comment)
+    {
         AppUtils.printDebugToLogcat("Model", "onRequestToCreateComment", "trying to save comment details to FireBase...");
 
-        try {
+        try
+        {
             // Save comment under the relevant post at FireBase -> comments.
             // Each post will be identified by it's 'postCreationDateTimeAsLong' field.
-            String postIdentificationAsString = String.valueOf(i_Comment.getBelongsToPostCreationDateTimeAsLong());
+            // String postIdentificationAsString = String.valueOf(i_Comment.getBelongsToPostCreationDateTimeAsLong());
+
+            String postIdentificationAsString = i_Comment.getOwnerPostID();
             String newCommentKey = m_CommentsTable.child(postIdentificationAsString).push().getKey();
             assert newCommentKey != null;
+            i_Comment.setCommentID(newCommentKey);
             m_CommentsTable.child(postIdentificationAsString).child(newCommentKey).setValue(i_Comment);
 
-            onSuccessToCreateComment();
-        } catch (Exception exception) {
-            onFailureToCreatePost(exception);
+            this.onSuccessToCreateComment(i_Comment);
+        }
+        catch (Exception exception)
+        {
+            this.onFailureToCreatePost(exception);
         }
     }
 
     @Override
-    public void onSuccessToCreateComment() {
-        ((ICommentCreationResponseEventHandler)viewModel).onSuccessToCreateComment();
+    public void onSuccessToCreateComment(Comment i_Comment)
+    {
+        ((ICommentCreationResponseEventHandler)viewModel).onSuccessToCreateComment(i_Comment);
     }
 
     @Override
@@ -973,5 +989,40 @@ public class Model implements IModel,
 
     public UserProfile resolveUserProfileFromUID(String i_UserID) {
         return m_CurrentSnapshotOfUsersTable.child(i_UserID).getValue(UserProfile.class);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public List<Comment> getAllPostComments(String postID)
+    {
+        List<Comment> commentsOfPost = new ArrayList<Comment>();
+
+        for (DataSnapshot commentOfPost : m_CurrentSnapshotOfCommentsTable.child(postID).getChildren())
+        {
+                String creatorUserUID = (String) commentOfPost.child("creatorUserUID").getValue();
+                String userProfileImageUri = (String) commentOfPost.child("userProfileImageUri").getValue();
+                String commentContent = (String) commentOfPost.child("commentContent").getValue();
+
+                long hour = (long) commentOfPost.child("commentCreationTime").child("hour").getValue();
+                long minute = (long) commentOfPost.child("commentCreationTime").child("minute").getValue();
+                long nano = (long) commentOfPost.child("commentCreationTime").child("nano").getValue();
+                long second = (long) commentOfPost.child("commentCreationTime").child("second").getValue();
+
+                // LocalTime commentCreationTime = LocalTime.parse(String.format("%d:%d:%d.%d", hour, minute, second, nano));
+
+                LocalTime commentCreationTime = LocalTime.of((int)hour, (int)minute, (int)second, (int)nano);
+
+                long commentCreationDateTimeAsLong = (long) commentOfPost.child("commentCreationDateTimeAsLong").getValue();
+                long commentCreationYear = (long) commentOfPost.child("commentCreationDate").child("creationYear").getValue();
+                long commentCreationMonth = (long) commentOfPost.child("commentCreationDate").child("creationMonth").getValue();
+                long commentCreationDay = (long) commentOfPost.child("commentCreationDate").child("creationDay").getValue();
+                String ownerPostID = (String) commentOfPost.child("ownerPostID").getValue();
+                String commentID = (String) commentOfPost.child("commentID").getValue();
+
+                Comment currentComment = new Comment(creatorUserUID, userProfileImageUri, commentContent, commentCreationTime, commentCreationDateTimeAsLong, (int)commentCreationYear, (int)commentCreationMonth, (int)commentCreationDay, ownerPostID, commentID);
+
+                commentsOfPost.add(currentComment);
+        }
+
+        return commentsOfPost;
     }
 }

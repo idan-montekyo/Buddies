@@ -69,6 +69,7 @@ public class CreatePostFragment extends Fragment implements IView,
 
     GoogleMap m_GoogleMap;
     Marker m_CurrMarker;
+    Context m_Context = null;
 
     interface IOnUploadListener
     {
@@ -80,6 +81,7 @@ public class CreatePostFragment extends Fragment implements IView,
     @Override
     public void onAttach(@NonNull Context context)
     {
+        this.m_Context = context;
         super.onAttach(context);
 
         Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HomeFragment.HOME_FRAGMENT_TAG);
@@ -202,14 +204,7 @@ public class CreatePostFragment extends Fragment implements IView,
                 }
                 else
                 {
-                    // TODO: save post to DataBase and notify to refresh adapter.
-                    ZoneId zoneId = ZoneId.of("Israel");
-                    int year = (Year.now(zoneId)).getValue();
-                    int month = (YearMonth.now(zoneId)).getMonthValue();
-                    int day = (MonthDay.now(zoneId)).getDayOfMonth();
-
-                    Post newPost = new Post(userUID, cityInput, streetInput, timeInput,
-                                            m_SelectedLocation, contentInput, year, month, day);
+                    Post newPost = new Post(userUID, cityInput, streetInput, timeInput, m_SelectedLocation, contentInput);
                     m_ViewModel.onRequestToCreatePost(requireContext(), newPost);
                 }
             }
@@ -234,10 +229,7 @@ public class CreatePostFragment extends Fragment implements IView,
             @Override
             public void run()
             {
-                // TODO: sometimes crashes! with exception:
-                //  " java.lang.IllegalStateException: Fragment CreatePostFragment{ce75c49}
-                //  (63531ab2-d50d-41b3-a78e-b38cc032b083) not attached to a context. "
-                m_LocationDetails = AppUtils.getStringValueFromJsonObject(requireContext(), i_SelectedLocation);
+                m_LocationDetails = AppUtils.getStringValueFromJsonObject(CreatePostFragment.this.m_Context, i_SelectedLocation);
 
                 // Update the Activity's TextView
                 m_MainActivityHandlerFromRemoteThreads.post(new Runnable()

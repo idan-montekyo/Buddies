@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardUseCompatPadding="true"
+    app:contentPadding="10dp"
+    app:cardCornerRadius="10dp"
+    app:cardBackgroundColor="@color/Color___Background"
+    app:strokeColor="@color/Color___BorderBlue"
+    app:strokeWidth="3dp"
+    android:layoutDirection="ltr">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/ImageView_ProfileImageOfCommenter" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="center">
+
+        <TextView
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="gfdgdfgdfg"
+            android:textDirection="ltr"
+            android:textColor="@color/Color___ForegroundSecondary"
+            android:id="@+id/TextView_NameOfCommenter" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:text="1234567890sfsdsdfdsdsfdsfsdf"
+            android:textDirection="ltr"
+            android:textColor="@color/Color___ForegroundPrimary"
+            android:id="@+id/TextView_TextOfComment" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

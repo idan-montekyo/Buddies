@@ -18,15 +18,16 @@ public class Post implements Comparable<Post> {
     private LatLng meetingLocation;
     private String postContent;
     private LocalTime postCreationTime;
-    private MyCreationDate postCreationDate;
+    private CreationDate postCreationDate;
     private long postCreationDateTimeAsLong;
+    private String postID = null;
 
     public Post() { }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
-                String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent,
-                int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay) {
+                String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent)
+    {
 
         this.creatorUserUID = i_CreatorUserUID;
         this.meetingCity = i_MeetingCity;
@@ -34,19 +35,20 @@ public class Post implements Comparable<Post> {
         this.meetingTime = i_MeetingTime;
         this.meetingLocation = i_MeetingLocation;
         this.postContent = i_PostContent;
+
         // Gets current time based on user's current location.
         this.postCreationTime = LocalTime.now();
+
         // Initialize date holder class.
-        this.postCreationDate = new MyCreationDate(i_PostCreationYear, i_PostCreationMonth,
-                                                   i_PostCreationDay);
+        this.postCreationDate = CreationDate.now();
 
         // Creating a long representing YYYY-MM-DD-HH-MM-SS for more convenient comparisons.
         // Meaning - newer posts will have higher value, and older posts will have lower value.
-        String yearAsString = String.valueOf(i_PostCreationYear);
-        String monthAsString = i_PostCreationMonth > 10 ?
-                String.valueOf(i_PostCreationMonth) : "0" + String.valueOf(i_PostCreationMonth);
-        String dayAsString = i_PostCreationDay > 10 ?
-                String.valueOf(i_PostCreationDay) : "0" + String.valueOf(i_PostCreationDay);
+        String yearAsString = String.valueOf(this.postCreationDate.getCreationYear());
+        String monthAsString = this.postCreationDate.getCreationMonth() > 10 ?
+                String.valueOf(this.postCreationDate.getCreationMonth()) : "0" + String.valueOf(this.postCreationDate.getCreationMonth());
+        String dayAsString = this.postCreationDate.getCreationDay() > 10 ?
+                String.valueOf(this.postCreationDate.getCreationDay()) : "0" + String.valueOf(this.postCreationDate.getCreationDay());
         String hourAsString = this.postCreationTime.getHour() > 10 ?
                 String.valueOf(this.postCreationTime.getHour()) :
                 "0" + String.valueOf(this.postCreationTime.getHour());
@@ -64,8 +66,8 @@ public class Post implements Comparable<Post> {
     public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
                 String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent,
                 LocalTime i_PostCreationTime, long i_PostCreationDateTimeAsLong,
-                int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay) {
-
+                int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay)
+    {
         this.creatorUserUID = i_CreatorUserUID;
         this.meetingCity = i_MeetingCity;
         this.meetingStreet = i_MeetingStreet;
@@ -74,7 +76,7 @@ public class Post implements Comparable<Post> {
         this.postContent = i_PostContent;
         this.postCreationTime = i_PostCreationTime;
         // Initialize date holder class.
-        this.postCreationDate = new MyCreationDate(i_PostCreationYear, i_PostCreationMonth,
+        this.postCreationDate = new CreationDate(i_PostCreationYear, i_PostCreationMonth,
                                                    i_PostCreationDay);
         this.postCreationDateTimeAsLong = i_PostCreationDateTimeAsLong;
     }
@@ -87,8 +89,9 @@ public class Post implements Comparable<Post> {
     public LatLng getMeetingLocation() { return meetingLocation; }
     public String getPostContent() { return postContent; }
     public LocalTime getPostCreationTime() { return postCreationTime; }
-    public MyCreationDate getPostCreationDate() { return postCreationDate; }
+    public CreationDate getPostCreationDate() { return postCreationDate; }
     public long getPostCreationDateTimeAsLong() { return postCreationDateTimeAsLong; }
+    public String getPostID() { return this.postID; }
 
     // Setters
     public void setMeetingCity(String meetingCity) { this.meetingCity = meetingCity; }
@@ -96,6 +99,7 @@ public class Post implements Comparable<Post> {
     public void setMeetingTime(String meetingTime) { this.meetingTime = meetingTime; }
     public void setMeetingLocation(LatLng meetingLocation) { this.meetingLocation = meetingLocation; }
     public void setPostContent(String postContent) { this.postContent = postContent; }
+    public void setPostID(String postID) { this.postID = postID; }
 
     @Override
     public int compareTo(Post other) {

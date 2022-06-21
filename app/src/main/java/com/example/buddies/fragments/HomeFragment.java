@@ -46,8 +46,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -145,11 +143,11 @@ public class HomeFragment extends Fragment implements IView,
                     {
                         if (currentSearch.equals(""))
                         {
-                            onLoadPosts(ePostType.ALL);
+                            onRequestToLoadPosts(ePostType.ALL);
                         }
                         else
                         {
-                            onLoadPostsByCity(currentSearch);
+                            onRequestToLoadPostsByCity(currentSearch);
                         }
                         Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
                         m_SwipeRefreshLayout.setRefreshing(false);
@@ -162,7 +160,7 @@ public class HomeFragment extends Fragment implements IView,
         m_RecyclerView.setHasFixedSize(true);
         m_RecyclerView.setLayoutManager(new GridLayoutManager(m_Context, 1));
 
-        onLoadPosts(ePostType.ALL);
+        onRequestToLoadPosts(ePostType.ALL);
 
         m_PostAdapter = new PostAdapter(m_Posts);
 
@@ -326,11 +324,11 @@ public class HomeFragment extends Fragment implements IView,
                 // Search bar is empty.
                 if (selectedCity.equals(""))
                 {
-                    onLoadPosts(ePostType.ALL);
+                    onRequestToLoadPosts(ePostType.ALL);
                 }
                 else
                 {
-                    onLoadPostsByCity(selectedCity);
+                    onRequestToLoadPostsByCity(selectedCity);
                 }
                 Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
                 m_SwipeRefreshLayout.setRefreshing(false);
@@ -420,11 +418,11 @@ public class HomeFragment extends Fragment implements IView,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) { m_ViewModel.onLoadPosts(type); }
+    public void onRequestToLoadPosts(ePostType type) { m_ViewModel.onRequestToLoadPosts(type); }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPostsByCity(String i_SearchedCity) { m_ViewModel.onLoadPostsByCity(i_SearchedCity); }
+    public void onRequestToLoadPostsByCity(String i_SearchedCity) { m_ViewModel.onRequestToLoadPostsByCity(i_SearchedCity); }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -441,20 +439,6 @@ public class HomeFragment extends Fragment implements IView,
                 .setBackgroundTint(Color.BLACK).show();
     }
 
-    /*
-    @SuppressLint("NotifyDataSetChanged")
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public void onSuccessToCreatePost()
-    {
-        onLoadPosts(ePostType.ALL);
-        // TODO: needs to change to notifyItemInserted with pos 0 only when relevant!
-        //       for example, if we search Haifa and Ashdod was added, it's not relevant to us.
-        Objects.requireNonNull(this.m_RecyclerView.getAdapter()).notifyDataSetChanged();
-        this.m_RecyclerView.invalidate();
-    }
-    */
-
     @SuppressLint("NotifyDataSetChanged")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -465,12 +449,10 @@ public class HomeFragment extends Fragment implements IView,
             @Override
             public void run()
             {
-                onLoadPosts(ePostType.ALL);
+                onRequestToLoadPosts(ePostType.ALL);
                 Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
-                // this.m_RecyclerView.invalidate();
             }
         });
-
     }
 
     @Override

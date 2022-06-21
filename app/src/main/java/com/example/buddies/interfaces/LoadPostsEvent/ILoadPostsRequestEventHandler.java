@@ -4,6 +4,6 @@ import com.example.buddies.enums.ePostType;
 
 public interface ILoadPostsRequestEventHandler {
 
-    void onLoadPosts(ePostType type);
-    void onLoadPostsByCity(String i_SearchedCity);
+    void onRequestToLoadPosts(ePostType type);
+    void onRequestToLoadPostsByCity(String i_SearchedCity);
 }

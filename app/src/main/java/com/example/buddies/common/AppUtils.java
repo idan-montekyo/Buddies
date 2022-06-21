@@ -226,7 +226,6 @@ public class AppUtils
     // Get selected RadioButton. If nothing is selected, return null.
     public static RadioButton getSelectedRadioButtonFromRadioGroup(RadioGroup i_OwnerRadioGroup, View i_OwnerView)
     {
-        // TODO: what if no button selected?
         int radioId = i_OwnerRadioGroup.getCheckedRadioButtonId();
 
         RadioButton selectedRadioButton = (RadioButton) i_OwnerView.findViewById(radioId);

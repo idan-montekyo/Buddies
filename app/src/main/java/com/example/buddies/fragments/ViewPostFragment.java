@@ -23,7 +23,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
@@ -32,12 +31,10 @@ import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.adapters.CommentAdapter;
-import com.example.buddies.adapters.PostAdapter;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Comment;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
-import com.example.buddies.enums.eDogGender;
 import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationRequestEventHandler;
 import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationResponseEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
@@ -47,14 +44,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.time.MonthDay;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,38 +57,38 @@ public class ViewPostFragment extends    Fragment
                                          ILoadUserProfileResponseEventHandler,
                                          OnMapReadyCallback,
                                          ICommentCreationRequestEventHandler,
-                                         ICommentCreationResponseEventHandler {
-
-    public static final String VIEW_POST_FRAGMENT_TAG = "view_post_fragment";
-
-    private UserProfile m_CurrentUserProfile = null;
-    private Context m_Context = null;
-    ViewModel m_ViewModel = ViewModel.getInstance();
-
-    // TODO: continue same as done with posts:
-//    public static List<Comment> m_Comments = new ArrayList<>();
-//    @SuppressLint("StaticFieldLeak")
-//    public static CommentAdapter m_commentAdapter;
-
-    RecyclerView m_RecyclerView;
-
-    ImageView postCreatorImageIv;
-    TextView postCreatorFullNameTv;
-    TextView postCreatorDogsGenderTv;
-    TextView cityTv;
-    TextView streetTv;
-    TextView timeTv;
-    TextView contentTv;
-    Button showHideLocationBtn;
-    MapView meetingLocationMapView;
-    ImageView userImageIv;
-    EditText addCommentEt;
-    ImageButton sendCommentBtn;
-
-    GoogleMap m_GoogleMap = null;
-    Marker m_CurrMarker = null;
-    UserProfile currentCreatorUserProfile = null;
-    Post currentPost = null;
+                                         ICommentCreationResponseEventHandler
+{
+    private Bundle             m_SavedInstanceState             = null;
+    private Bundle             m_ViewPostFragmentArguments      = null;
+    private Button             m_Button_ShowHideLocation        = null;
+    private CommentAdapter     m_CommentAdapter                 = null;
+    private Context            m_Context                        = null;
+    private EditText           m_EditText_AddComment            = null;
+    private final float        m_DisabledElementsAlphaValue     = 0.15f;
+    private GoogleMap          m_MapObject                      = null;
+    private ImageButton        m_Button_GoBack                  = null;
+    private ImageButton        m_Button_SendComment             = null;
+    private ImageView          m_ImageView_PostCreatorImage     = null;
+    private ImageView          m_ImageView_UserImage            = null;
+    private List<Comment>      m_PostComments                   = new ArrayList<Comment>();
+    private MapView            m_MapView_MeetingLocationViewer  = null;
+    private Marker             m_CurrentMapMarker               = null;
+    private Post               m_CurrentPost                    = null;
+    private RecyclerView       m_RecyclerView                   = null;
+    private String             m_PostID                         = null;
+    private String             m_UserProfileJsonString          = null;
+    private String             m_CurrentPostJsonString          = null;
+    public static final String VIEW_POST_FRAGMENT_TAG           = "view_post_fragment";
+    private TextView           m_TextView_PostCreatorFullName   = null;
+    private TextView           m_TextView_PostCreatorDogsGender = null;
+    private TextView           m_TextView_CityOfMeeting         = null;
+    private TextView           m_TextView_StreetOfMeeting       = null;
+    private TextView           m_TextView_TimeOfMeeting         = null;
+    private TextView           m_TextView_ContentOfPost         = null;
+    private UserProfile        m_CurrentUserProfile             = null;
+    private UserProfile        m_CurrentCreatorUserProfile      = null;
+    private ViewModel          m_ViewModel                      = ViewModel.getInstance();
 
     @Override
     public void onAttach(@NonNull Context context)
@@ -104,34 +97,36 @@ public class ViewPostFragment extends    Fragment
         super.onAttach(this.m_Context);
     }
 
-    // Register for events in ViewModel.
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
+        // Register for events in ViewModel.
         m_ViewModel.registerForEvents((IView)this);
 
         super.onCreate(savedInstanceState);
     }
 
-    // Inflate fragment_view_post
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        // Inflate fragment_view_post
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        this.m_SavedInstanceState = savedInstanceState;
 
         final String SHOW_LOCATION = m_Context.getString(R.string.show_location);
         final String HIDE_LOCATION = m_Context.getString(R.string.hide_location);
 
-        ImageButton backBtn = view.findViewById(R.id.view_post_back_image_button);
-        backBtn.setOnClickListener(new View.OnClickListener()
+        this.m_Button_GoBack = view.findViewById(R.id.view_post_back_image_button);
+        this.m_Button_GoBack.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -140,73 +135,68 @@ public class ViewPostFragment extends    Fragment
             }
         });
 
-        Bundle viewPostFragmentArguments = getArguments();
+        this.m_ImageView_PostCreatorImage      = view.findViewById(R.id.view_post_creator_image_view);
+        this.m_TextView_PostCreatorFullName   = view.findViewById(R.id.view_post_creator_full_name_text_view);
+        this.m_TextView_PostCreatorDogsGender = view.findViewById(R.id.view_post_creator_dog_gender_text_view);
+        this.m_TextView_CityOfMeeting                  = view.findViewById(R.id.view_post_city_text_view);
+        this.m_TextView_StreetOfMeeting                = view.findViewById(R.id.view_post_street_text_view);
+        this.m_TextView_TimeOfMeeting                  = view.findViewById(R.id.view_post_time_text_view);
+        this.m_TextView_ContentOfPost               = view.findViewById(R.id.view_post_content_text_view);
+        this.m_Button_ShowHideLocation     = view.findViewById(R.id.view_post_location_button);
+        this.m_MapView_MeetingLocationViewer  = view.findViewById(R.id.view_post_map_view);
 
-        String userProfileJsonString = viewPostFragmentArguments.getString("userProfileJsonString");
-        currentCreatorUserProfile = AppUtils.getGsonParser().fromJson(userProfileJsonString, UserProfile.class);
+        this.loadArgumentsFromBundle();
 
-        String currentPostJsonString = viewPostFragmentArguments.getString("currentPostJsonString");
-        currentPost = AppUtils.getGsonParser().fromJson(currentPostJsonString, Post.class);
-
-        postCreatorImageIv = view.findViewById(R.id.view_post_creator_image_view);
-        postCreatorFullNameTv = view.findViewById(R.id.view_post_creator_full_name_text_view);
-        postCreatorDogsGenderTv = view.findViewById(R.id.view_post_creator_dog_gender_text_view);
-        cityTv = view.findViewById(R.id.view_post_city_text_view);
-        streetTv = view.findViewById(R.id.view_post_street_text_view);
-        timeTv = view.findViewById(R.id.view_post_time_text_view);
-        contentTv = view.findViewById(R.id.view_post_content_text_view);
-        showHideLocationBtn = view.findViewById(R.id.view_post_location_button);
-        meetingLocationMapView = view.findViewById(R.id.view_post_map_view);
+        this.m_PostID = m_CurrentPost.getPostID();
 
         AppUtils.loadImageUsingGlide(
                 ViewPostFragment.this.m_Context,
-                Uri.parse(currentCreatorUserProfile.getProfileImageUri()),
+                Uri.parse(m_CurrentCreatorUserProfile.getProfileImageUri()),
                 null,
                 null,
                 true,
                 null,
-                postCreatorImageIv);
+                m_ImageView_PostCreatorImage);
 
-        postCreatorFullNameTv.setText(currentCreatorUserProfile.getFullName());
-        postCreatorDogsGenderTv.setText(currentCreatorUserProfile.getDogGender().toString());
-        cityTv.setText(currentPost.getMeetingCity());
-        streetTv.setText(currentPost.getMeetingStreet());
-        timeTv.setText(currentPost.getMeetingTime());
-        contentTv.setText(currentPost.getPostContent());
-        meetingLocationMapView.onCreate(savedInstanceState);
-        meetingLocationMapView.onResume();
-        meetingLocationMapView.getMapAsync(ViewPostFragment.this);
+        this.m_TextView_PostCreatorFullName.setText(m_CurrentCreatorUserProfile.getFullName());
+        this.m_TextView_PostCreatorDogsGender.setText(m_CurrentCreatorUserProfile.getDogGender().toString());
+        this.m_TextView_CityOfMeeting.setText(m_CurrentPost.getMeetingCity());
+        this.m_TextView_StreetOfMeeting.setText(m_CurrentPost.getMeetingStreet());
+        this.m_TextView_TimeOfMeeting.setText(m_CurrentPost.getMeetingTime());
+        this.m_TextView_ContentOfPost.setText(m_CurrentPost.getPostContent());
+        this.m_MapView_MeetingLocationViewer.onCreate(this.m_SavedInstanceState);
+        this.m_MapView_MeetingLocationViewer.onResume();
+        this.m_MapView_MeetingLocationViewer.getMapAsync(ViewPostFragment.this);
 
-        showHideLocationBtn.setOnClickListener(new View.OnClickListener()
+        this.m_Button_ShowHideLocation.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                if (meetingLocationMapView.getVisibility() == View.GONE)
+                // If the MapView is hidden - show it
+                if (ViewPostFragment.this.m_MapView_MeetingLocationViewer.getVisibility() == View.GONE)
                 {
-                    meetingLocationMapView.setVisibility(View.VISIBLE);
+                    ViewPostFragment.this.m_MapView_MeetingLocationViewer.setVisibility(View.VISIBLE);
+                    ViewPostFragment.this.m_Button_ShowHideLocation.setText(HIDE_LOCATION);
                 }
+                // If the MapView is shown - hide it
                 else
                 {
-                    meetingLocationMapView.setVisibility(View.GONE);
-                    showHideLocationBtn.setText(SHOW_LOCATION);
+                    ViewPostFragment.this.m_MapView_MeetingLocationViewer.setVisibility(View.GONE);
+                    ViewPostFragment.this.m_Button_ShowHideLocation.setText(SHOW_LOCATION);
                 }
             }
         });
 
-        m_RecyclerView = view.findViewById(R.id.view_post_recycler_view);
-        // TODO: add adapter mechanism
-        //  + create "CommentCard" layout (instagram-like)
-        //  + load comments from FireBase.
-
-        userImageIv = view.findViewById(R.id.view_post_user_image_view);
-        addCommentEt = view.findViewById(R.id.view_post_add_comment_edit_text);
-        sendCommentBtn = view.findViewById(R.id.view_post_send_comment_image_button);
+        this.m_ImageView_UserImage    = view.findViewById(R.id.view_post_user_image_view);
+        this.m_EditText_AddComment   = view.findViewById(R.id.view_post_add_comment_edit_text);
+        this.m_Button_SendComment = view.findViewById(R.id.view_post_send_comment_image_button);
 
         if (Model.getInstance().isCurrentUserAnonymous() == false)
         {
-            // TODO: insert currentUser's image.
-            UserProfile currentLoggedOnUserProfile = Model.getInstance().resolveUserProfileFromUID(Model.getInstance().getCurrentUserUID());
+            String currentUserID = Model.getInstance().getCurrentUserUID();
+            UserProfile currentLoggedOnUserProfile = Model.getInstance().resolveUserProfileFromUID(currentUserID);
+
             AppUtils.loadImageUsingGlide(
                     this.m_Context,
                     Uri.parse(currentLoggedOnUserProfile.getProfileImageUri()),
@@ -214,53 +204,80 @@ public class ViewPostFragment extends    Fragment
                     null,
                     true,
                     null,
-                    userImageIv);
+                    m_ImageView_UserImage);
 
-            sendCommentBtn.setOnClickListener(new View.OnClickListener()
+            m_Button_SendComment.setOnClickListener(new View.OnClickListener()
             {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onClick(View v)
                 {
-                    // TODO: if addCommentEt is not-empty:
-                    //  1. save comment to FireBase
-                    //  2. notify (refresh) m_RecyclerView
-                    //  3. addCommentEt.settext("")
+                    // If the user wants to send an empty comment
+                    if (m_EditText_AddComment.getText().toString().isEmpty() == true)
+                    {
+                        Snackbar.make(ViewPostFragment.this.m_Context, view, "Empty comment cannot be sent", 1);
+                    }
+                    else
+                    {
+                        // Save the new comment to FireBase
+                        Comment newComment = new Comment(currentUserID, currentLoggedOnUserProfile.getProfileImageUri(), m_EditText_AddComment.getText().toString(), ViewPostFragment.this.m_PostID);
+                        ViewPostFragment.this.onRequestToCreateComment(newComment);
+                    }
                 }
             });
         }
         else
         {
-            float alphaValue = 0.15f;
+            m_ImageView_UserImage.setEnabled(false);
+            m_ImageView_UserImage.setAlpha(m_DisabledElementsAlphaValue);
 
-            userImageIv.setEnabled(false);
-            userImageIv.setAlpha(alphaValue);
+            m_EditText_AddComment.setEnabled(false);
+            m_EditText_AddComment.setAlpha(m_DisabledElementsAlphaValue);
 
-            addCommentEt.setEnabled(false);
-            addCommentEt.setAlpha(alphaValue);
-
-            sendCommentBtn.setEnabled(false);
-            sendCommentBtn.setAlpha(alphaValue);
+            m_Button_SendComment.setEnabled(false);
+            m_Button_SendComment.setAlpha(m_DisabledElementsAlphaValue);
         }
 
-        // TODO: Continue coding the recyclerview logic here !
+        this.m_RecyclerView = view.findViewById(R.id.view_post_recycler_view);
+        this.initializeRecyclerView();
+    }
 
-        RecyclerView recycler = view.findViewById(R.id.view_post_recycler_view);
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void initializeRecyclerView()
+    {
         RecyclerView.LayoutManager manager = new LinearLayoutManager(this.m_Context);
-        recycler.setLayoutManager(manager);
+        m_RecyclerView.setLayoutManager(manager);
 
-        CommentAdapter commentAdapter = new CommentAdapter(/*getAllPostComments()*/);
+        // Load comments from firebase
+        this.m_PostComments = Model.getInstance().getAllPostComments(this.m_PostID);
 
-        /*
-        If needed, add here ItemTouchHelper or any other logic to handle events in the recycler view (like swipe, click or long click)
-        */
+        // If no comments found for this post, initialize an empty list with no comments.
+        if (this.m_PostComments == null)
+        {
+            this.m_PostComments = new ArrayList<Comment>();
+        }
 
-        // recycler.setAdapter(commentAdapter);
+        // Create the CommentAdapter which will be bound to the RecyclerView
+        this.m_CommentAdapter = new CommentAdapter(this.m_Context, this.m_PostComments);
+
+        this.m_RecyclerView.setAdapter(this.m_CommentAdapter);
+    }
+
+    private void loadArgumentsFromBundle()
+    {
+        this.m_ViewPostFragmentArguments = getArguments();
+
+        this.m_UserProfileJsonString = m_ViewPostFragmentArguments.getString("userProfileJsonString");
+        this.m_CurrentCreatorUserProfile = AppUtils.getGsonParser().fromJson(this.m_UserProfileJsonString, UserProfile.class);
+
+        this.m_CurrentPostJsonString = m_ViewPostFragmentArguments.getString("currentPostJsonString");
+        this.m_CurrentPost = AppUtils.getGsonParser().fromJson(this.m_CurrentPostJsonString, Post.class);
     }
 
     @Override
-    public void onLoadProfile()
+    public void onRequestToLoadProfile()
     {
-        m_ViewModel.onLoadProfile();
+        m_ViewModel.onRequestToLoadProfile();
     }
 
     @Override
@@ -289,8 +306,8 @@ public class ViewPostFragment extends    Fragment
             @Override
             public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource)
             {
-                postCreatorFullNameTv.setText(i_UserProfile.getFullName());
-                postCreatorDogsGenderTv.setText(i_UserProfile.getDogGender().toString());
+                m_TextView_PostCreatorFullName.setText(i_UserProfile.getFullName());
+                m_TextView_PostCreatorDogsGender.setText(i_UserProfile.getDogGender().toString());
 
                 return false;
             }
@@ -303,7 +320,7 @@ public class ViewPostFragment extends    Fragment
                 null,
                 true,
                 glideListener,
-                postCreatorImageIv);
+                m_ImageView_PostCreatorImage);
     }
 
     @Override
@@ -312,10 +329,10 @@ public class ViewPostFragment extends    Fragment
         Toast.makeText(m_Context, i_Reason.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
-    // Unregister for events in ViewModel.
     @Override
     public void onDestroy()
     {
+        // Unregister for events in ViewModel.
         m_ViewModel.unregisterForEvents((IView)this);
         super.onDestroy();
     }
@@ -323,35 +340,47 @@ public class ViewPostFragment extends    Fragment
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap)
     {
-        m_GoogleMap = googleMap;
+        m_MapObject = googleMap;
 
         // If we want to disable moving the map, uncomment this. (Source: https://stackoverflow.com/a/28452115/2196301)
         // m_Map.getUiSettings().setAllGesturesEnabled(false);
 
-        m_GoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        m_MapObject.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        if (m_CurrMarker == null)
+        if (m_CurrentMapMarker == null)
         {
-            m_CurrMarker = m_GoogleMap.addMarker(new MarkerOptions().position(currentPost.getMeetingLocation())
-                    .title(currentPost.getMeetingStreet()).snippet(currentPost.getMeetingCity()));
+            m_CurrentMapMarker = m_MapObject.addMarker(new MarkerOptions().position(m_CurrentPost.getMeetingLocation())
+                    .title(m_CurrentPost.getMeetingStreet()).snippet(m_CurrentPost.getMeetingCity()));
         }
         else
         {
-            m_CurrMarker.setPosition(currentPost.getMeetingLocation());
+            m_CurrentMapMarker.setPosition(m_CurrentPost.getMeetingLocation());
         }
 
         // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
-        m_GoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPost.getMeetingLocation(), 14f));
+        m_MapObject.moveCamera(CameraUpdateFactory.newLatLngZoom(m_CurrentPost.getMeetingLocation(), 14f));
     }
 
     @Override
     public void onRequestToCreateComment(Comment i_Comment) { m_ViewModel.onRequestToCreateComment(i_Comment); }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
-    public void onSuccessToCreateComment() { addCommentEt.setText(""); }
+    public void onSuccessToCreateComment(Comment i_Comment)
+    {
+        // Refresh the RecyclerView
+        ((CommentAdapter)this.m_RecyclerView.getAdapter()).updateAdapter(i_Comment);
+
+        // Scroll the RecyclerView to the end automatically (Source: https://stackoverflow.com/a/27063152/2196301)
+        this.m_RecyclerView.scrollToPosition(this.m_PostComments.size() - 1);
+
+        //  Clear the messages edit text
+        m_EditText_AddComment.setText("");
+    }
 
     @Override
-    public void onFailureToCreateComment(Exception i_Reason) {
+    public void onFailureToCreateComment(Exception i_Reason)
+    {
         AppUtils.printDebugToLogcat("ViewPostFragment", "onFailureToCreateComment", i_Reason.toString());
         Toast.makeText(m_Context, "Comment failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }

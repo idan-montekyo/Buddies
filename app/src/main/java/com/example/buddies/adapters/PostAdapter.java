@@ -2,6 +2,7 @@ package com.example.buddies.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
+import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.interfaces.MVVM.IView;
@@ -127,23 +129,17 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
 
             if ((currentUserProfile.getProfileImageUri() != null) && (!currentUserProfile.getProfileImageUri().equals("")))
             {
-                // TODO: Use AppUtils method instead
-                Glide.with(m_Context).load(currentUserProfile.getProfileImageUri()).
-                        circleCrop().into(m_Holder.m_ImageIv);
+                AppUtils.loadImageUsingGlide(m_Context, Uri.parse(currentUserProfile.getProfileImageUri()), null, null, true, null, m_Holder.m_ImageIv);
             }
             else
             {
-                // TODO: Use AppUtils method instead
-                Glide.with(m_Context).load(m_Context.getDrawable(R.drawable.dog_default_profile_rounded)).
-                        circleCrop().into(m_Holder.m_ImageIv);
+                AppUtils.loadImageUsingGlide(m_Context, AppUtils.getUriOfDrawable("dog_default_profile_rounded", m_Context), null, null, true, null, m_Holder.m_ImageIv);
             }
         }
         else
         {
             Toast.makeText(m_Context, "Model.m_UserProfile is null", Toast.LENGTH_SHORT).show();
         }
-        // onRequestToResolveUIDToUserProfile(m_CurrentPost.getCreatorUserUID(), (IView)this);
-        // onRequestToLoadPostCard(m_CurrentPost.getCreatorUserUID(), this);
     }
 
     @Override

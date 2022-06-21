@@ -123,7 +123,7 @@ public class LoginFragment extends Fragment implements IView,
     public void onFailureToLogin(Exception i_Reason)
     {
         // TODO: check again
-        Toast.makeText(requireContext(), "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
+        Toast.makeText(this.m_Context, "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class LoginFragment extends Fragment implements IView,
     public void onFailureToAnonymousLogin(Exception i_Reason)
     {
         // TODO: check again
-        Toast.makeText(requireContext(), "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
+        Toast.makeText(this.m_Context, "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
     }
 
     private void moveToMainProgramFragment()

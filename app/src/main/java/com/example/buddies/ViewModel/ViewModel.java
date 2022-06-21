@@ -340,8 +340,8 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onLoadProfile() {
-        m_Model.onLoadProfile();
+    public void onRequestToLoadProfile() {
+        m_Model.onRequestToLoadProfile();
     }
 
     @Override
@@ -374,12 +374,6 @@ public class ViewModel implements IViewModel,
     {
         this.m_Model.onRequestToUploadImage(i_PathOfFileInFilesystem);
     }
-    */
-
-    /*
-    TODO: NOTE: At any moment there could be only one view which handles the success or failure of uploading image.
-                In addition, the 2 fragments "HomeFragment" and "ProfileFragment" should implement the interface "IUploadImageResponsesEventHandler",
-                because we don't know which one of them will handle the success or failure of upload image request.
     */
 
     /*
@@ -448,11 +442,11 @@ public class ViewModel implements IViewModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPosts(ePostType type) { m_Model.onLoadPosts(type); }
+    public void onRequestToLoadPosts(ePostType type) { m_Model.onRequestToLoadPosts(type); }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onLoadPostsByCity(String i_SearchedCity) { m_Model.onLoadPostsByCity(i_SearchedCity); }
+    public void onRequestToLoadPostsByCity(String i_SearchedCity) { m_Model.onRequestToLoadPostsByCity(i_SearchedCity); }
 
     @Override
     public void onSuccessToLoadPosts(List<Post> i_PostsList)
@@ -536,10 +530,10 @@ public class ViewModel implements IViewModel,
     public void onRequestToCreateComment(Comment i_Comment) { m_Model.onRequestToCreateComment(i_Comment); }
 
     @Override
-    public void onSuccessToCreateComment() {
+    public void onSuccessToCreateComment(Comment i_Comment) {
         for (IView view : views) {
             if (view instanceof ICommentCreationResponseEventHandler) {
-                ((ICommentCreationResponseEventHandler)view).onSuccessToCreateComment();
+                ((ICommentCreationResponseEventHandler)view).onSuccessToCreateComment(i_Comment);
             }
         }
     }

@@ -17,4 +17,11 @@
     <color name="gray50">#323232</color>
     <color name="gray30">#1E1E1E</color>
     <color name="magenta">#FF00FF</color>
+    <color name="Color___ForegroundPrimary">#FFF6F6F6</color>
+    <color name="Color___ForegroundSecondary">#FF007ACC</color>
+    <color name="Color___ForegroundTertiary">#FFE5C365</color>
+    <color name="Color___BadInput">#FF0000</color>
+    <color name="Color___GoodInput">#00FF00</color>
+    <color name="Color___Background">#FF252526</color>
+    <color name="Color___BorderBlue">#FF007ACC</color>
 </resources>

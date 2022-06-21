@@ -347,7 +347,6 @@ public class ProfileFragment extends Fragment implements IView,
             @Override
             public void onClick(View v)
             {
-                // TODO: delete image from DataBase and set dog_default_profile_rounded.png
                 // initialize DB.image to null.
                 imageView.setImageResource(R.drawable.dog_default_profile_rounded);
 
@@ -399,7 +398,7 @@ public class ProfileFragment extends Fragment implements IView,
             }
         });
 
-        onLoadProfile();
+        onRequestToLoadProfile();
 
         saveBtn = view.findViewById(R.id.profile_save_button);
         saveBtn.setEnabled(false);
@@ -465,9 +464,9 @@ public class ProfileFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onLoadProfile()
+    public void onRequestToLoadProfile()
     {
-        m_ViewModel.onLoadProfile();
+        m_ViewModel.onRequestToLoadProfile();
     }
 
     @Override
