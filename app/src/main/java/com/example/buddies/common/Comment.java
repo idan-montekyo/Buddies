@@ -24,6 +24,14 @@ public class Comment implements Comparable<Comment>
 
     public Comment() { }
 
+    /**
+     * Constructor of the class "Comment"
+     * This constructor will be generally used where a new comment is created by the user
+     * @param i_CreatorUserUID      - The UserID which belongs to the creator of the current post
+     * @param i_UserProfileImageUri - The profile image uri of the commenter
+     * @param i_CommentContent      - The content of the comment itself
+     * @param i_OwnerPostID         - The ID of the post which this comment belongs to
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Comment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_OwnerPostID)
     {
@@ -33,15 +41,6 @@ public class Comment implements Comparable<Comment>
 
         // Gets current time based on user's current location.
         this.commentCreationTime = LocalTime.now();
-
-        /*
-        ZoneId zoneId = ZoneId.of("Israel");
-        int year = (Year.now(zoneId)).getValue();
-        int month = (YearMonth.now(zoneId)).getMonthValue();
-        int day = (MonthDay.now(zoneId)).getDayOfMonth();
-
-        this.commentCreationDate = new CreationDate(year, month, day);
-         */
 
         // Initialize date holder class.
         this.commentCreationDate = CreationDate.now();
@@ -68,7 +67,20 @@ public class Comment implements Comparable<Comment>
         this.ownerPostID = i_OwnerPostID;
     }
 
-    // Constructor for existing posts, loaded from FireBase.
+    /**
+     * Constructor of the class "Comment"
+     * This constructor will be generally used where there's a need to load an existing comments from the FireBase.
+     * @param i_CreatorUserUID                - The UserID which belongs to the creator of the current post
+     * @param i_UserProfileImageUri           - The profile image uri of the commenter
+     * @param i_CommentContent                - The content of the comment itself
+     * @param i_CommentCreationTime           - The time when the comment created
+     * @param i_CommentCreationDateTimeAsLong - A long which represents the creation time of the comment
+     * @param i_CommentCreationYear           - The year when the comment has been created
+     * @param i_CommentCreationMonth          - The month when the comment has been created
+     * @param i_CommentCreationDay            - The day when the comment has been created
+     * @param i_OwnerPostID                   - The ID of the post which this comment belongs to
+     * @param i_CommentID                     - The ID of the comment itself
+     */
     public Comment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent,
                    LocalTime i_CommentCreationTime, long i_CommentCreationDateTimeAsLong,
                    int i_CommentCreationYear, int i_CommentCreationMonth, int i_CommentCreationDay,
@@ -110,14 +122,16 @@ public class Comment implements Comparable<Comment>
     public void setOwnerPostID(String ownerPostID) { this.ownerPostID = ownerPostID; }
 
     @Override
-    public int compareTo(Comment other) {
+    public int compareTo(Comment other)
+    {
         long comparison = other.getCommentCreationDateTimeAsLong() - this.getCommentCreationDateTimeAsLong();
         return (int)comparison;
     }
 
     @NonNull
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Comment{" +
                 "creatorUserUID='" + creatorUserUID + '\'' +
                 ", userProfileImageUri='" + userProfileImageUri + '\'' +

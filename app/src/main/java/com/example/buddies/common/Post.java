@@ -9,97 +9,122 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.time.LocalTime;
 
-public class Post implements Comparable<Post> {
-
-    private String creatorUserUID;
-    private String meetingCity;
-    private String meetingStreet;
-    private String meetingTime;
-    private LatLng meetingLocation;
-    private String postContent;
-    private LocalTime postCreationTime;
-    private CreationDate postCreationDate;
-    private long postCreationDateTimeAsLong;
-    private String postID = null;
+public class Post implements Comparable<Post>
+{
+    private CreationDate m_PostCreationDate           = null;
+    private LatLng       m_MeetingLocation            = null;
+    private LocalTime    m_PostCreationTime           = null;
+    private long         m_PostCreationDateTimeAsLong = 0;
+    private String       m_CreatorUserUID             = null;
+    private String       m_MeetingCity                = null;
+    private String       m_MeetingStreet              = null;
+    private String       m_MeetingTime                = null;
+    private String       m_PostContent                = null;
+    private String       m_PostID                     = null;
 
     public Post() { }
 
+    /**
+     * Constructor of the class "Post"
+     * This constructor will be generally used where a new post is created by the user
+     * @param i_CreatorUserUID  - The UserID which belongs to the creator of the current post
+     * @param i_MeetingCity     - The city where the meeting will take place
+     * @param i_MeetingStreet   - The street where the meeting will take place
+     * @param i_MeetingTime     - The time when the meeting will take place
+     * @param i_MeetingLocation - The location of the meeting, represented by coordinates
+     * @param i_PostContent     - The content of the post itself
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
                 String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent)
     {
-
-        this.creatorUserUID = i_CreatorUserUID;
-        this.meetingCity = i_MeetingCity;
-        this.meetingStreet = i_MeetingStreet;
-        this.meetingTime = i_MeetingTime;
-        this.meetingLocation = i_MeetingLocation;
-        this.postContent = i_PostContent;
+        this.m_CreatorUserUID = i_CreatorUserUID;
+        this.m_MeetingCity = i_MeetingCity;
+        this.m_MeetingStreet = i_MeetingStreet;
+        this.m_MeetingTime = i_MeetingTime;
+        this.m_MeetingLocation = i_MeetingLocation;
+        this.m_PostContent = i_PostContent;
 
         // Gets current time based on user's current location.
-        this.postCreationTime = LocalTime.now();
+        this.m_PostCreationTime = LocalTime.now();
 
         // Initialize date holder class.
-        this.postCreationDate = CreationDate.now();
+        this.m_PostCreationDate = CreationDate.now();
 
         // Creating a long representing YYYY-MM-DD-HH-MM-SS for more convenient comparisons.
         // Meaning - newer posts will have higher value, and older posts will have lower value.
-        String yearAsString = String.valueOf(this.postCreationDate.getCreationYear());
-        String monthAsString = this.postCreationDate.getCreationMonth() > 10 ?
-                String.valueOf(this.postCreationDate.getCreationMonth()) : "0" + String.valueOf(this.postCreationDate.getCreationMonth());
-        String dayAsString = this.postCreationDate.getCreationDay() > 10 ?
-                String.valueOf(this.postCreationDate.getCreationDay()) : "0" + String.valueOf(this.postCreationDate.getCreationDay());
-        String hourAsString = this.postCreationTime.getHour() > 10 ?
-                String.valueOf(this.postCreationTime.getHour()) :
-                "0" + String.valueOf(this.postCreationTime.getHour());
-        String minuteAsString = this.postCreationTime.getMinute() > 10 ?
-                String.valueOf(this.postCreationTime.getMinute()) :
-                "0" + String.valueOf(this.postCreationTime.getMinute());
-        String secondAsString = this.postCreationTime.getSecond() > 10 ?
-                String.valueOf(this.postCreationTime.getSecond()) :
-                "0" + String.valueOf(this.postCreationTime.getSecond());
-        this.postCreationDateTimeAsLong = Long.parseLong(yearAsString + monthAsString + dayAsString
+        String yearAsString = String.valueOf(this.m_PostCreationDate.getCreationYear());
+        String monthAsString = this.m_PostCreationDate.getCreationMonth() > 10 ?
+                String.valueOf(this.m_PostCreationDate.getCreationMonth()) : "0" + String.valueOf(this.m_PostCreationDate.getCreationMonth());
+        String dayAsString = this.m_PostCreationDate.getCreationDay() > 10 ?
+                String.valueOf(this.m_PostCreationDate.getCreationDay()) : "0" + String.valueOf(this.m_PostCreationDate.getCreationDay());
+        String hourAsString = this.m_PostCreationTime.getHour() > 10 ?
+                String.valueOf(this.m_PostCreationTime.getHour()) :
+                "0" + String.valueOf(this.m_PostCreationTime.getHour());
+        String minuteAsString = this.m_PostCreationTime.getMinute() > 10 ?
+                String.valueOf(this.m_PostCreationTime.getMinute()) :
+                "0" + String.valueOf(this.m_PostCreationTime.getMinute());
+        String secondAsString = this.m_PostCreationTime.getSecond() > 10 ?
+                String.valueOf(this.m_PostCreationTime.getSecond()) :
+                "0" + String.valueOf(this.m_PostCreationTime.getSecond());
+        this.m_PostCreationDateTimeAsLong = Long.parseLong(yearAsString + monthAsString + dayAsString
                                                          + hourAsString + minuteAsString + secondAsString);
     }
 
-    // Constructor for existing posts, loaded from FireBase.
+    /**
+     * Constructor of the class "Post"
+     * This constructor will be generally used where there's a need to load an existing posts from the FireBase.
+     * @param i_CreatorUserUID             - The UserID which belongs to the creator of the current post
+     * @param i_MeetingCity                - The city where the meeting will take place
+     * @param i_MeetingStreet              - The street where the meeting will take place
+     * @param i_MeetingTime                - The time when the meeting will take place
+     * @param i_MeetingLocation            - The location of the meeting, represented by coordinates
+     * @param i_PostContent                - The content of the post itself
+     * @param i_PostCreationTime           - The time when the post created
+     * @param i_PostCreationDateTimeAsLong - A long which represents the creation time of the post
+     * @param i_PostCreationYear           - The year when the post has been created
+     * @param i_PostCreationMonth          - The month when the post has been created
+     * @param i_PostCreationDay            - The day when the post has been created
+     * @param i_PostID                     - The ID of the post itself
+     */
     public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
                 String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent,
                 LocalTime i_PostCreationTime, long i_PostCreationDateTimeAsLong,
-                int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay)
+                int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay, String i_PostID)
     {
-        this.creatorUserUID = i_CreatorUserUID;
-        this.meetingCity = i_MeetingCity;
-        this.meetingStreet = i_MeetingStreet;
-        this.meetingTime = i_MeetingTime;
-        this.meetingLocation = i_MeetingLocation;
-        this.postContent = i_PostContent;
-        this.postCreationTime = i_PostCreationTime;
+        this.m_CreatorUserUID = i_CreatorUserUID;
+        this.m_MeetingCity = i_MeetingCity;
+        this.m_MeetingStreet = i_MeetingStreet;
+        this.m_MeetingTime = i_MeetingTime;
+        this.m_MeetingLocation = i_MeetingLocation;
+        this.m_PostContent = i_PostContent;
+        this.m_PostCreationTime = i_PostCreationTime;
         // Initialize date holder class.
-        this.postCreationDate = new CreationDate(i_PostCreationYear, i_PostCreationMonth,
+        this.m_PostCreationDate = new CreationDate(i_PostCreationYear, i_PostCreationMonth,
                                                    i_PostCreationDay);
-        this.postCreationDateTimeAsLong = i_PostCreationDateTimeAsLong;
+        this.m_PostCreationDateTimeAsLong = i_PostCreationDateTimeAsLong;
+        this.m_PostID = i_PostID;
     }
 
     // Getters
-    public String getCreatorUserUID() { return creatorUserUID; }
-    public String getMeetingCity() { return meetingCity; }
-    public String getMeetingStreet() { return meetingStreet; }
-    public String getMeetingTime() { return meetingTime; }
-    public LatLng getMeetingLocation() { return meetingLocation; }
-    public String getPostContent() { return postContent; }
-    public LocalTime getPostCreationTime() { return postCreationTime; }
-    public CreationDate getPostCreationDate() { return postCreationDate; }
-    public long getPostCreationDateTimeAsLong() { return postCreationDateTimeAsLong; }
-    public String getPostID() { return this.postID; }
+    public String getCreatorUserUID() { return m_CreatorUserUID; }
+    public String getMeetingCity() { return m_MeetingCity; }
+    public String getMeetingStreet() { return m_MeetingStreet; }
+    public String getMeetingTime() { return m_MeetingTime; }
+    public LatLng getMeetingLocation() { return m_MeetingLocation; }
+    public String getPostContent() { return m_PostContent; }
+    public LocalTime getPostCreationTime() { return m_PostCreationTime; }
+    public CreationDate getPostCreationDate() { return m_PostCreationDate; }
+    public long getPostCreationDateTimeAsLong() { return m_PostCreationDateTimeAsLong; }
+    public String getPostID() { return this.m_PostID; }
 
     // Setters
-    public void setMeetingCity(String meetingCity) { this.meetingCity = meetingCity; }
-    public void setMeetingStreet(String meetingStreet) { this.meetingStreet = meetingStreet; }
-    public void setMeetingTime(String meetingTime) { this.meetingTime = meetingTime; }
-    public void setMeetingLocation(LatLng meetingLocation) { this.meetingLocation = meetingLocation; }
-    public void setPostContent(String postContent) { this.postContent = postContent; }
-    public void setPostID(String postID) { this.postID = postID; }
+    public void setMeetingCity(String m_MeetingCity) { this.m_MeetingCity = m_MeetingCity; }
+    public void setMeetingStreet(String m_MeetingStreet) { this.m_MeetingStreet = m_MeetingStreet; }
+    public void setMeetingTime(String m_MeetingTime) { this.m_MeetingTime = m_MeetingTime; }
+    public void setMeetingLocation(LatLng m_MeetingLocation) { this.m_MeetingLocation = m_MeetingLocation; }
+    public void setPostContent(String m_PostContent) { this.m_PostContent = m_PostContent; }
+    public void setPostID(String m_PostID) { this.m_PostID = m_PostID; }
 
     @Override
     public int compareTo(Post other) {
@@ -111,15 +136,15 @@ public class Post implements Comparable<Post> {
     @Override
     public String toString() {
         return "Post{" +
-                "creatorUserUID='" + creatorUserUID + '\'' +
-                ", meetingCity='" + meetingCity + '\'' +
-                ", meetingStreet='" + meetingStreet + '\'' +
-                ", meetingTime='" + meetingTime + '\'' +
-                ", meetingLocation=" + meetingLocation +
-                ", postContent='" + postContent + '\'' +
-                ", postCreationTime=" + postCreationTime +
-                ", postCreationDate=" + postCreationDate +
-                ", postCreationDateTimeAsLong=" + postCreationDateTimeAsLong +
+                "creatorUserUID='" + m_CreatorUserUID + '\'' +
+                ", meetingCity='" + m_MeetingCity + '\'' +
+                ", meetingStreet='" + m_MeetingStreet + '\'' +
+                ", meetingTime='" + m_MeetingTime + '\'' +
+                ", meetingLocation=" + m_MeetingLocation +
+                ", postContent='" + m_PostContent + '\'' +
+                ", postCreationTime=" + m_PostCreationTime +
+                ", postCreationDate=" + m_PostCreationDate +
+                ", postCreationDateTimeAsLong=" + m_PostCreationDateTimeAsLong +
                 '}';
     }
 }

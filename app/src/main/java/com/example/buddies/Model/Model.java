@@ -798,9 +798,8 @@ public class Model implements IModel,
                                     latLng,
                                     (String) post.child("postContent").getValue(),
                                     localTime, creationDateTimeAsLong,
-                                    creationYear.intValue(), creationMonth.intValue(), creationDay.intValue());
+                                    creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
 
-                            newPost.setPostID(postID);
                             m_PostsList.add(newPost);
                         }
                     }

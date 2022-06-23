@@ -29,6 +29,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     private Context m_OwnerContext = null;
     List<Comment> m_CommentsOfPost = new ArrayList<Comment>();
 
+    /**
+     * Constructor of the class "CommentAdapter"
+     * @param i_Context      - The context which has created the adapter
+     * @param commentsOfPost - The list which contains all the comments that should be displayed
+     */
     public CommentAdapter(Context i_Context, List<Comment> commentsOfPost)
     {
         super();
@@ -63,7 +68,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
      * Purpose:
      *     This method allows to create the suitable ViewHolder for the current view.
      *     Note that this method is being called only as the amount of the first cells in the RecyclerView.
-     * @param parent - The parent of the given view
+     * @param parent   - The parent of the given view
      * @param viewType - The type of the given view
      * @return The ViewHolder of the current given view
      */
@@ -114,7 +119,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
      *     This method is responsible to retrieve the type of the given view, which passed as it's index
      *     in the RecyclerView.
      *     If there's only one type of layout - it is not necessary to implement this method
-     * @param position - The position of the view in the RecyclerView
+     * @param position   - The position of the view in the RecyclerView
      * @return <unnamed> - The type of the given view
      */
     @Override

@@ -51,9 +51,15 @@ import com.google.gson.GsonBuilder;
 
 public class AppUtils
 {
-    Model m_Model = Model.getInstance();
     private static Gson gson;
+    private Model m_Model = Model.getInstance();
 
+    /**
+     * This method is responsible to retrieve a string value by its name
+     * @param i_StringName - The name of the string it's text should be returned
+     * @param i_Context    - The context which called to this method
+     * @return             - The string value which belongs to the given string name
+     */
     public static String GetResourceStringValueByStringName(String i_StringName, Context i_Context)
     {
         Resources res = i_Context.getResources();
@@ -64,18 +70,12 @@ public class AppUtils
         return i_Context.getString(stringId);
     }
 
-    public double convertExponentialNumberToDecimalNumber()
-    {
-        String str = "6.151536E-8";
-        BigDecimal bd = new BigDecimal(str);
-        bd = bd.round(new MathContext(2, RoundingMode.HALF_UP));
-        return bd.doubleValue();
-    }
-
-    /*
-    Remove all the desired fragments from container, by their given fragments tags
-    (Source: https://stackoverflow.com/a/39569243/2196301)
-    */
+    /**
+     * This method is responsible to remove all the desired fragments from container, by their given fragments tags
+     * (Source: https://stackoverflow.com/a/39569243/2196301)
+     * @param i_FragmentManager - The FragmentManager which will be used in order to close the desired fragments
+     * @param i_TagsToRemoveBy  - A collection of strings which represents the tags which indicates what fragments should be closed
+     */
     public static void closeFragmentsByFragmentsTags(FragmentManager i_FragmentManager, String... i_TagsToRemoveBy)
     {
         List<Fragment> allFragments = i_FragmentManager.getFragments();
@@ -98,10 +98,16 @@ public class AppUtils
     }
 
     /**
+     * This method is responsible to retrieve a reverse-geolocation data of the given coordinates.
      * You can read the docs (Link: https://positionstack.com/documentation) which indicating how to receive
      * the reversed-geolocation data from the api.
-     * @param i_Coordinates
-     * @return
+     * @param i_Coordinates - The coordinates which their reverse-geolocation data should be retrieved.
+     * @return              - A strings array which contains all the information about the given coordinates.
+     *                        The order of the information details is:
+     *                        1. Establishment
+     *                        2. Street
+     *                        3. City
+     *                        4. Country
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static String[] getStringValueFromJsonObject(Context i_Context, LatLng i_Coordinates)
@@ -208,6 +214,12 @@ public class AppUtils
         return null;
     }
 
+    /**
+     * This method is responsible to print a message to logcat
+     * @param i_CallerClass  - The class which called to this method
+     * @param i_CallerMethod - The method which called to this method
+     * @param i_Message      - The message to print to logcat
+     */
     public static void printDebugToLogcat(String i_CallerClass, String i_CallerMethod, String i_Message)
     {
         SimpleDateFormat sdf = null;
@@ -223,7 +235,14 @@ public class AppUtils
         Log.d(debuggerKey, currentTime + "[" + i_CallerClass + "][" + i_CallerMethod + "] " + i_Message);
     }
 
-    // Get selected RadioButton. If nothing is selected, return null.
+    //
+
+    /**
+     * This method is responsible to retrieve a selected RadioButton from a given RadioGroup
+     * @param i_OwnerRadioGroup - The RadioGroup which contians all the RadioButton components
+     * @param i_OwnerView       - The view which owns the given RadioGroup
+     * @return                  - The selected RadioButton. If nothing is selected, return null.
+     */
     public static RadioButton getSelectedRadioButtonFromRadioGroup(RadioGroup i_OwnerRadioGroup, View i_OwnerView)
     {
         int radioId = i_OwnerRadioGroup.getCheckedRadioButtonId();
@@ -233,6 +252,13 @@ public class AppUtils
         return selectedRadioButton;
     }
 
+    /**
+     * This method is responsible to resolve a given RadioButton text to a suitable DogGender
+     * @param i_RadioButton - The RadioButton which it's text should be translated to DogGender
+     * @param i_Context     - The context which called to this method
+     * @return              - The suitable eDogGender of the given RadioButton.
+     *                        If the given RadioButton doesn't represent a gender, eDogGender.UNINITIALIZED is returned.
+     */
     public static eDogGender resolveDogGender(RadioButton i_RadioButton, Context i_Context)
     {
         eDogGender m_dogGender = eDogGender.UNINITIALIZED;
@@ -293,22 +319,15 @@ public class AppUtils
 
         // imageview object
         glideLoader.into(i_TargetImageView);
-
-        /*
-                Glide.with(i_Context)
-                .load(i_AddressOfPhoto)                     // Photo url
-                .placeholder(R.drawable.dog_default_profile_rounded) // any placeholder to load at start
-                .error(R.drawable.dog_default_profile_rounded)         // any Photo in case of error
-                // .override(i_Width, i_Height)                // resizing
-                .into(i_TargetImageView);                   // imageview object
-        */
     }
 
-    public static Uri getUriOfMipmap(String i_MipmapName, Context i_Context)
-    {
-        return Uri.parse("android.resource://" + i_Context.getPackageName() + "/mipmap/" + i_MipmapName);
-    }
 
+    /**
+     * This method is responsible to retrieve a uri for the given drawable name.
+     * @param i_DrawableName - The name of the drawable which it's uri should be returned.
+     * @param i_Context      - The context which called to this method
+     * @return               - The uri of the given drawable
+     */
     public static Uri getUriOfDrawable(String i_DrawableName, Context i_Context)
     {
         return Uri.parse("android.resource://" + i_Context.getPackageName() + "/drawable/" + i_DrawableName);
@@ -316,8 +335,8 @@ public class AppUtils
 
     /**
      * Check if there is an available network connection (Source: https://stackoverflow.com/a/4239019/2196301)
-     * @param i_Context
-     * @return
+     * @param i_Context - The context which called to this method
+     * @return          - True if a network connection is available, otherwise false.
      */
     public static boolean isNetworkAvailable(Context i_Context)
     {
@@ -333,6 +352,10 @@ public class AppUtils
         return false;
     }
 
+    /**
+     * This method is responsible to retrieve a Gson parser object
+     * @return - The Gson parser object
+     */
     public static Gson getGsonParser()
     {
         if(null == gson)
@@ -344,8 +367,11 @@ public class AppUtils
         return gson;
     }
 
+    // TODO: Think if this should be removed from here and maybe placed in other place that exclusively
+    //       responsivble to handle the app's logic and not a general library like this
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static Post ConvertDataSnapshotToPost(DataSnapshot post) {
+    public static Post ConvertDataSnapshotToPost(DataSnapshot post)
+    {
 
         LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
                 (double) post.child("meetingLocation").child("longitude").getValue());
