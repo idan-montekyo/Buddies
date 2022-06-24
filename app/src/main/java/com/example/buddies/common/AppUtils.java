@@ -383,9 +383,9 @@ public class AppUtils
         LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
                 localSecond.intValue(), localNano.intValue());
 
-        Long creationYear = (long) post.child("postCreationDate").child("postCreationYear").getValue();
-        Long creationMonth = (long) post.child("postCreationDate").child("postCreationMonth").getValue();
-        Long creationDay = (long) post.child("postCreationDate").child("postCreationDay").getValue();
+        Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
+        Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
+        Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
         Long creationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
 
         Post newPost = new Post((String) post.child("creatorUserUID").getValue(),

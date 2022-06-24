@@ -825,27 +825,41 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPostsByCity(String i_SearchedCity) {
-        try {
-            if (!this.m_ListOfCities.contains(i_SearchedCity)) {
+    public void onRequestToLoadPostsByCity(String i_SearchedCity)
+    {
+        try
+        {
+            // if (!this.m_ListOfCities.contains(i_SearchedCity))
+            if (i_SearchedCity.equals(""))
+            {
                 this.onRequestToLoadPosts(ePostType.ALL);
-            } else {
+            }
+            else
+            {
                 m_PostsList = new ArrayList<>();
 
-                for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
-                    for (DataSnapshot post : UserUIDs.getChildren()) {
-                        Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
-                        if (newPost.getMeetingCity().equals(i_SearchedCity)) {
-                            m_PostsList.add(newPost);
+                if (this.m_ListOfCities.contains(i_SearchedCity) == true)
+                {
+                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren())
+                    {
+                        for (DataSnapshot post : UserUIDs.getChildren())
+                        {
+                            Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
+                            if (newPost.getMeetingCity().equals(i_SearchedCity))
+                            {
+                                m_PostsList.add(newPost);
+                            }
                         }
                     }
+
+                    Collections.sort(m_PostsList);
                 }
 
-                Collections.sort(m_PostsList);
                 Model.this.onSuccessToLoadPosts(m_PostsList);
             }
-
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             Model.this.onFailureToLoadPosts(exception);
         }
     }
