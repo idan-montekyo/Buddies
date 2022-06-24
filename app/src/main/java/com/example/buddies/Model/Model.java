@@ -829,8 +829,7 @@ public class Model implements IModel,
     {
         try
         {
-            // if (!this.m_ListOfCities.contains(i_SearchedCity))
-            if (i_SearchedCity.equals(""))
+            if (i_SearchedCity.equals("") == true)
             {
                 this.onRequestToLoadPosts(ePostType.ALL);
             }
