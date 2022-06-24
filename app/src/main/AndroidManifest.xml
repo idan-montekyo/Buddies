@@ -25,6 +25,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <!--
+        Use these <uses-feature> tags in order to allow location gathering from both gps and network providers
+        (Source: https://stackoverflow.com/a/55300972/2196301)
+
+        Note: These tags are Needed only if your app targets Android 5.0 (API level 21) or higher.
+    -->
+    <uses-feature android:name="android.hardware.location.gps" />
+    <uses-feature android:name="android.hardware.location.network" />
+
+    <!--
         Use here networkSecurityConfig in order to solve the "Cleartext HTTP traffic not permitted" error
         (Source: https://stackoverflow.com/a/50834600/2196301)
     -->

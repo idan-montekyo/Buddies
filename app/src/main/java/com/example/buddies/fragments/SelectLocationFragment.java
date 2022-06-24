@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -31,6 +32,8 @@ import androidx.appcompat.app.AlertDialog;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.AppUtils;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -38,6 +41,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.List;
 
@@ -54,7 +59,7 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     LatLng currentLatLng = null;
     private ActivityResultLauncher<String> requestLocationPermissionLauncher;
     Context m_Context = null;
-    LatLng startingCoordinates = null;
+    LatLng startingCoordinates = new LatLng(31.881417, 34.709998);
     AlertDialog alertDialog;
 
     LocationListener m_LocationListener = null;
@@ -63,6 +68,7 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     int LOCATION_REFRESH_DISTANCE = 500; // 500 meters to update
 
     public static final String SELECT_LOCATION_FRAGMENT_TAG = "select_location_fragment";
+    private FusedLocationProviderClient fusedLocationClient;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -79,12 +85,12 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
         // Request location permission with contracts (Source: https://stackoverflow.com/a/63546099/2196301)
         this.requestLocationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->
         {
+            // Start load the map
+            m_MapHolder.getMapAsync(SelectLocationFragment.this);
+
+            // If there is permission to access the device's location
             if (isGranted)
             {
-                Intent intent=new Intent("android.location.GPS_ENABLED_CHANGE");
-                intent.putExtra("enabled", true);
-                SelectLocationFragment.this.m_Context.sendBroadcast(intent);
-
                 // Do this dummy permission check because the code doesn't recognize that we are inside a code block that means the location
                 // permission is actually granted (Source: https://www.gool.co.il/MyCourses/Chapter/86423#83994)
                 int hasLocationPermission = this.m_Context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -98,49 +104,78 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                         @Override
                         public void onLocationChanged(@NonNull Location location)
                         {
-                            SelectLocationFragment.this.startingCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
-
                             // After the first location has been granted, stop getting more location updates - we don't need them.
                             manager.removeUpdates(SelectLocationFragment.this.m_LocationListener);
 
-                            // Start load the map
-                            m_MapHolder.getMapAsync(SelectLocationFragment.this);
+                            SelectLocationFragment.this.startingCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
+
+                            AppUtils.printDebugToLogcat("SelectLocationFragment", "onLocationChanged()", "Current location is: " + location);
+
+                            SelectLocationFragment.this.moveMapFocusToSpecificLocation(SelectLocationFragment.this.startingCoordinates);
                         }
                     };
 
-                    // Check if the location service is enabled (Source: https://stackoverflow.com/a/54648795/2196301)
+                    // Check if the location service is off (Source: https://stackoverflow.com/a/54648795/2196301)
                     if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false)
                     {
-                        // Create a dialog for ordering the user to turn on the gps
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.m_Context);
-                        alertDialogBuilder.setTitle("Location Access Alert");
-                        alertDialogBuilder.setMessage("You will be now redirected to the settings page in order to turn on gps location.\nAfter the location access confirmation, please wait a few seconds in order the app will recognize your location.");
-                        alertDialogBuilder.setCancelable(false);
-                        alertDialogBuilder.setPositiveButton("Take me there !", new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                // Open the GPS settings (Source: https://stackoverflow.com/a/23040461/2196301)
-                                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                            }
-                        });
-
-                        alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
+                        SelectLocationFragment.this.askUserToTurnOnLocationService();
                     }
 
+                    // Get the last known location
+                    fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.m_Context);
+                    Task<Location> lastKnownLocationTask = fusedLocationClient.getLastLocation();
+                    lastKnownLocationTask.addOnSuccessListener(new OnSuccessListener<Location>()
+                    {
+                        @Override
+                        public void onSuccess(Location location)
+                        {
+                            AppUtils.printDebugToLogcat("SelectLocationFragment", "onSuccess()", "Last known location is: " + location);
+
+                            // If there is an information about the last location
+                            if (location != null)
+                            {
+                                SelectLocationFragment.this.startingCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
+
+                                SelectLocationFragment.this.moveMapFocusToSpecificLocation(SelectLocationFragment.this.startingCoordinates);
+                            }
+                        }
+                    });
+
+                    // Request the current user's location
+                    // Note: Use both GPS_PROVIDER and NETWORK_PROVIDER in order to allow location gathering from various providers (Source: https://stackoverflow.com/a/55300972/2196301)
                     manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, SelectLocationFragment.this.m_LocationListener);
+                    manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, SelectLocationFragment.this.m_LocationListener);
                 }
             }
+            /*
             else
             {
-                SelectLocationFragment.this.startingCoordinates = new LatLng(31.881417, 34.709998);
-
                 // Start load the map
                 m_MapHolder.getMapAsync(this);
             }
+            */
         });
+    }
+
+    private void askUserToTurnOnLocationService()
+    {
+        // Create a dialog for ordering the user to turn on the gps
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.m_Context);
+        alertDialogBuilder.setTitle("Location Access Alert");
+        alertDialogBuilder.setMessage("You will be now redirected to the settings page in order to turn on gps location.\nAfter the location access confirmation, please wait a few seconds in order the app will recognize your location.");
+        alertDialogBuilder.setCancelable(false);
+        alertDialogBuilder.setPositiveButton("Take me there !", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                // Open the GPS settings (Source: https://stackoverflow.com/a/23040461/2196301)
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        });
+
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     @Nullable
@@ -213,14 +248,14 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap)
     {
+        AppUtils.printDebugToLogcat("SelectLocationFragment", "onMapReady()", "got here");
         m_Map = googleMap;
         m_Map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         // currMarker = m_Map.addMarker(new MarkerOptions().position(this.startingCoordinates).title("Title").snippet("Description"));
         m_Map.setOnMapClickListener(this);
 
-        // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
-        m_Map.moveCamera(CameraUpdateFactory.newLatLngZoom(this.startingCoordinates, 14f));
+        this.moveMapFocusToSpecificLocation(this.startingCoordinates);
     }
 
     private void setMarkerPosition(LatLng latLng)
@@ -234,6 +269,15 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
         else
         {
             currMarker.setPosition(latLng);
+        }
+    }
+
+    private void moveMapFocusToSpecificLocation(LatLng i_Location)
+    {
+        if (m_Map != null)
+        {
+            // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
+            m_Map.moveCamera(CameraUpdateFactory.newLatLngZoom(i_Location, 14f));
         }
     }
 

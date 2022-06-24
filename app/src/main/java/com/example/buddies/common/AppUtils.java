@@ -372,7 +372,6 @@ public class AppUtils
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static Post ConvertDataSnapshotToPost(DataSnapshot post)
     {
-
         LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
                 (double) post.child("meetingLocation").child("longitude").getValue());
 
@@ -396,7 +395,7 @@ public class AppUtils
                 latLng,
                 (String) post.child("postContent").getValue(),
                 localTime, creationDateTimeAsLong,
-                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue());
+                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), (String) post.child("postID").getValue());
 
         return newPost;
     }
