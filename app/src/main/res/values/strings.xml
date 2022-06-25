@@ -36,4 +36,6 @@
     <string name="show_location">Show Location</string>
     <string name="hide_location">Hide Location</string>
     <string name="created_on">Created on </string>
+    <string name="pick_date">Pick Date</string>
+    <string name="date">Date</string>
 </resources>

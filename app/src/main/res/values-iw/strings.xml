@@ -35,4 +35,6 @@
     <string name="show_location">הצג מיקום</string>
     <string name="hide_location">הסתר מיקום</string>
     <string name="created_on">"תאריך פרסום "</string>
+    <string name="pick_date">בחר תאריך</string>
+    <string name="date">תאריך</string>
 </resources>

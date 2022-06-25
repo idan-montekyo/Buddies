@@ -18,6 +18,7 @@ public class Post implements Comparable<Post>
     private String       m_CreatorUserUID             = null;
     private String       m_MeetingCity                = null;
     private String       m_MeetingStreet              = null;
+    private CreationDate m_MeetingDate                = null;
     private String       m_MeetingTime                = null;
     private String       m_PostContent                = null;
     private String       m_PostID                     = null;
@@ -30,17 +31,19 @@ public class Post implements Comparable<Post>
      * @param i_CreatorUserUID  - The UserID which belongs to the creator of the current post
      * @param i_MeetingCity     - The city where the meeting will take place
      * @param i_MeetingStreet   - The street where the meeting will take place
+     * @param i_MeetingDate     - The date when the meeting will take place
      * @param i_MeetingTime     - The time when the meeting will take place
      * @param i_MeetingLocation - The location of the meeting, represented by coordinates
      * @param i_PostContent     - The content of the post itself
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
-                String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent)
+                CreationDate i_MeetingDate, String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent)
     {
         this.m_CreatorUserUID = i_CreatorUserUID;
         this.m_MeetingCity = i_MeetingCity;
         this.m_MeetingStreet = i_MeetingStreet;
+        this.m_MeetingDate = i_MeetingDate;
         this.m_MeetingTime = i_MeetingTime;
         this.m_MeetingLocation = i_MeetingLocation;
         this.m_PostContent = i_PostContent;
@@ -77,6 +80,7 @@ public class Post implements Comparable<Post>
      * @param i_CreatorUserUID             - The UserID which belongs to the creator of the current post
      * @param i_MeetingCity                - The city where the meeting will take place
      * @param i_MeetingStreet              - The street where the meeting will take place
+     * @param i_MeetingDate                - The date when the meeting will take place
      * @param i_MeetingTime                - The time when the meeting will take place
      * @param i_MeetingLocation            - The location of the meeting, represented by coordinates
      * @param i_PostContent                - The content of the post itself
@@ -88,13 +92,14 @@ public class Post implements Comparable<Post>
      * @param i_PostID                     - The ID of the post itself
      */
     public Post(String i_CreatorUserUID, String i_MeetingCity, String i_MeetingStreet,
-                String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent,
+                CreationDate i_MeetingDate, String i_MeetingTime, LatLng i_MeetingLocation, String i_PostContent,
                 LocalTime i_PostCreationTime, long i_PostCreationDateTimeAsLong,
                 int i_PostCreationYear, int i_PostCreationMonth, int i_PostCreationDay, String i_PostID)
     {
         this.m_CreatorUserUID = i_CreatorUserUID;
         this.m_MeetingCity = i_MeetingCity;
         this.m_MeetingStreet = i_MeetingStreet;
+        this.m_MeetingDate = i_MeetingDate;
         this.m_MeetingTime = i_MeetingTime;
         this.m_MeetingLocation = i_MeetingLocation;
         this.m_PostContent = i_PostContent;
@@ -110,6 +115,7 @@ public class Post implements Comparable<Post>
     public String getCreatorUserUID() { return m_CreatorUserUID; }
     public String getMeetingCity() { return m_MeetingCity; }
     public String getMeetingStreet() { return m_MeetingStreet; }
+    public CreationDate getMeetingDate() { return m_MeetingDate; }
     public String getMeetingTime() { return m_MeetingTime; }
     public LatLng getMeetingLocation() { return m_MeetingLocation; }
     public String getPostContent() { return m_PostContent; }
@@ -121,6 +127,7 @@ public class Post implements Comparable<Post>
     // Setters
     public void setMeetingCity(String m_MeetingCity) { this.m_MeetingCity = m_MeetingCity; }
     public void setMeetingStreet(String m_MeetingStreet) { this.m_MeetingStreet = m_MeetingStreet; }
+    public void setMeetingDate(CreationDate m_MeetingDate) { this.m_MeetingDate = m_MeetingDate; }
     public void setMeetingTime(String m_MeetingTime) { this.m_MeetingTime = m_MeetingTime; }
     public void setMeetingLocation(LatLng m_MeetingLocation) { this.m_MeetingLocation = m_MeetingLocation; }
     public void setPostContent(String m_PostContent) { this.m_PostContent = m_PostContent; }
@@ -139,6 +146,7 @@ public class Post implements Comparable<Post>
                 "creatorUserUID='" + m_CreatorUserUID + '\'' +
                 ", meetingCity='" + m_MeetingCity + '\'' +
                 ", meetingStreet='" + m_MeetingStreet + '\'' +
+                ", meetingDate='" + m_MeetingDate + '\'' +
                 ", meetingTime='" + m_MeetingTime + '\'' +
                 ", meetingLocation=" + m_MeetingLocation +
                 ", postContent='" + m_PostContent + '\'' +

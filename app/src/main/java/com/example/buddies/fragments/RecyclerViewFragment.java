@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.adapters.PostAdapter;
+import com.example.buddies.common.Comment;
 import com.example.buddies.common.Post;
 import com.example.buddies.enums.ePostType;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
@@ -30,6 +31,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -148,7 +150,10 @@ public class RecyclerViewFragment extends Fragment implements IView,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPosts(ePostType type) { this.m_ViewModel.onRequestToLoadPosts(type); }
+    public void onRequestToLoadPosts(ePostType type)
+    {
+        this.m_ViewModel.onRequestToLoadPosts(type);
+    }
 
     @Override
     public void onRequestToLoadPostsByCity(String i_SearchedCity) { } // Irrelevant.

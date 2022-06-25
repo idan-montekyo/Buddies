@@ -23,6 +23,7 @@ import com.example.buddies.common.UserProfile;
 import com.example.buddies.interfaces.MVVM.IView;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHolder>
@@ -211,4 +212,14 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
         Toast.makeText(m_Context, i_Reason.getMessage(), Toast.LENGTH_SHORT).show();
     }
     */
+
+    public void updateAdapter(List<Post> i_NewPostsList)
+    {
+        this.m_Posts.addAll(i_NewPostsList);
+    }
+
+    public void updateAdapter(Post i_NewPost)
+    {
+        this.updateAdapter(Arrays.asList(i_NewPost));
+    }
 }

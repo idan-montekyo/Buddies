@@ -369,6 +369,7 @@ public class AppUtils
 
     // TODO: Think if this should be removed from here and maybe placed in other place that exclusively
     //       responsivble to handle the app's logic and not a general library like this
+    /*
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static Post ConvertDataSnapshotToPost(DataSnapshot post)
     {
@@ -399,4 +400,5 @@ public class AppUtils
 
         return newPost;
     }
+    */
 }

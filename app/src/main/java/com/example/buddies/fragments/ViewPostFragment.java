@@ -85,6 +85,7 @@ public class ViewPostFragment extends    Fragment
     private TextView           m_TextView_CityOfMeeting         = null;
     private TextView           m_TextView_StreetOfMeeting       = null;
     private TextView           m_TextView_TimeOfMeeting         = null;
+    private TextView           m_TextView_DateOfMeeting         = null;
     private TextView           m_TextView_ContentOfPost         = null;
     private UserProfile        m_CurrentUserProfile             = null;
     private UserProfile        m_CurrentCreatorUserProfile      = null;
@@ -141,6 +142,7 @@ public class ViewPostFragment extends    Fragment
         this.m_TextView_CityOfMeeting                  = view.findViewById(R.id.view_post_city_text_view);
         this.m_TextView_StreetOfMeeting                = view.findViewById(R.id.view_post_street_text_view);
         this.m_TextView_TimeOfMeeting                  = view.findViewById(R.id.view_post_time_text_view);
+        this.m_TextView_DateOfMeeting                  = view.findViewById(R.id.view_post_date_text_view);
         this.m_TextView_ContentOfPost               = view.findViewById(R.id.view_post_content_text_view);
         this.m_Button_ShowHideLocation     = view.findViewById(R.id.view_post_location_button);
         this.m_MapView_MeetingLocationViewer  = view.findViewById(R.id.view_post_map_view);
@@ -162,6 +164,7 @@ public class ViewPostFragment extends    Fragment
         this.m_TextView_PostCreatorDogsGender.setText(m_CurrentCreatorUserProfile.getDogGender().toString());
         this.m_TextView_CityOfMeeting.setText(m_CurrentPost.getMeetingCity());
         this.m_TextView_StreetOfMeeting.setText(m_CurrentPost.getMeetingStreet());
+        this.m_TextView_DateOfMeeting.setText(m_CurrentPost.getMeetingDate().toString());
         this.m_TextView_TimeOfMeeting.setText(m_CurrentPost.getMeetingTime());
         this.m_TextView_ContentOfPost.setText(m_CurrentPost.getPostContent());
         this.m_MapView_MeetingLocationViewer.onCreate(this.m_SavedInstanceState);
@@ -267,6 +270,7 @@ public class ViewPostFragment extends    Fragment
     {
         this.m_ViewPostFragmentArguments = getArguments();
 
+        // Create custom objects from their json representation which exists in the bundle (Source: https://stackoverflow.com/a/46591617/2196301)
         this.m_UserProfileJsonString = m_ViewPostFragmentArguments.getString("userProfileJsonString");
         this.m_CurrentCreatorUserProfile = AppUtils.getGsonParser().fromJson(this.m_UserProfileJsonString, UserProfile.class);
 

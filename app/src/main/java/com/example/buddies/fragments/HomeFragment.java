@@ -175,7 +175,7 @@ public class HomeFragment extends Fragment implements IView,
                 Post        currentPost               = m_Posts.get(index);
                 UserProfile currentCreatorUserProfile = Model.getInstance().resolveUserProfileFromUID(currentPost.getCreatorUserUID()); // m_PostAdapter.getCreatorUserProfile();
 
-
+                // Convert the custom objects to json and pass them as json to the bundle (Source: https://stackoverflow.com/a/46591617/2196301)
                 String userProfileJsonString = AppUtils.getGsonParser().toJson(currentCreatorUserProfile);
                 String currentPostJsonString = AppUtils.getGsonParser().toJson(currentPost);
 
@@ -418,7 +418,10 @@ public class HomeFragment extends Fragment implements IView,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPosts(ePostType type) { m_ViewModel.onRequestToLoadPosts(type); }
+    public void onRequestToLoadPosts(ePostType type)
+    {
+        m_ViewModel.onRequestToLoadPosts(type);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -442,16 +445,18 @@ public class HomeFragment extends Fragment implements IView,
     @SuppressLint("NotifyDataSetChanged")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onSuccessToCreatePost()
+    public void onSuccessToCreatePost(Post i_Post)
     {
         m_Handler.post(new Runnable()
         {
             @Override
             public void run()
             {
-                onRequestToLoadPosts(ePostType.ALL);
+                HomeFragment.this.onRequestToLoadPosts(ePostType.ALL);
+                ((PostAdapter)m_RecyclerView.getAdapter()).updateAdapter(i_Post);
                 Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
             }
+
         });
     }
 

@@ -30,22 +30,31 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center_horizontal"
-        android:weightSum="100"
+        android:weightSum="99"
         android:layout_marginTop="25dp">
 
         <Button
             android:id="@+id/create_post_pick_location_button"
             android:layout_width="0dp"
-            android:layout_weight="50"
+            android:layout_weight="33"
             android:layout_height="wrap_content"
             android:text="@string/pick_location"
             android:textAllCaps="false"
             android:layout_gravity="center_vertical"/>
 
         <Button
+            android:id="@+id/create_post_pick_date_button"
+            android:layout_width="0dp"
+            android:layout_weight="33"
+            android:layout_height="wrap_content"
+            android:text="@string/pick_date"
+            android:textAllCaps="false"
+            android:layout_gravity="center_vertical"/>
+
+        <Button
             android:id="@+id/create_post_pick_time_button"
             android:layout_width="0dp"
-            android:layout_weight="50"
+            android:layout_weight="33"
             android:textAllCaps="false"
             android:text="@string/pick_time"
             android:layout_height="wrap_content"
@@ -59,13 +68,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
-        android:weightSum="99"
+        android:weightSum="100"
         android:layout_gravity="center_horizontal">
 
         <TextView
             android:id="@+id/create_post_city_output"
             android:layout_width="0dp"
-            android:layout_weight="33"
+            android:layout_weight="25"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"
@@ -73,10 +82,10 @@
             android:textColorHint="@color/faded_white"
             android:gravity="center" />
 
-        <TextView
+        <EditText
             android:id="@+id/create_post_street_output"
             android:layout_width="0dp"
-            android:layout_weight="33"
+            android:layout_weight="25"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"
@@ -85,9 +94,20 @@
             android:gravity="center"/>
 
         <TextView
+            android:id="@+id/create_post_date_output"
+            android:layout_width="0dp"
+            android:layout_weight="25"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:hint="@string/date"
+            android:textColorHint="@color/faded_white"
+            android:gravity="center"/>
+
+        <TextView
             android:id="@+id/create_post_time_output"
             android:layout_width="0dp"
-            android:layout_weight="33"
+            android:layout_weight="25"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"

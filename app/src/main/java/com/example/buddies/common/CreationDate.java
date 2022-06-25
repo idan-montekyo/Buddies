@@ -16,8 +16,8 @@ public class CreationDate
     private int creationMonth;
     private int creationDay;
 
-    public CreationDate(int i_CreationYear, int i_CreationMonth, int i_CreationDay) {
-
+    public CreationDate(int i_CreationYear, int i_CreationMonth, int i_CreationDay)
+    {
         this.creationYear = i_CreationYear;
         this.creationMonth = i_CreationMonth;
         this.creationDay = i_CreationDay;
@@ -30,12 +30,9 @@ public class CreationDate
 
     @NonNull
     @Override
-    public String toString() {
-        return "PostCreationDate{" +
-                "postCreationYear=" + creationYear +
-                ", postCreationMonth=" + creationMonth +
-                ", postCreationDay=" + creationDay +
-                '}';
+    public String toString()
+    {
+        return creationDay + "." + creationMonth + "." + creationYear;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -47,5 +44,35 @@ public class CreationDate
         int day = (MonthDay.now(zoneId)).getDayOfMonth();
 
         return new CreationDate(year, month, day);
+    }
+
+    public static CreationDate parse(String i_StringOfDate)
+    {
+        int day;
+        int month;
+        int year;
+
+        try
+        {
+            // Use escaping in order to split by dot (Source: https://stackoverflow.com/a/14833048/2196301)
+            String[] dateParts = i_StringOfDate.split("\\.");
+
+            if (dateParts.length == 3)
+            {
+                day   = Integer.parseInt(dateParts[0]);
+                month = Integer.parseInt(dateParts[1]);
+                year  = Integer.parseInt(dateParts[2]);
+
+                return new CreationDate(year, month, day);
+            }
+            else
+            {
+                throw new Exception();
+            }
+        }
+        catch (Exception error)
+        {
+            return null;
+        }
     }
 }

@@ -270,23 +270,24 @@ public class ViewModel implements IViewModel,
     ****************************************************************************************************
     */
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToCreatePost(Context i_Context, Post i_Post)
+    public void onRequestToCreatePost(Context i_Context, String i_UserID, String i_CityOfMeeting, String i_StreetOfMeeting, String i_DateOfMeeting, String i_TimeOfMeeting, LatLng i_LocationOfMeeting, String i_ContentOfPost)
     {
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "calling onRequestToCreatePost()");
-        this.m_Model.onRequestToCreatePost(i_Context, i_Post);
+        this.m_Model.onRequestToCreatePost(i_Context, i_UserID, i_CityOfMeeting, i_StreetOfMeeting, i_DateOfMeeting, i_TimeOfMeeting, i_LocationOfMeeting, i_ContentOfPost);
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "returned from onRequestToCreatePost()");
 
     }
 
     @Override
-    public void onSuccessToCreatePost()
+    public void onSuccessToCreatePost(Post i_Post)
     {
         for (IView view : views)
         {
             if (view instanceof IPostCreationResponseEventHandler)
             {
-                ((IPostCreationResponseEventHandler)view).onSuccessToCreatePost();
+                ((IPostCreationResponseEventHandler)view).onSuccessToCreatePost(i_Post);
             }
         }
     }

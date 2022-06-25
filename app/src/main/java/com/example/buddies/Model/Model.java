@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi;
 import com.example.buddies.adapters.PostAdapter;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Comment;
+import com.example.buddies.common.CreationDate;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.ProgressNotification;
 import com.example.buddies.common.UserProfile;
@@ -420,26 +421,31 @@ public class Model implements IModel,
     ****************************************************************************************************
     */
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToCreatePost(Context i_Context, Post i_Post)
+    public void onRequestToCreatePost(Context i_Context, String i_UserID, String i_CityOfMeeting, String i_StreetOfMeeting, String i_DateOfMeeting, String i_TimeOfMeeting, LatLng i_LocationOfMeeting, String i_ContentOfPost)
     {
         AppUtils.printDebugToLogcat("Model", "onRequestToCreatePost", "trying to save post details to FireBase...");
 
         try
         {
+            // First, create the Post object.
+            Post newPost = new Post(i_UserID, i_CityOfMeeting, i_StreetOfMeeting, CreationDate.parse(i_DateOfMeeting), i_TimeOfMeeting, i_LocationOfMeeting, i_ContentOfPost);
+
             // Save post under the current user at FireBase -> posts.
             String newPostKey = m_PostsTable.child(getCurrentUserUID()).push().getKey();
             assert newPostKey != null;
-            i_Post.setPostID(newPostKey);
-            m_PostsTable.child(getCurrentUserUID()).child(newPostKey).setValue(i_Post);
+
+            newPost.setPostID(newPostKey);
+            m_PostsTable.child(getCurrentUserUID()).child(newPostKey).setValue(newPost);
 
             // Save city at FireBase -> cities (if the city does not exist already).
-            String desiredCity = i_Post.getMeetingCity();
+            String desiredCity = newPost.getMeetingCity();
             if (!this.m_ListOfCities.contains(desiredCity))
             {
                 m_CitiesTable.child(desiredCity).setValue(true);
             }
-            onSuccessToCreatePost();
+            this.onSuccessToCreatePost(newPost);
         }
         catch (Exception exception)
         {
@@ -448,12 +454,14 @@ public class Model implements IModel,
     }
 
     @Override
-    public void onSuccessToCreatePost() {
-        ((IPostCreationResponseEventHandler)viewModel).onSuccessToCreatePost();
+    public void onSuccessToCreatePost(Post i_Post)
+    {
+        ((IPostCreationResponseEventHandler)viewModel).onSuccessToCreatePost(i_Post);
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason) {
+    public void onFailureToCreatePost(Exception i_Reason)
+    {
         ((IPostCreationResponseEventHandler)viewModel).onFailureToCreatePost(i_Reason);
     }
 
@@ -762,52 +770,79 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPosts(ePostType type) {
-        try {
+    public void onRequestToLoadPosts(ePostType type)
+    {
+        try
+        {
             m_PostsTable = m_CurrentSnapshotOfPostsTable.getRef();
             m_PostsList = new ArrayList<>();
 
-            switch (type) {
+            switch (type)
+            {
                 case ALL:
-                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
-                        for (DataSnapshot post : UserUIDs.getChildren()) {
-                            LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
-                                    (double) post.child("meetingLocation").child("longitude").getValue());
+                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren())
+                    {
+                        for (DataSnapshot post : UserUIDs.getChildren())
+                        {
+                            /*
+                            String userID = (String) post.child("creatorUserUID").getValue();
+                            String cityOfMeeting = (String) post.child("meetingCity").getValue();
+                            String streetOfMeeting = (String) post.child("meetingStreet").getValue();
 
+                            // Get the meeting date
+                            Long meetingYear = (long) post.child("meetingDate").child("creationYear").getValue();
+                            Long meetingMonth = (long) post.child("meetingDate").child("creationMonth").getValue();
+                            Long meetingDay = (long) post.child("meetingDate").child("creationDay").getValue();
+                            CreationDate dateOfMeeting = new CreationDate(meetingYear.intValue(), meetingMonth.intValue(), meetingDay.intValue());
+
+                            String timeOfMeeting = (String) post.child("meetingTime").getValue();
+
+                            LatLng locationOfMeeting = new LatLng(
+                                    (double) post.child("meetingLocation").child("latitude").getValue(),
+                                    (double) post.child("meetingLocation").child("longitude").getValue()
+                            );
+
+                            String contentOfPost = (String) post.child("postContent").getValue();
+
+                            // Get the time of post creation
                             Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
                             Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
                             Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
                             Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
 
-                            // Instead of the code below, this can be done too:
-                            // Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
-
-                            LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
+                            LocalTime postCreationTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
                                     localSecond.intValue(), localNano.intValue());
 
+                            Long postCreationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
+
+                            // Get the date of post creation
                             Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
                             Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
                             Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
-                            Long creationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
+
                             String postID = (String) post.child("postID").getValue();
 
-                            Post newPost = new Post((String) post.child("creatorUserUID").getValue(),
-                                    (String) post.child("meetingCity").getValue(),
-                                    (String) post.child("meetingStreet").getValue(),
-                                    (String) post.child("meetingTime").getValue(),
-                                    latLng,
-                                    (String) post.child("postContent").getValue(),
-                                    localTime, creationDateTimeAsLong,
+                            Post newPost = new Post(userID,
+                                    cityOfMeeting,
+                                    streetOfMeeting,
+                                    dateOfMeeting,
+                                    timeOfMeeting,
+                                    locationOfMeeting,
+                                    contentOfPost,
+                                    postCreationTime, postCreationDateTimeAsLong,
                                     creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
+                             */
+
+                            Post newPost = this._instance.ConvertDataSnapshotToPost(post);
 
                             m_PostsList.add(newPost);
                         }
                     }
                     break;
                 case MY_POSTS:
-                    for (DataSnapshot post : m_CurrentSnapshotOfPostsTable.child(getCurrentUserUID()).getChildren()) {
-
-                        Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
+                    for (DataSnapshot post : m_CurrentSnapshotOfPostsTable.child(getCurrentUserUID()).getChildren())
+                    {
+                        Post newPost = this._instance.ConvertDataSnapshotToPost(post);
                         m_PostsList.add(newPost);
                     }
                     break;
@@ -818,7 +853,9 @@ public class Model implements IModel,
             Collections.sort(m_PostsList);
             Model.this.onSuccessToLoadPosts(m_PostsList);
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             Model.this.onFailureToLoadPosts(exception);
         }
     }
@@ -843,7 +880,7 @@ public class Model implements IModel,
                     {
                         for (DataSnapshot post : UserUIDs.getChildren())
                         {
-                            Post newPost = AppUtils.ConvertDataSnapshotToPost(post);
+                            Post newPost = this._instance.ConvertDataSnapshotToPost(post);
                             if (newPost.getMeetingCity().equals(i_SearchedCity))
                             {
                                 m_PostsList.add(newPost);
@@ -864,12 +901,14 @@ public class Model implements IModel,
     }
 
     @Override
-    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
+    public void onSuccessToLoadPosts(List<Post> i_PostsList)
+    {
         ((ILoadPostsResponseEventHandler)viewModel).onSuccessToLoadPosts(i_PostsList);
     }
 
     @Override
-    public void onFailureToLoadPosts(Exception i_Reason) {
+    public void onFailureToLoadPosts(Exception i_Reason)
+    {
         ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(i_Reason);
     }
 
@@ -880,27 +919,36 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
-        try {
+    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate)
+    {
+        try
+        {
             m_UserProfile = this.resolveUserProfileFromUID(i_CreatorUserUID);
-            if (m_UserProfile != null) {
+            if (m_UserProfile != null)
+            {
                 onSuccessToLoadPostCard(m_UserProfile, i_PostAdapterToUpdate);
-            } else {
+            }
+            else
+            {
                 onFailureToLoadPostCard(new Exception("Model.m_UserProfile is null"), i_PostAdapterToUpdate);
             }
 
-        } catch (Exception exception) {
+        }
+        catch (Exception exception)
+        {
             onFailureToLoadPostCard(exception, i_PostAdapterToUpdate);
         }
     }
 
     @Override
-    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate)
+    {
         ((ILoadPostCardResponseEventHandler)viewModel).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
     }
 
     @Override
-    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate)
+    {
         ((ILoadPostCardResponseEventHandler)viewModel).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
     }
 
@@ -911,15 +959,22 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller) {
-        try {
+    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller)
+    {
+        try
+        {
             UserProfile currentResolvedUserProfile = this.resolveUserProfileFromUID(i_UserIDToResolve); // m_CurrentSnapshotOfUsersTable.child(i_CreatorUserUID).getValue(UserProfile.class);
-            if (currentResolvedUserProfile != null) {
+            if (currentResolvedUserProfile != null)
+            {
                 this.onSuccessToResolveUIDToUserProfile(currentResolvedUserProfile, i_Caller);
-            } else {
+            }
+            else
+            {
                 new Exception("Model.m_UserProfile is null");
             }
-        } catch (Exception err) {
+        }
+        catch (Exception err)
+        {
             this.onFailureToResolveUIDToUserProfile(err, i_Caller);
         }
     }
@@ -972,7 +1027,8 @@ public class Model implements IModel,
     }
 
     @Override
-    public void onFailureToCreateComment(Exception i_Reason) {
+    public void onFailureToCreateComment(Exception i_Reason)
+    {
         ((ICommentCreationResponseEventHandler)viewModel).onFailureToCreateComment(i_Reason);
     }
 
@@ -988,10 +1044,10 @@ public class Model implements IModel,
 
     public String getCurrentUserUID() { return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid(); }
 
-    public boolean areRegisterDetailsValid(String i_UserName, String i_Password,
-                                           String i_FullName, String i_age, eDogGender i_DogGender) {
-        if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("") || i_age.equals("")
-                || i_DogGender == eDogGender.UNINITIALIZED) {
+    public boolean areRegisterDetailsValid(String i_UserName, String i_Password, String i_FullName, String i_age, eDogGender i_DogGender)
+    {
+        if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("") || i_age.equals("") || i_DogGender == eDogGender.UNINITIALIZED)
+        {
             return false;
         }
         return true;
@@ -999,7 +1055,8 @@ public class Model implements IModel,
 
     public List<Post> getPostsList() { return m_PostsList; }
 
-    public UserProfile resolveUserProfileFromUID(String i_UserID) {
+    public UserProfile resolveUserProfileFromUID(String i_UserID)
+    {
         return m_CurrentSnapshotOfUsersTable.child(i_UserID).getValue(UserProfile.class);
     }
 
@@ -1019,8 +1076,6 @@ public class Model implements IModel,
                 long nano = (long) commentOfPost.child("commentCreationTime").child("nano").getValue();
                 long second = (long) commentOfPost.child("commentCreationTime").child("second").getValue();
 
-                // LocalTime commentCreationTime = LocalTime.parse(String.format("%d:%d:%d.%d", hour, minute, second, nano));
-
                 LocalTime commentCreationTime = LocalTime.of((int)hour, (int)minute, (int)second, (int)nano);
 
                 long commentCreationDateTimeAsLong = (long) commentOfPost.child("commentCreationDateTimeAsLong").getValue();
@@ -1036,5 +1091,58 @@ public class Model implements IModel,
         }
 
         return commentsOfPost;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private Post ConvertDataSnapshotToPost(DataSnapshot post)
+    {
+        String userID = (String) post.child("creatorUserUID").getValue();
+        String cityOfMeeting = (String) post.child("meetingCity").getValue();
+        String streetOfMeeting = (String) post.child("meetingStreet").getValue();
+
+        // Get the meeting date
+        Long meetingYear = (long) post.child("meetingDate").child("creationYear").getValue();
+        Long meetingMonth = (long) post.child("meetingDate").child("creationMonth").getValue();
+        Long meetingDay = (long) post.child("meetingDate").child("creationDay").getValue();
+        CreationDate dateOfMeeting = new CreationDate(meetingYear.intValue(), meetingMonth.intValue(), meetingDay.intValue());
+
+        String timeOfMeeting = (String) post.child("meetingTime").getValue();
+
+        LatLng locationOfMeeting = new LatLng(
+                (double) post.child("meetingLocation").child("latitude").getValue(),
+                (double) post.child("meetingLocation").child("longitude").getValue()
+        );
+
+        String contentOfPost = (String) post.child("postContent").getValue();
+
+        // Get the time of post creation
+        Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
+        Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
+        Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
+        Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
+
+        LocalTime postCreationTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
+                localSecond.intValue(), localNano.intValue());
+
+        Long postCreationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
+
+        // Get the date of post creation
+        Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
+        Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
+        Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
+
+        String postID = (String) post.child("postID").getValue();
+
+        Post newPost = new Post(userID,
+                cityOfMeeting,
+                streetOfMeeting,
+                dateOfMeeting,
+                timeOfMeeting,
+                locationOfMeeting,
+                contentOfPost,
+                postCreationTime, postCreationDateTimeAsLong,
+                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
+
+        return newPost;
     }
 }

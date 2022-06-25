@@ -29,7 +29,7 @@
         (Source: https://stackoverflow.com/a/55300972/2196301)
 
         Note: These tags are Needed only if your app targets Android 5.0 (API level 21) or higher.
-    -->
+    -->ge
     <uses-feature android:name="android.hardware.location.gps" />
     <uses-feature android:name="android.hardware.location.network" />
 

@@ -72,7 +72,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:weightSum="3"
+        android:weightSum="4"
         android:layout_gravity="center_horizontal">
 
         <TextView
@@ -94,6 +94,17 @@
             android:textSize="25sp"
             android:textColor="@color/white"
             android:hint="@string/street"
+            android:textColorHint="@color/faded_white"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/view_post_date_text_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:hint="@string/time"
             android:textColorHint="@color/faded_white"
             android:gravity="center"/>
 

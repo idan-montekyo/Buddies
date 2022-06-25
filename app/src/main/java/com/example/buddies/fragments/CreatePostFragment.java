@@ -1,8 +1,11 @@
 package com.example.buddies.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,12 +15,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -29,6 +37,7 @@ import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.AppUtils;
+import com.example.buddies.common.CreationDate;
 import com.example.buddies.common.Post;
 import com.example.buddies.interfaces.LocationSelectionEvent.ILocationSelect_EventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
@@ -40,11 +49,16 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AddressComponent;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
-import java.time.MonthDay;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class CreatePostFragment extends Fragment implements IView,
                                                             ILocationSelect_EventHandler,
@@ -64,7 +78,8 @@ public class CreatePostFragment extends Fragment implements IView,
     MapView m_mapView;
 
     TextView m_cityTv;
-    TextView m_streetTv;
+    EditText m_streetTv;
+    TextView m_dateTv;
     TextView m_timeTv;
 
     GoogleMap m_GoogleMap;
@@ -75,6 +90,8 @@ public class CreatePostFragment extends Fragment implements IView,
     {
         void onUpload();
     }
+
+    private ActivityResultLauncher<Intent> autocompleteLocationLauncher;
 
     public IOnUploadListener onUploadListener;
 
@@ -88,6 +105,50 @@ public class CreatePostFragment extends Fragment implements IView,
         try
         {
             onUploadListener = (IOnUploadListener) homeFragment;
+
+            autocompleteLocationLauncher = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    new ActivityResultCallback<ActivityResult>()
+                    {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onActivityResult(ActivityResult result)
+                        {
+                            if (result.getResultCode() == Activity.RESULT_OK)
+                            {
+                                Intent data = result.getData();
+
+                                Place place = Autocomplete.getPlaceFromIntent(data);
+
+                                // If there is information available for the selected street
+                                if (place.getAddressComponents() != null)
+                                {
+                                    List<AddressComponent> components = place.getAddressComponents().asList();
+                                    String streetName = components.get(0).getName();
+                                    String cityName = components.get(1).getName();
+                                    AppUtils.printDebugToLogcat("CreatePostFragment", "onActivityResult()", "Address components are: " + place.getAddressComponents().toString());
+
+                                    // If the user selected some street but not in the city that he selected earlier - show error message
+                                    if (cityName.equals(CreatePostFragment.this.m_LocationDetails[2]) == false)
+                                    {
+                                        Toast.makeText(CreatePostFragment.this.m_Context, "Illegal choose! Choose in your city only.", Toast.LENGTH_LONG).show();
+                                    }
+                                    else
+                                    {
+                                        CreatePostFragment.this.m_streetTv.setText(streetName);
+                                        CreatePostFragment.this.m_streetTv.setEnabled(false);
+                                    }
+                                }
+                                else
+                                {
+                                    Toast.makeText(CreatePostFragment.this.m_Context, "Cannot selected this location, place select other.", Toast.LENGTH_LONG).show();
+                                }
+
+                                AppUtils.printDebugToLogcat("CreatePostFragment", "onActivityResult()", place.toString());
+
+                            }
+                        }
+                    });
         }
         catch (ClassCastException ex)
         {
@@ -110,6 +171,7 @@ public class CreatePostFragment extends Fragment implements IView,
         return view;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
@@ -162,6 +224,30 @@ public class CreatePostFragment extends Fragment implements IView,
             }
         });
 
+        Button pickDateBtn = view.findViewById(R.id.create_post_pick_date_button);
+        pickDateBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                CreationDate currentDate = CreationDate.now();
+
+                DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener()
+                {
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
+                    {
+                        // Set the month value to be the correct one.
+                        monthOfYear++;
+                        String selectedDate = dayOfMonth + "." + monthOfYear + "." + year;
+                        CreatePostFragment.this.m_dateTv.setText(selectedDate);
+                    }
+                };
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(CreatePostFragment.this.m_Context, mDateSetListener, currentDate.getCreationYear(), currentDate.getCreationMonth() - 1, currentDate.getCreationDay());
+                datePickerDialog.show();
+            }
+        });
+
         Button pickTimeBtn = (Button) view.findViewById(R.id.create_post_pick_time_button);
         pickTimeBtn.setOnClickListener(new View.OnClickListener()
         {
@@ -180,8 +266,45 @@ public class CreatePostFragment extends Fragment implements IView,
             }
         });
 
+
+
         m_cityTv = view.findViewById(R.id.create_post_city_output);
-        m_streetTv = view.findViewById(R.id.create_post_street_output);
+        m_streetTv = (EditText) view.findViewById(R.id.create_post_street_output);
+        m_streetTv.setFocusable(false);
+
+        m_streetTv.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // If necessary - initialize the Places class
+                if (Places.isInitialized() == false)
+                {
+                    Places.initialize(CreatePostFragment.this.m_Context, AppUtils.GetResourceStringValueByStringName("google_maps_key", CreatePostFragment.this.m_Context), Locale.US);
+                }
+
+                // PlacesClient placesClient = Places.createClient(CreatePostFragment.this.m_Context);
+
+                // Set the fields to specify which types of place data to
+                // return after the user has made a selection.
+                List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS_COMPONENTS);
+
+                // Start the autocomplete intent.
+                Autocomplete.IntentBuilder builder = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields);
+
+                // Suggest to the user results which are only in Israel
+                builder.setCountry("IL");
+
+                // Suggest to the user addresses only (Source: https://developers.google.com/maps/documentation/places/android-sdk/reference/com/google/android/libraries/places/api/model/TypeFilter#enum-values)
+                builder.setTypeFilter(TypeFilter.ADDRESS);
+
+                Intent intent = builder.build(CreatePostFragment.this.m_Context);
+                autocompleteLocationLauncher.launch(intent);
+            }
+        });
+
+        m_dateTv = (TextView) view.findViewById(R.id.create_post_date_output);
+
         m_timeTv = (TextView) view.findViewById(R.id.create_post_time_output);
         EditText contentEt = view.findViewById(R.id.create_post_content_input);
 
@@ -195,17 +318,17 @@ public class CreatePostFragment extends Fragment implements IView,
                 String userUID = Model.getInstance().getCurrentUserUID();
                 String cityInput = m_cityTv.getText().toString();
                 String streetInput = m_streetTv.getText().toString();
+                String dateInput = m_dateTv.getText().toString();
                 String timeInput = m_timeTv.getText().toString();
                 String contentInput = contentEt.getText().toString();
 
-                if (cityInput.equals("") || streetInput.equals("") || timeInput.equals("") || contentInput.equals(""))
+                if (cityInput.equals("") || streetInput.equals("") || dateInput.equals("") || timeInput.equals("") || contentInput.equals(""))
                 {
                     Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-                    Post newPost = new Post(userUID, cityInput, streetInput, timeInput, m_SelectedLocation, contentInput);
-                    m_ViewModel.onRequestToCreatePost(requireContext(), newPost);
+                    m_ViewModel.onRequestToCreatePost(CreatePostFragment.this.m_Context, userUID, cityInput, streetInput, dateInput, timeInput, m_SelectedLocation, contentInput);
                 }
             }
         });
@@ -239,8 +362,19 @@ public class CreatePostFragment extends Fragment implements IView,
                     public void run()
                     {
                         assert m_LocationDetails != null;
+
                         m_cityTv.setText(m_LocationDetails[2]);
-                        m_streetTv.setText(m_LocationDetails[1]);
+
+                        if (m_LocationDetails[1].equals("Unknown Street"))
+                        {
+                            m_streetTv.setText("");
+                            m_streetTv.setEnabled(true);
+                        }
+                        else
+                        {
+                            m_streetTv.setText(m_LocationDetails[1]);
+                            m_streetTv.setEnabled(false);
+                        }
 
                         // m_mapView.setVisibility(View.VISIBLE);
                         m_mapView.getMapAsync(CreatePostFragment.this);
@@ -289,7 +423,7 @@ public class CreatePostFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onSuccessToCreatePost()
+    public void onSuccessToCreatePost(Post i_Post)
     {
         getParentFragmentManager().popBackStack();
         onUploadListener.onUpload();
