@@ -40,4 +40,5 @@
     <string name="post_creator_name">שם יוצר הפוסט</string>
     <string name="commenter_name">שם המגיב</string>
     <string name="comment_content">תוכן התגובה</string>
+    <string name="soon">בקרוב</string>
 </resources>

@@ -30,13 +30,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center_horizontal"
-        android:weightSum="99"
+        android:weightSum="10"
         android:layout_marginTop="25dp">
 
         <Button
             android:id="@+id/create_post_pick_location_button"
             android:layout_width="0dp"
-            android:layout_weight="33"
+            android:layout_weight="4"
             android:layout_height="wrap_content"
             android:text="@string/pick_location"
             android:textAllCaps="false"
@@ -45,7 +45,7 @@
         <Button
             android:id="@+id/create_post_pick_date_button"
             android:layout_width="0dp"
-            android:layout_weight="33"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
             android:text="@string/pick_date"
             android:textAllCaps="false"
@@ -54,7 +54,7 @@
         <Button
             android:id="@+id/create_post_pick_time_button"
             android:layout_width="0dp"
-            android:layout_weight="33"
+            android:layout_weight="3"
             android:textAllCaps="false"
             android:text="@string/pick_time"
             android:layout_height="wrap_content"
@@ -66,26 +66,25 @@
     <LinearLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="5dp"
-        android:weightSum="100"
-        android:layout_gravity="center_horizontal">
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center">
 
         <TextView
             android:id="@+id/create_post_city_output"
-            android:layout_width="0dp"
-            android:layout_weight="25"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"
             android:hint="@string/city"
             android:textColorHint="@color/faded_white"
-            android:gravity="center" />
+            android:gravity="center"
+            android:layout_marginBottom="5dp"/>
 
         <EditText
             android:id="@+id/create_post_street_output"
-            android:layout_width="0dp"
-            android:layout_weight="25"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"
@@ -93,27 +92,48 @@
             android:textColorHint="@color/faded_white"
             android:gravity="center"/>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:weightSum="5"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center">
+
+            <androidx.slidingpanelayout.widget.SlidingPaneLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
         <TextView
             android:id="@+id/create_post_date_output"
-            android:layout_width="0dp"
-            android:layout_weight="25"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"
             android:hint="@string/date"
             android:textColorHint="@color/faded_white"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:layout_marginEnd="30dp"/>
 
         <TextView
             android:id="@+id/create_post_time_output"
-            android:layout_width="0dp"
-            android:layout_weight="25"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"
             android:hint="@string/time"
             android:textColorHint="@color/faded_white"
             android:gravity="center"/>
+
+            <androidx.slidingpanelayout.widget.SlidingPaneLayout
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+        </LinearLayout>
     </LinearLayout>
 
     <com.google.android.gms.maps.MapView

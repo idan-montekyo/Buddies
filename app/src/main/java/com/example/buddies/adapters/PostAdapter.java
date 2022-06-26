@@ -13,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
@@ -57,7 +56,7 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
     public class PostViewHolder extends RecyclerView.ViewHolder
     {
         ImageView m_ImageIv;
-        TextView m_NameTv, m_CityTv, m_DateTv, m_TimeTv, m_ContentTv;
+        TextView m_NameTv, m_MeetingDate, m_CityTv, m_CreationDateTv, m_TimeTv, m_ContentTv;
 
         // Constructor
         public PostViewHolder(@NonNull View itemView)
@@ -65,9 +64,10 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
             super(itemView);
 
             m_ImageIv = itemView.findViewById(R.id.card_post_image);
+            m_MeetingDate = itemView.findViewById(R.id.card_post_date);
             m_NameTv = itemView.findViewById(R.id.card_post_creators_name);
             m_CityTv = itemView.findViewById(R.id.card_post_city);
-            m_DateTv = itemView.findViewById(R.id.card_post_creation_date);
+            m_CreationDateTv = itemView.findViewById(R.id.card_post_creation_date);
             m_TimeTv = itemView.findViewById(R.id.card_post_time);
             m_ContentTv = itemView.findViewById(R.id.card_post_content);
 
@@ -107,18 +107,20 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position)
     {
         m_Holder = holder;
-        m_Context = holder.m_DateTv.getContext();
+        m_Context = holder.m_CreationDateTv.getContext();
 
         Post m_CurrentPost = m_Posts.get(position);
 
         holder.m_CityTv.setText(m_CurrentPost.getMeetingCity());
+        holder.m_MeetingDate.setText(m_CurrentPost.getMeetingDate().getCreationDay() + "/" +
+                                     m_CurrentPost.getMeetingDate().getCreationMonth());
         holder.m_TimeTv.setText(m_CurrentPost.getMeetingTime());
         holder.m_ContentTv.setText(m_CurrentPost.getPostContent());
 
         String creationDate = m_CurrentPost.getPostCreationDate().getCreationDay() +
                 "/" + m_CurrentPost.getPostCreationDate().getCreationMonth() +
                 "/" + m_CurrentPost.getPostCreationDate().getCreationYear();
-        holder.m_DateTv.setText(m_Context.getString(R.string.created_on) +
+        holder.m_CreationDateTv.setText(m_Context.getString(R.string.created_on) +
                 " " + creationDate);
 
         // this.i_PostAdapterToUpdate = this;

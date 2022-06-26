@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -205,6 +207,13 @@ public class HomeFragment extends Fragment implements IView,
             }
         });
 
+        // Change color for a menuItem (Source: https://stackoverflow.com/questions/3519277/how-to-change-the-text-color-of-menu-item-in-android)
+        MenuItem item = m_NavigationView.getMenu().findItem(R.id.menu_posts_i_commented_on);
+        SpannableString s = new SpannableString(getString(R.string.posts_i_commented_on) + " " + getString(R.string.soon));
+        s.setSpan(new ForegroundColorSpan(Color.GRAY), 0, getString(R.string.posts_i_commented_on).length(), 0);
+        s.setSpan(new ForegroundColorSpan(Color.RED), getString(R.string.posts_i_commented_on).length()+1, s.length(), 0);
+        item.setTitle(s);
+
         if (Model.getInstance().isCurrentUserAnonymous()) {
             m_NavigationView.getMenu().removeItem(R.id.menu_my_posts);
             m_NavigationView.getMenu().removeItem(R.id.menu_posts_i_commented_on);
@@ -255,24 +264,6 @@ public class HomeFragment extends Fragment implements IView,
                                 .addToBackStack(null).commit();
                         break;
                     case R.id.menu_posts_i_commented_on:
-
-                        Bundle bundlePostsICommentedOn = new Bundle();
-                        bundlePostsICommentedOn.putString(RecyclerViewFragment.ACTION_KEY,
-                                                          RecyclerViewFragment.ACTION_POSTS_I_COMMENTED_ON);
-
-                        RecyclerViewFragment recyclerViewFragmentPostsICommentedOn = new RecyclerViewFragment();
-                        recyclerViewFragmentPostsICommentedOn.setArguments(bundlePostsICommentedOn);
-
-                        assert thisFragment != null;
-                        getParentFragmentManager().beginTransaction()
-                                .setCustomAnimations(
-                                        R.anim.slide_in,  // enter
-                                        R.anim.fade_out,  // exit
-                                        R.anim.fade_in,   // popEnter
-                                        R.anim.slide_out) // popExit
-                                .hide(thisFragment)
-                                .add(R.id.root_main_activity, recyclerViewFragmentPostsICommentedOn, RecyclerViewFragment.RECYCLER_VIEW_FRAGMENT_TAG)
-                                .addToBackStack(null).commit();
                         break;
                     case R.id.menu_settings:
                         break;
@@ -407,17 +398,16 @@ public class HomeFragment extends Fragment implements IView,
     @Override
     public void onSuccessToCreatePost(Post i_Post)
     {
-        m_Handler.post(new Runnable()
+        m_Handler.postDelayed(new Runnable()
         {
             @Override
             public void run()
             {
                 HomeFragment.this.onRequestToLoadPosts(ePostType.ALL);
-                ((PostAdapter)m_RecyclerView.getAdapter()).updateAdapter(i_Post);
                 Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
             }
 
-        });
+        }, 100);
     }
 
     @Override

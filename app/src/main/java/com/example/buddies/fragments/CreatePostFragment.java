@@ -279,6 +279,7 @@ public class CreatePostFragment extends Fragment implements IView,
         m_cityTv = view.findViewById(R.id.create_post_city_output);
         m_streetTv = (EditText) view.findViewById(R.id.create_post_street_output);
         m_streetTv.setFocusable(false);
+        m_streetTv.setEnabled(false);
 
         m_streetTv.setOnClickListener(new View.OnClickListener()
         {

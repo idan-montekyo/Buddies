@@ -68,56 +68,76 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_marginTop="15dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:weightSum="4"
-        android:layout_gravity="center_horizontal">
+        android:layout_gravity="center_horizontal"
+        android:gravity="center">
 
         <TextView
             android:id="@+id/view_post_city_text_view"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="25sp"
             android:textColor="@color/white"
             android:hint="@string/city"
             android:textColorHint="@color/faded_white"
-            android:gravity="center" />
+            android:gravity="center"
+            android:layout_marginBottom="5dp"/>
 
         <TextView
             android:id="@+id/view_post_street_text_view"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:textSize="25sp"
             android:textColor="@color/white"
             android:hint="@string/street"
             android:textColorHint="@color/faded_white"
             android:gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:weightSum="5"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center">
+
+        <androidx.slidingpanelayout.widget.SlidingPaneLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
 
         <TextView
             android:id="@+id/view_post_date_text_view"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:hint="@string/date"
+            android:textColorHint="@color/faded_white"
+            android:gravity="center"
+            android:layout_marginEnd="30dp"/>
+
+        <TextView
+            android:id="@+id/view_post_time_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="25sp"
             android:textColor="@color/white"
             android:hint="@string/time"
             android:textColorHint="@color/faded_white"
             android:gravity="center"/>
 
-        <TextView
-            android:id="@+id/view_post_time_text_view"
+        <androidx.slidingpanelayout.widget.SlidingPaneLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="25sp"
-            android:textColor="@color/white"
-            android:hint="@string/time"
-            android:textColorHint="@color/faded_white"
-            android:gravity="center"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
     </LinearLayout>
 
     <Button
