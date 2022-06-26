@@ -41,4 +41,6 @@
     <string name="post_creator_name">Post creator\'s name</string>
     <string name="commenter_name">Commenter\'s Name</string>
     <string name="comment_content">Comment Content</string>
+    <string name="fcm_api_token_key" translatable="false">AAAAeAqZc38:APA91bHxOAprs_LKN_UBbrVpuy53xTsUoBZxvdYi386PPsKh8-caPc2dmsffqqAfhL7QdtQWT2WMFnemdPG7MiIyJT-z7qJvUhY4wyb3DcR26Iz1PmnLezsEqnN9R1fdoIhmzNOugWUT</string>
+    <string name="soon">soon</string>
 </resources>

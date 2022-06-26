@@ -42,6 +42,7 @@ import com.example.buddies.interfaces.LoadPostCommentsEvent.ILoadPostCommentsRes
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
+import com.example.buddies.service.MyFirebaseMessagingService;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -132,7 +133,9 @@ public class ViewPostFragment extends    Fragment
         super.onViewCreated(view, savedInstanceState);
         this.m_SavedInstanceState = savedInstanceState;
 
-        this.onRequestToLoadProfile();
+        if(!Model.getInstance().isCurrentUserAnonymous()) {
+            this.onRequestToLoadProfile();
+        }
 
         final String SHOW_LOCATION = m_Context.getString(R.string.show_location);
         final String HIDE_LOCATION = m_Context.getString(R.string.hide_location);
@@ -366,8 +369,9 @@ public class ViewPostFragment extends    Fragment
 
         // Send notification only when you reply on someone else's posts.
         if (!m_CurrentPost.getCreatorUserUID().equals(i_Comment.getCreatorUserUID())) {
-            AppUtils.initializeDataMessageAndSendToServer(m_Context, m_CurrentPost, i_Comment,
-                                                          m_CurrentCreatorUserProfile, m_CurrentUserProfile);
+            MyFirebaseMessagingService.
+                    initializeDataMessageAndSendToServer(m_Context, m_CurrentPost, i_Comment,
+                            m_CurrentCreatorUserProfile, m_CurrentUserProfile);
         }
     }
 

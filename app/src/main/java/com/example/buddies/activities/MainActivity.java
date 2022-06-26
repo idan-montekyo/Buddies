@@ -1,13 +1,11 @@
 package com.example.buddies.activities;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,20 +19,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.NotificationTarget;
+import com.example.buddies.BuildConfig;
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
@@ -48,13 +39,7 @@ import com.example.buddies.interfaces.MVVM.IView;
 import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileResponsesEventHandler;
 import com.example.buddies.service.MyFirebaseMessagingService;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.messaging.FirebaseMessaging;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements IView,
@@ -66,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements IView,
     boolean m_doubleBackToExitPressedOnce = false;
     Toast m_backToast;
     View m_RootMainActivity;
+    Model m_Model = Model.getInstance();
     ViewModel m_ViewModel = ViewModel.getInstance();
 
     BroadcastReceiver receiver;
@@ -89,16 +75,17 @@ public class MainActivity extends AppCompatActivity implements IView,
 
         m_RootMainActivity = this.findViewById(R.id.root_main_activity);
 
-        if (Model.getInstance().isUserLoggedIn())
+        if (m_Model.isUserLoggedIn())
         {
             // Inflate Home-Fragment.
             HomeFragment homeFragment = new HomeFragment();
 
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.root_main_activity, new HomeFragment(), HomeFragment.HOME_FRAGMENT_TAG)
+                    .add(R.id.root_main_activity, homeFragment, HomeFragment.HOME_FRAGMENT_TAG)
                     .commit();
 
+            // TODO: fix
 //            isNotificationClicked(homeFragment);
         }
         else
@@ -226,33 +213,33 @@ public class MainActivity extends AppCompatActivity implements IView,
 //        builder.build().flags |= Notification.FLAG_AUTO_CANCEL;
     }
 
-//    private void isNotificationClicked(HomeFragment homeFragment) {
-//
-//        Boolean bool = getIntent().hasExtra(OPEN_FRAGMENT_FROM_NOTIFICATION_TAG);
-//        if(bool) {
-//
-//            String postAsJsonString = getIntent().getStringExtra(OPEN_FRAGMENT_FROM_NOTIFICATION_TAG);
-//            Post post = AppUtils.getGsonParser().fromJson(postAsJsonString, Post.class);
-//
-//            UserProfile currentCreatorUserProfile = Model.getInstance().resolveUserProfileFromUID(post.getCreatorUserUID());
-//            String userProfileAsJsonString = AppUtils.getGsonParser().toJson(currentCreatorUserProfile);
-//
-//            Bundle viewPostFragmentArguments = new Bundle();
-//            viewPostFragmentArguments.putString("userProfileJsonString", postAsJsonString);
-//            viewPostFragmentArguments.putString("currentPostJsonString", userProfileAsJsonString);
-//
-//            ViewPostFragment postFragmentToLaunch = new ViewPostFragment();
-//            postFragmentToLaunch.setArguments(viewPostFragmentArguments);
-//
-//            getSupportFragmentManager().beginTransaction()
-//                    .setCustomAnimations(
-//                            R.anim.slide_in,  // enter
-//                            R.anim.fade_out,  // exit
-//                            R.anim.fade_in,   // popEnter
-//                            R.anim.slide_out) // popExit
-//                    .hide(homeFragment)
-//                    .add(R.id.root_main_activity, postFragmentToLaunch, ViewPostFragment.VIEW_POST_FRAGMENT_TAG)
-//                    .addToBackStack(null).commit();
-//        }
-//    }
+    private void isNotificationClicked(HomeFragment homeFragment) {
+
+        Boolean bool = getIntent().hasExtra(OPEN_FRAGMENT_FROM_NOTIFICATION_TAG);
+        if(bool) {
+
+            String postAsJsonString = getIntent().getStringExtra(OPEN_FRAGMENT_FROM_NOTIFICATION_TAG);
+            Post post = AppUtils.getGsonParser().fromJson(postAsJsonString, Post.class);
+
+            UserProfile currentCreatorUserProfile = Model.getInstance().resolveUserProfileFromUID(post.getCreatorUserUID());
+            String userProfileAsJsonString = AppUtils.getGsonParser().toJson(currentCreatorUserProfile);
+
+            Bundle viewPostFragmentArguments = new Bundle();
+            viewPostFragmentArguments.putString("userProfileJsonString", postAsJsonString);
+            viewPostFragmentArguments.putString("currentPostJsonString", userProfileAsJsonString);
+
+            ViewPostFragment postFragmentToLaunch = new ViewPostFragment();
+            postFragmentToLaunch.setArguments(viewPostFragmentArguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_in,  // enter
+                            R.anim.fade_out,  // exit
+                            R.anim.fade_in,   // popEnter
+                            R.anim.slide_out) // popExit
+                    .hide(homeFragment)
+                    .add(R.id.root_main_activity, postFragmentToLaunch, ViewPostFragment.VIEW_POST_FRAGMENT_TAG)
+                    .addToBackStack(null).commit();
+        }
+    }
 }

@@ -1,6 +1,8 @@
 package com.example.buddies.Model;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
@@ -136,6 +138,7 @@ public class Model implements IModel,
 
     private Model() {
         this.m_FirebaseAuth = FirebaseAuth.getInstance();
+        Model.this.m_CurrentUser = Model.this.m_FirebaseAuth.getCurrentUser();
 
         this.m_AuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -330,7 +333,7 @@ public class Model implements IModel,
     public void onRequestToLogin(Context i_Context, String i_UserName, String i_Password) {
         // firebase code here
         try {
-            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+            if (!AppUtils.isNetworkAvailable(i_Context)) {
                 throw new Exception("No internet access");
             }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_IN;
@@ -338,7 +341,7 @@ public class Model implements IModel,
             loginHandler.addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful() == false) {
+                    if (!task.isSuccessful()) {
                         Model.this.onFailureToLogin(task.getException());
                     }
                 }
@@ -370,7 +373,7 @@ public class Model implements IModel,
     public void onRequestToAnonymousLogin(Context i_Context) {
         // firebase code here
         try {
-            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+            if (!AppUtils.isNetworkAvailable(i_Context)) {
                 throw new Exception("No internet access");
             }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_IN_ANONYMOUSLY;
@@ -401,7 +404,7 @@ public class Model implements IModel,
     @Override
     public void onRequestToLogout(Context i_Context) {
         try {
-            if (AppUtils.isNetworkAvailable(i_Context) == false) {
+            if (!AppUtils.isNetworkAvailable(i_Context)) {
                 throw new Exception("No internet access");
             }
             this.m_OnAuthStateChangedCaller = eOnAuthStateChangedCaller.LOG_OUT;

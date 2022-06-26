@@ -80,6 +80,23 @@
                         android:textSize="12.5sp"/>
 
                     <TextView
+                        android:id="@+id/card_post_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:text="@string/date"
+                        android:textColor="@color/white"
+                        android:textSize="12.5sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:text="•"
+                        android:textColor="@color/white"
+                        android:textSize="12.5sp"/>
+
+                    <TextView
                         android:id="@+id/card_post_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
