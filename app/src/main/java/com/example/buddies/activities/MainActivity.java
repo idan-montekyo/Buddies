@@ -48,7 +48,6 @@ import com.example.buddies.interfaces.MVVM.IView;
 import com.example.buddies.interfaces.UpdateProfileEvent.IUpdateProfileResponsesEventHandler;
 import com.example.buddies.service.MyFirebaseMessagingService;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,7 +59,6 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements IView,
                                                                IUpdateProfileResponsesEventHandler
 {
-
     private final String OPEN_FRAGMENT_FROM_NOTIFICATION_TAG = "open_fragment_from_notification";
 
     boolean m_doubleBackToExitPressedOnce = false;
@@ -75,9 +73,6 @@ public class MainActivity extends AppCompatActivity implements IView,
     RemoteViews remoteViews = null;
     NotificationTarget targetImageView;
     int NOTIF_ID = 0;
-
-    // TODO: delete
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -192,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements IView,
                 .setBackgroundTint(Color.BLACK).show();
     }
 
-    // TODO: (?) create Notification Class (?)
     @RequiresApi(api = Build.VERSION_CODES.S)
     private void handleNotificationSettings(String postAsJsonString) {
 

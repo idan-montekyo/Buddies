@@ -69,6 +69,7 @@ public class ViewPostFragment extends    Fragment
     private ViewModel          m_ViewModel                      = ViewModel.getInstance();
     private Bundle             m_SavedInstanceState             = null;
     private Bundle             m_ViewPostFragmentArguments      = null;
+    private Button             m_Button_ShowHideLocation        = null;
 
     private final float        m_DisabledElementsAlphaValue     = 0.15f;
 
@@ -78,7 +79,7 @@ public class ViewPostFragment extends    Fragment
     private ImageView          m_ImageView_UserImage            = null;
     private ImageButton        m_Button_SendComment             = null;
     private ImageButton        m_Button_GoBack                  = null;
-    private Button             m_Button_ShowHideLocation        = null;
+
     private EditText           m_EditText_AddComment            = null;
     private TextView           m_TextView_PostCreatorFullName   = null;
     private TextView           m_TextView_PostCreatorDogsGender = null;
@@ -345,6 +346,7 @@ public class ViewPostFragment extends    Fragment
         m_MapObject.moveCamera(CameraUpdateFactory.newLatLngZoom(m_CurrentPost.getMeetingLocation(), 14f));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID) {
         m_ViewModel.onRequestToCreateComment(i_CreatorUserUID, i_UserProfileImageUri, i_CommentContent, i_PostID);

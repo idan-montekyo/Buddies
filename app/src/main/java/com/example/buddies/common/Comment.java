@@ -21,8 +21,6 @@ public class Comment implements Comparable<Comment>
     private String commentID = null;
     private String ownerPostID = null;
 
-    private final String toStringFormat = "Comment{creatorUserUID='{0}', userProfileImageUri='{1}', commentContent='{2}', commentCreationDate={3}, commentCreationTime={4}, commentCreationDateTimeAsLong={5}}";
-
     private static final String creatorUserIDMainKey = "creatorUserUID";
     private static final String profileImageUriMainKey = "userProfileImageUri";
     private static final String commentContentMainKey = "commentContent";
@@ -156,20 +154,6 @@ public class Comment implements Comparable<Comment>
     @Override
     public String toString()
     {
-        Object[] args = { creatorUserUID, userProfileImageUri, commentContent, commentCreationDate, commentCreationTime,commentCreationDateTimeAsLong };
-        MessageFormat fmt = new MessageFormat(this.toStringFormat);
-
-        /*
-        String.format("Comment{creatorUserUID='%s', userProfileImageUri='%s', commentContent='%', commentCreationDate=%s, commentCreationTime=%s, commentCreationDateTimeAsLong=%s}",
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
-        */
-
-        /*
         return "Comment{" +
                 "creatorUserUID='" + creatorUserUID + '\'' +
                 ", userProfileImageUri='" + userProfileImageUri + '\'' +
@@ -178,9 +162,6 @@ public class Comment implements Comparable<Comment>
                 ", commentCreationDate=" + commentCreationDate +
                 ", commentCreationDateTimeAsLong=" + commentCreationDateTimeAsLong +
                 '}';
-        */
-
-        return fmt.format(args);
     }
 
     public static Comment parse(DataSnapshot commentOfPost) throws Exception

@@ -394,42 +394,6 @@ public class AppUtils
         return gson;
     }
 
-    // TODO: Think if this should be removed from here and maybe placed in other place that exclusively
-    //       responsivble to handle the app's logic and not a general library like this
-    /*
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public static Post ConvertDataSnapshotToPost(DataSnapshot post)
-    {
-        LatLng latLng = new LatLng((double) post.child("meetingLocation").child("latitude").getValue(),
-                (double) post.child("meetingLocation").child("longitude").getValue());
-
-        Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
-        Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
-        Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
-        Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
-
-        LocalTime localTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
-                localSecond.intValue(), localNano.intValue());
-
-        Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
-        Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
-        Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
-        Long creationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
-
-        Post newPost = new Post((String) post.child("creatorUserUID").getValue(),
-                (String) post.child("meetingCity").getValue(),
-                (String) post.child("meetingStreet").getValue(),
-                (String) post.child("meetingTime").getValue(),
-                latLng,
-                (String) post.child("postContent").getValue(),
-                localTime, creationDateTimeAsLong,
-                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(),
-                (String) post.child("postID").getValue());
-
-        return newPost;
-    }
-    */
-
     public static void initializeDataMessageAndSendToServer(Context context, Post post, Comment comment,
                                                      UserProfile postCreatorProfile,
                                                      UserProfile commentCreatorProfile) {

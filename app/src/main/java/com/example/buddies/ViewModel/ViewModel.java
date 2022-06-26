@@ -531,6 +531,7 @@ public class ViewModel implements IViewModel,
     ****************************************************************************************************
     */
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID)
     {

@@ -8,7 +8,7 @@
     app:cardCornerRadius="10dp"
     app:cardBackgroundColor="@color/Color___Background"
     app:strokeColor="@color/Color___BorderBlue"
-    app:strokeWidth="3dp"
+    app:strokeWidth="1dp"
     android:layoutDirection="ltr">
 
     <LinearLayout

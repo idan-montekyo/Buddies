@@ -157,6 +157,7 @@ public class Post implements Comparable<Post>
                 '}';
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public static Post parse(DataSnapshot post) throws Exception
     {
         String userID = (String) post.child("creatorUserUID").getValue();

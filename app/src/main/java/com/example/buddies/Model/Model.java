@@ -5,6 +5,7 @@ import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -240,19 +241,15 @@ public class Model implements IModel,
         this.m_CommentsTable.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                try {
+                try
+                {
                     m_CurrentSnapshotOfCommentsTable = snapshot;
-                } catch (Exception exception) {
-                    // TODO: change to relevant ILoadCommentsEH:
-//                    ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(exception);
                 }
+                catch (Exception exception) { }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // TODO: change to relevant ILoadCommentsEH:
-//                ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(error.toException());
-            }
+            public void onCancelled(@NonNull DatabaseError error) { }
         });
     }
 
@@ -487,7 +484,6 @@ public class Model implements IModel,
         m_ListOfCities = new ArrayList<String>();
 
         try {
-            // TODO: Check if this solves the bug of sometime exception in load of the app.
             if (this.m_CurrentSnapshotOfCitiesTable != null) {
                 for (DataSnapshot currentRecord : this.m_CurrentSnapshotOfCitiesTable.getChildren()) {
                     currentCity = currentRecord.getKey(); // currentRecord.getValue(String.class);

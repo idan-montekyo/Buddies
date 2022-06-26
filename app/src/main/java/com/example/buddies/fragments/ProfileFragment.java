@@ -427,22 +427,6 @@ public class ProfileFragment extends Fragment implements IView,
                     // If RadioButton selected
                     if(m_radioButton != null)
                     {
-                        // TODO: The whole code contains this code block more than one time. move this to method.
-                        /*
-                        String dogGenderLabel = m_radioButton.getText().toString();
-
-                        if (dogGenderLabel.equals("זכר"))
-                        {
-                            dogGenderLabel = "MALE";
-                        }
-                        else if (dogGenderLabel.equals("נקבה"))
-                        {
-                            dogGenderLabel = "FEMALE";
-                        }
-
-                        m_dogGender = eDogGender.valueOf(dogGenderLabel.toUpperCase());
-                        */
-
                         m_dogGender = AppUtils.resolveDogGender(m_radioButton, ProfileFragment.this.m_Context);
                     }
 
