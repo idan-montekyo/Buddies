@@ -70,6 +70,14 @@ public class CreatePostFragment extends Fragment implements IView,
 
     ViewModel m_ViewModel = ViewModel.getInstance();
 
+    private final String invalidCityNameErrorMessage = "Illegal choose! Choose in your city only.";
+    private final String invalidLocationErrorMessage = "Cannot selected this location, place select other.";
+    private final String interfaceNotImplementedErrorMessage = "Fragment must implement IOnUploadListener interface.";
+    private final String notAllFieldsAreFullErrorMEssage = "Please fill in all fields";
+
+    private final String israelCountryCode = "IL";
+    private static final String unknownStreetDefaultValue = "Unknown Street";
+
     String[] m_LocationDetails;
 
     LatLng m_SelectedLocation;
@@ -131,7 +139,7 @@ public class CreatePostFragment extends Fragment implements IView,
                                     // If the user selected some street but not in the city that he selected earlier - show error message
                                     if (cityName.equals(CreatePostFragment.this.m_LocationDetails[2]) == false)
                                     {
-                                        Toast.makeText(CreatePostFragment.this.m_Context, "Illegal choose! Choose in your city only.", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(CreatePostFragment.this.m_Context, CreatePostFragment.this.invalidCityNameErrorMessage, Toast.LENGTH_LONG).show();
                                     }
                                     else
                                     {
@@ -141,7 +149,7 @@ public class CreatePostFragment extends Fragment implements IView,
                                 }
                                 else
                                 {
-                                    Toast.makeText(CreatePostFragment.this.m_Context, "Cannot selected this location, place select other.", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(CreatePostFragment.this.m_Context, CreatePostFragment.this.invalidLocationErrorMessage, Toast.LENGTH_LONG).show();
                                 }
 
                                 AppUtils.printDebugToLogcat("CreatePostFragment", "onActivityResult()", place.toString());
@@ -152,7 +160,7 @@ public class CreatePostFragment extends Fragment implements IView,
         }
         catch (ClassCastException ex)
         {
-            throw new ClassCastException("Fragment must implement IOnUploadListener interface.");
+            throw new ClassCastException(this.interfaceNotImplementedErrorMessage);
         }
     }
 
@@ -293,7 +301,7 @@ public class CreatePostFragment extends Fragment implements IView,
                 Autocomplete.IntentBuilder builder = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields);
 
                 // Suggest to the user results which are only in Israel
-                builder.setCountry("IL");
+                builder.setCountry(CreatePostFragment.this.israelCountryCode);
 
                 // Suggest to the user addresses only (Source: https://developers.google.com/maps/documentation/places/android-sdk/reference/com/google/android/libraries/places/api/model/TypeFilter#enum-values)
                 builder.setTypeFilter(TypeFilter.ADDRESS);
@@ -324,10 +332,11 @@ public class CreatePostFragment extends Fragment implements IView,
 
                 if (cityInput.equals("") || streetInput.equals("") || dateInput.equals("") || timeInput.equals("") || contentInput.equals(""))
                 {
-                    Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreatePostFragment.this.m_Context, CreatePostFragment.this.notAllFieldsAreFullErrorMEssage, Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
+                    // Save the new post to FireBase
                     m_ViewModel.onRequestToCreatePost(CreatePostFragment.this.m_Context, userUID, cityInput, streetInput, dateInput, timeInput, m_SelectedLocation, contentInput);
                 }
             }
@@ -365,7 +374,7 @@ public class CreatePostFragment extends Fragment implements IView,
 
                         m_cityTv.setText(m_LocationDetails[2]);
 
-                        if (m_LocationDetails[1].equals("Unknown Street"))
+                        if (m_LocationDetails[1].equals(unknownStreetDefaultValue))
                         {
                             m_streetTv.setText("");
                             m_streetTv.setEnabled(true);
@@ -433,6 +442,6 @@ public class CreatePostFragment extends Fragment implements IView,
     public void onFailureToCreatePost(Exception i_Reason)
     {
         AppUtils.printDebugToLogcat("CreatePostFragment", "onFailureToCreatePost", i_Reason.toString());
-        Toast.makeText(requireContext(), "Post failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
+        Toast.makeText(requireContext(), i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }
 }

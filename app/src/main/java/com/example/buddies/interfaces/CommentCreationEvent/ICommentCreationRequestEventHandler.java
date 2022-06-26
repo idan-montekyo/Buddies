@@ -1,8 +1,6 @@
 package com.example.buddies.interfaces.CommentCreationEvent;
 
-import com.example.buddies.common.Comment;
-
 public interface ICommentCreationRequestEventHandler {
 
-    void onRequestToCreateComment(Comment i_Comment);
+    void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID);
 }

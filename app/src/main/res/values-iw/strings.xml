@@ -37,4 +37,7 @@
     <string name="created_on">"תאריך פרסום "</string>
     <string name="pick_date">בחר תאריך</string>
     <string name="date">תאריך</string>
+    <string name="post_creator_name">שם יוצר הפוסט</string>
+    <string name="commenter_name">שם המגיב</string>
+    <string name="comment_content">תוכן התגובה</string>
 </resources>

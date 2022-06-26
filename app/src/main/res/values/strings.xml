@@ -38,4 +38,7 @@
     <string name="created_on">Created on </string>
     <string name="pick_date">Pick Date</string>
     <string name="date">Date</string>
+    <string name="post_creator_name">Post creator\'s name</string>
+    <string name="commenter_name">Commenter\'s Name</string>
+    <string name="comment_content">Comment Content</string>
 </resources>

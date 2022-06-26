@@ -17,6 +17,8 @@ import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationReque
 import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationResponseEventHandler;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardResponseEventHandler;
+import com.example.buddies.interfaces.LoadPostCommentsEvent.ILoadPostCommentsRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostCommentsEvent.ILoadPostCommentsResponsesEventHandler;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsResponseEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
@@ -63,6 +65,8 @@ public class ViewModel implements IViewModel,
                                   ILoadUserProfileResponseEventHandler,
                                   ILoadPostsRequestEventHandler,
                                   ILoadPostsResponseEventHandler,
+                                  ILoadPostCommentsRequestEventHandler,
+                                  ILoadPostCommentsResponsesEventHandler,
                                   ILoadPostCardRequestEventHandler,
                                   ILoadPostCardResponseEventHandler,
                                   IResolveUIDToUserProfileRequestEventHandler,
@@ -251,7 +255,7 @@ public class ViewModel implements IViewModel,
             }
         }
     }
-    
+
     @Override
     public void onFailureToSignup(Exception i_Reason)
     {
@@ -528,7 +532,10 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToCreateComment(Comment i_Comment) { m_Model.onRequestToCreateComment(i_Comment); }
+    public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID)
+    {
+        m_Model.onRequestToCreateComment(i_CreatorUserUID, i_UserProfileImageUri, i_CommentContent, i_PostID);
+    }
 
     @Override
     public void onSuccessToCreateComment(Comment i_Comment) {
@@ -544,6 +551,32 @@ public class ViewModel implements IViewModel,
         for (IView view : views) {
             if (view instanceof ICommentCreationResponseEventHandler) {
                 ((ICommentCreationResponseEventHandler)view).onFailureToCreateComment(i_Reason);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestToLoadPostComments(String i_PostID)
+    {
+        this.m_Model.onRequestToLoadPostComments(i_PostID);
+    }
+
+    @Override
+    public void onSuccessToLoadPostComments(List<Comment> i_Comments)
+    {
+        for (IView view : views) {
+            if (view instanceof ILoadPostCommentsResponsesEventHandler) {
+                ((ILoadPostCommentsResponsesEventHandler)view).onSuccessToLoadPostComments(i_Comments);
+            }
+        }
+    }
+
+    @Override
+    public void onFailureToLoadPostComments(Exception i_Reason)
+    {
+        for (IView view : views) {
+            if (view instanceof ILoadPostCommentsResponsesEventHandler) {
+                ((ILoadPostCommentsResponsesEventHandler)view).onFailureToLoadPostComments(i_Reason);
             }
         }
     }

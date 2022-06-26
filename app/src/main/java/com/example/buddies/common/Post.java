@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DataSnapshot;
 
 import java.time.LocalTime;
 
@@ -154,5 +155,57 @@ public class Post implements Comparable<Post>
                 ", postCreationDate=" + m_PostCreationDate +
                 ", postCreationDateTimeAsLong=" + m_PostCreationDateTimeAsLong +
                 '}';
+    }
+
+    public static Post parse(DataSnapshot post) throws Exception
+    {
+        String userID = (String) post.child("creatorUserUID").getValue();
+        String cityOfMeeting = (String) post.child("meetingCity").getValue();
+        String streetOfMeeting = (String) post.child("meetingStreet").getValue();
+
+        // Get the meeting date
+        Long meetingYear = (long) post.child("meetingDate").child("creationYear").getValue();
+        Long meetingMonth = (long) post.child("meetingDate").child("creationMonth").getValue();
+        Long meetingDay = (long) post.child("meetingDate").child("creationDay").getValue();
+        CreationDate dateOfMeeting = new CreationDate(meetingYear.intValue(), meetingMonth.intValue(), meetingDay.intValue());
+
+        String timeOfMeeting = (String) post.child("meetingTime").getValue();
+
+        LatLng locationOfMeeting = new LatLng(
+                (double) post.child("meetingLocation").child("latitude").getValue(),
+                (double) post.child("meetingLocation").child("longitude").getValue()
+        );
+
+        String contentOfPost = (String) post.child("postContent").getValue();
+
+        // Get the time of post creation
+        Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
+        Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
+        Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
+        Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
+
+        LocalTime postCreationTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
+                localSecond.intValue(), localNano.intValue());
+
+        Long postCreationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
+
+        // Get the date of post creation
+        Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
+        Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
+        Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
+
+        String postID = (String) post.child("postID").getValue();
+
+        Post newPost = new Post(userID,
+                cityOfMeeting,
+                streetOfMeeting,
+                dateOfMeeting,
+                timeOfMeeting,
+                locationOfMeeting,
+                contentOfPost,
+                postCreationTime, postCreationDateTimeAsLong,
+                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
+
+        return newPost;
     }
 }

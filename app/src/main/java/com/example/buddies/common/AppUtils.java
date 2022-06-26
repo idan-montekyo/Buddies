@@ -53,6 +53,22 @@ public class AppUtils
 {
     private static Gson gson;
     private Model m_Model = Model.getInstance();
+    private static final String addressComponent_PlusCode_Indicator = "plus_code";
+    private static final String addressComponent_Establishment_Indicator = "establishment";
+    private static final String addressComponent_Route_Indicator = "route";
+    private static final String addressComponent_Locality_Indicator = "locality";
+    private static final String addressComponent_Country_Indicator = "country";
+    private static final String countryName = "Israel";
+    private static final String invalidCountryNameErrorMessage = "The selected location is not located in Israel, please select another location.";
+
+    private static final String unknownStreetDefaultValue = "Unknown Street";
+    private static final String unknownCityDefaultValue = "Unknown City";
+    private static final String unknownPlaceDefaultValue = "Unknown Place";
+    private static final String unknownPlusCOdeDefaultValue = "Unknown PlusCode";
+    private static final String longNameJsonKey = "long_name";
+
+    private static final String maleGenderString = "male";
+    private static final String femaleGenderString = "female";
 
     /**
      * This method is responsible to retrieve a string value by its name
@@ -169,19 +185,19 @@ public class AppUtils
 
                     switch (currentObjectInformationType)
                     {
-                        case "plus_code":
+                        case addressComponent_PlusCode_Indicator:
                             plusCodeObject = currentObject;
                             break;
-                        case "establishment":
+                        case addressComponent_Establishment_Indicator:
                             establishmentObject = currentObject;
                             break;
-                        case "route":
+                        case addressComponent_Route_Indicator:
                             streetObject = currentObject;
                             break;
-                        case "locality":
+                        case addressComponent_Locality_Indicator:
                             cityObject = currentObject;
                             break;
-                        case "country":
+                        case addressComponent_Country_Indicator:
                             countryObject = currentObject;
                             break;
                         default:
@@ -189,17 +205,17 @@ public class AppUtils
                     }
                 }
 
-                country = (countryObject == null) ? "Israel" : countryObject.getString("long_name");
+                country = (countryObject == null) ? countryName : countryObject.getString(longNameJsonKey);
 
-                if (country.equals("Israel") == false)
+                if (country.equals(countryName) == false)
                 {
-                    throw new IllegalArgumentException("The selected location is not located in Israel, please select another location.");
+                    throw new IllegalArgumentException(invalidCountryNameErrorMessage);
                 }
 
-                street        = (streetObject == null)        ? "Unknown Street"   : streetObject.getString("long_name");
-                city          = (cityObject == null)          ? "Unknown City"     : cityObject.getString("long_name");
-                establishment = (establishmentObject == null) ? "Unknown Place"    : establishmentObject.getString("long_name");
-                plusCode      = (plusCodeObject == null)      ? "Unknown PlusCode" : plusCodeObject.getString("long_name");
+                street        = (streetObject == null)        ? unknownStreetDefaultValue   : streetObject.getString(longNameJsonKey);
+                city          = (cityObject == null)          ? unknownCityDefaultValue     : cityObject.getString(longNameJsonKey);
+                establishment = (establishmentObject == null) ? unknownPlaceDefaultValue    : establishmentObject.getString(longNameJsonKey);
+                plusCode      = (plusCodeObject == null)      ? unknownPlusCOdeDefaultValue : plusCodeObject.getString(longNameJsonKey);
 
                 String[] locationDetails = new String[]{establishment, street, city, country};
 

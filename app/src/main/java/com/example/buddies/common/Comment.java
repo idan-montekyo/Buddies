@@ -1,15 +1,14 @@
 package com.example.buddies.common;
 
+import android.icu.text.MessageFormat;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.google.firebase.database.DataSnapshot;
+
 import java.time.LocalTime;
-import java.time.MonthDay;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
 
 public class Comment implements Comparable<Comment>
 {
@@ -21,6 +20,30 @@ public class Comment implements Comparable<Comment>
     private long commentCreationDateTimeAsLong;
     private String commentID = null;
     private String ownerPostID = null;
+
+    private final String toStringFormat = "Comment{creatorUserUID='{0}', userProfileImageUri='{1}', commentContent='{2}', commentCreationDate={3}, commentCreationTime={4}, commentCreationDateTimeAsLong={5}}";
+
+    private static final String creatorUserIDMainKey = "creatorUserUID";
+    private static final String profileImageUriMainKey = "userProfileImageUri";
+    private static final String commentContentMainKey = "commentContent";
+
+    private static final String commentCreationTimeMainKey = "commentCreationTime";
+    private static final String commentCreationTimeSubKeyOfHour = "hour";
+    private static final String commentCreationTimeSubKeyOfMinute = "minute";
+    private static final String commentCreationTimeSubKeyOfSecond = "second";
+    private static final String commentCreationTimeSubKeyOfNano = "nano";
+
+    private static final String commentCreationTimeAsLongMainKey = "commentCreationDateTimeAsLong";
+
+    private static final String commentCreationDateMainKey = "commentCreationDate";
+    private static final String commentCreationDateSubKeyOfYear = "creationYear";
+    private static final String commentCreationDateSubKeyOfMonth = "creationMonth";
+    private static final String commentCreationDateSubKeyOfDay = "creationDay";
+
+    private static final String commentOwnerPostIDMainKey = "ownerPostID";
+    private static final String commentIDMainKey = "commentID";
+
+
 
     public Comment() { }
 
@@ -128,10 +151,25 @@ public class Comment implements Comparable<Comment>
         return (int)comparison;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @NonNull
     @Override
     public String toString()
     {
+        Object[] args = { creatorUserUID, userProfileImageUri, commentContent, commentCreationDate, commentCreationTime,commentCreationDateTimeAsLong };
+        MessageFormat fmt = new MessageFormat(this.toStringFormat);
+
+        /*
+        String.format("Comment{creatorUserUID='%s', userProfileImageUri='%s', commentContent='%', commentCreationDate=%s, commentCreationTime=%s, commentCreationDateTimeAsLong=%s}",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        */
+
+        /*
         return "Comment{" +
                 "creatorUserUID='" + creatorUserUID + '\'' +
                 ", userProfileImageUri='" + userProfileImageUri + '\'' +
@@ -140,5 +178,33 @@ public class Comment implements Comparable<Comment>
                 ", commentCreationDate=" + commentCreationDate +
                 ", commentCreationDateTimeAsLong=" + commentCreationDateTimeAsLong +
                 '}';
+        */
+
+        return fmt.format(args);
+    }
+
+    public static Comment parse(DataSnapshot commentOfPost) throws Exception
+    {
+        String creatorUserUID = (String) commentOfPost.child(creatorUserIDMainKey).getValue();
+        String userProfileImageUri = (String) commentOfPost.child(profileImageUriMainKey).getValue();
+        String commentContent = (String) commentOfPost.child(commentContentMainKey).getValue();
+
+        long hour   = (long) commentOfPost.child(commentCreationTimeMainKey).child(commentCreationTimeSubKeyOfHour).getValue();
+        long minute = (long) commentOfPost.child(commentCreationTimeMainKey).child(commentCreationTimeSubKeyOfMinute).getValue();
+        long nano   = (long) commentOfPost.child(commentCreationTimeMainKey).child(commentCreationTimeSubKeyOfNano).getValue();
+        long second = (long) commentOfPost.child(commentCreationTimeMainKey).child(commentCreationTimeSubKeyOfSecond).getValue();
+
+        LocalTime commentCreationTime = LocalTime.of((int)hour, (int)minute, (int)second, (int)nano);
+
+        long commentCreationDateTimeAsLong = (long) commentOfPost.child(commentCreationTimeAsLongMainKey).getValue();
+        long commentCreationYear = (long) commentOfPost.child(commentCreationDateMainKey).child(commentCreationDateSubKeyOfYear).getValue();
+        long commentCreationMonth = (long) commentOfPost.child(commentCreationDateMainKey).child(commentCreationDateSubKeyOfMonth).getValue();
+        long commentCreationDay = (long) commentOfPost.child(commentCreationDateMainKey).child(commentCreationDateSubKeyOfDay).getValue();
+        String ownerPostID = (String) commentOfPost.child(commentOwnerPostIDMainKey).getValue();
+        String commentID = (String) commentOfPost.child(commentIDMainKey).getValue();
+
+        Comment newComment = new Comment(creatorUserUID, userProfileImageUri, commentContent, commentCreationTime, commentCreationDateTimeAsLong, (int)commentCreationYear, (int)commentCreationMonth, (int)commentCreationDay, ownerPostID, commentID);
+
+        return newComment;
     }
 }

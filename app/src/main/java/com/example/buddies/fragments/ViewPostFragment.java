@@ -37,6 +37,8 @@ import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
 import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationRequestEventHandler;
 import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationResponseEventHandler;
+import com.example.buddies.interfaces.LoadPostCommentsEvent.ILoadPostCommentsRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostCommentsEvent.ILoadPostCommentsResponsesEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileResponseEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
@@ -57,7 +59,9 @@ public class ViewPostFragment extends    Fragment
                                          ILoadUserProfileResponseEventHandler,
                                          OnMapReadyCallback,
                                          ICommentCreationRequestEventHandler,
-                                         ICommentCreationResponseEventHandler
+                                         ICommentCreationResponseEventHandler,
+                                         ILoadPostCommentsRequestEventHandler,
+                                         ILoadPostCommentsResponsesEventHandler
 {
     private Bundle             m_SavedInstanceState             = null;
     private Bundle             m_ViewPostFragmentArguments      = null;
@@ -223,8 +227,7 @@ public class ViewPostFragment extends    Fragment
                     else
                     {
                         // Save the new comment to FireBase
-                        Comment newComment = new Comment(currentUserID, currentLoggedOnUserProfile.getProfileImageUri(), m_EditText_AddComment.getText().toString(), ViewPostFragment.this.m_PostID);
-                        ViewPostFragment.this.onRequestToCreateComment(newComment);
+                        ViewPostFragment.this.onRequestToCreateComment(currentUserID, currentLoggedOnUserProfile.getProfileImageUri(), m_EditText_AddComment.getText().toString(), ViewPostFragment.this.m_PostID);
                     }
                 }
             });
@@ -252,6 +255,10 @@ public class ViewPostFragment extends    Fragment
         m_RecyclerView.setLayoutManager(manager);
 
         // Load comments from firebase
+        this.onRequestToLoadPostComments(this.m_PostID);
+
+        /*
+        // Load comments from firebase
         this.m_PostComments = Model.getInstance().getAllPostComments(this.m_PostID);
 
         // If no comments found for this post, initialize an empty list with no comments.
@@ -264,6 +271,7 @@ public class ViewPostFragment extends    Fragment
         this.m_CommentAdapter = new CommentAdapter(this.m_Context, this.m_PostComments);
 
         this.m_RecyclerView.setAdapter(this.m_CommentAdapter);
+        */
     }
 
     private void loadArgumentsFromBundle()
@@ -366,7 +374,10 @@ public class ViewPostFragment extends    Fragment
     }
 
     @Override
-    public void onRequestToCreateComment(Comment i_Comment) { m_ViewModel.onRequestToCreateComment(i_Comment); }
+    public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID)
+    {
+        m_ViewModel.onRequestToCreateComment(i_CreatorUserUID, i_UserProfileImageUri, i_CommentContent, i_PostID);
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -387,5 +398,34 @@ public class ViewPostFragment extends    Fragment
     {
         AppUtils.printDebugToLogcat("ViewPostFragment", "onFailureToCreateComment", i_Reason.toString());
         Toast.makeText(m_Context, "Comment failed - " + i_Reason.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onRequestToLoadPostComments(String i_PostID)
+    {
+        this.m_ViewModel.onRequestToLoadPostComments(i_PostID);
+    }
+
+    @Override
+    public void onSuccessToLoadPostComments(List<Comment> i_Comments)
+    {
+        this.m_PostComments = i_Comments;
+
+        // If no comments found for this post, initialize an empty list with no comments.
+        if (this.m_PostComments == null)
+        {
+            this.m_PostComments = new ArrayList<Comment>();
+        }
+
+        // Create the CommentAdapter which will be bound to the RecyclerView
+        this.m_CommentAdapter = new CommentAdapter(this.m_Context, this.m_PostComments);
+
+        this.m_RecyclerView.setAdapter(this.m_CommentAdapter);
+    }
+
+    @Override
+    public void onFailureToLoadPostComments(Exception i_Reason)
+    {
+        Toast.makeText(this.m_Context, i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }
 }

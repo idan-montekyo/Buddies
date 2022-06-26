@@ -23,6 +23,8 @@ import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationReque
 import com.example.buddies.interfaces.CommentCreationEvent.ICommentCreationResponseEventHandler;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostCardEvent.ILoadPostCardResponseEventHandler;
+import com.example.buddies.interfaces.LoadPostCommentsEvent.ILoadPostCommentsRequestEventHandler;
+import com.example.buddies.interfaces.LoadPostCommentsEvent.ILoadPostCommentsResponsesEventHandler;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsResponseEventHandler;
 import com.example.buddies.interfaces.LoadUserProfileEvent.ILoadUserProfileRequestEventHandler;
@@ -92,6 +94,8 @@ public class Model implements IModel,
                               IUpdateProfileResponsesEventHandler,
                               ILoadPostsRequestEventHandler,
                               ILoadPostsResponseEventHandler,
+                              ILoadPostCommentsRequestEventHandler,
+                              ILoadPostCommentsResponsesEventHandler,
                               ILoadPostCardRequestEventHandler,
                               ILoadPostCardResponseEventHandler,
                               IResolveUIDToUserProfileRequestEventHandler,
@@ -833,7 +837,8 @@ public class Model implements IModel,
                                     creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
                              */
 
-                            Post newPost = this._instance.ConvertDataSnapshotToPost(post);
+                            // Post newPost = this._instance.ConvertDataSnapshotToPost(post);
+                            Post newPost = Post.parse(post);
 
                             m_PostsList.add(newPost);
                         }
@@ -842,7 +847,7 @@ public class Model implements IModel,
                 case MY_POSTS:
                     for (DataSnapshot post : m_CurrentSnapshotOfPostsTable.child(getCurrentUserUID()).getChildren())
                     {
-                        Post newPost = this._instance.ConvertDataSnapshotToPost(post);
+                        Post newPost = Post.parse(post);
                         m_PostsList.add(newPost);
                     }
                     break;
@@ -880,7 +885,8 @@ public class Model implements IModel,
                     {
                         for (DataSnapshot post : UserUIDs.getChildren())
                         {
-                            Post newPost = this._instance.ConvertDataSnapshotToPost(post);
+                            Post newPost = Post.parse(post);
+
                             if (newPost.getMeetingCity().equals(i_SearchedCity))
                             {
                                 m_PostsList.add(newPost);
@@ -995,8 +1001,9 @@ public class Model implements IModel,
     ****************************************************************************************************
     */
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToCreateComment(Comment i_Comment)
+    public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID)
     {
         AppUtils.printDebugToLogcat("Model", "onRequestToCreateComment", "trying to save comment details to FireBase...");
 
@@ -1006,13 +1013,16 @@ public class Model implements IModel,
             // Each post will be identified by it's 'postCreationDateTimeAsLong' field.
             // String postIdentificationAsString = String.valueOf(i_Comment.getBelongsToPostCreationDateTimeAsLong());
 
-            String postIdentificationAsString = i_Comment.getOwnerPostID();
+            Comment newComment = new Comment(i_CreatorUserUID, i_UserProfileImageUri, i_CommentContent, i_PostID);
+
+            String postIdentificationAsString = newComment.getOwnerPostID();
             String newCommentKey = m_CommentsTable.child(postIdentificationAsString).push().getKey();
             assert newCommentKey != null;
-            i_Comment.setCommentID(newCommentKey);
-            m_CommentsTable.child(postIdentificationAsString).child(newCommentKey).setValue(i_Comment);
 
-            this.onSuccessToCreateComment(i_Comment);
+            newComment.setCommentID(newCommentKey);
+            m_CommentsTable.child(postIdentificationAsString).child(newCommentKey).setValue(newComment);
+
+            this.onSuccessToCreateComment(newComment);
         }
         catch (Exception exception)
         {
@@ -1060,13 +1070,14 @@ public class Model implements IModel,
         return m_CurrentSnapshotOfUsersTable.child(i_UserID).getValue(UserProfile.class);
     }
 
+    /*
     @RequiresApi(api = Build.VERSION_CODES.O)
     public List<Comment> getAllPostComments(String postID)
     {
-        List<Comment> commentsOfPost = new ArrayList<Comment>();
+            List<Comment> commentsOfPost = new ArrayList<Comment>();
 
-        for (DataSnapshot commentOfPost : m_CurrentSnapshotOfCommentsTable.child(postID).getChildren())
-        {
+            for (DataSnapshot commentOfPost : m_CurrentSnapshotOfCommentsTable.child(postID).getChildren())
+            {
                 String creatorUserUID = (String) commentOfPost.child("creatorUserUID").getValue();
                 String userProfileImageUri = (String) commentOfPost.child("userProfileImageUri").getValue();
                 String commentContent = (String) commentOfPost.child("commentContent").getValue();
@@ -1088,10 +1099,11 @@ public class Model implements IModel,
                 Comment currentComment = new Comment(creatorUserUID, userProfileImageUri, commentContent, commentCreationTime, commentCreationDateTimeAsLong, (int)commentCreationYear, (int)commentCreationMonth, (int)commentCreationDay, ownerPostID, commentID);
 
                 commentsOfPost.add(currentComment);
-        }
+            }
 
-        return commentsOfPost;
+            return commentsOfPost;
     }
+    */
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private Post ConvertDataSnapshotToPost(DataSnapshot post)
@@ -1144,5 +1156,38 @@ public class Model implements IModel,
                 creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
 
         return newPost;
+    }
+
+    @Override
+    public void onRequestToLoadPostComments(String i_PostID)
+    {
+        try
+        {
+            List<Comment> commentsOfPost = new ArrayList<Comment>();
+
+            for (DataSnapshot commentOfPost : m_CurrentSnapshotOfCommentsTable.child(i_PostID).getChildren())
+            {
+                Comment currentComment = Comment.parse(commentOfPost);
+                commentsOfPost.add(currentComment);
+            }
+
+            this.onSuccessToLoadPostComments(commentsOfPost);
+        }
+        catch (Exception error)
+        {
+            this.onFailureToLoadPostComments(error);
+        }
+    }
+
+    @Override
+    public void onSuccessToLoadPostComments(List<Comment> i_Comments)
+    {
+        ((ILoadPostCommentsResponsesEventHandler)viewModel).onSuccessToLoadPostComments(i_Comments);
+    }
+
+    @Override
+    public void onFailureToLoadPostComments(Exception i_Reason)
+    {
+        ((ILoadPostCommentsResponsesEventHandler)viewModel).onFailureToLoadPostComments(i_Reason);
     }
 }
