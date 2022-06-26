@@ -20,14 +20,23 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.RequestListener;
 import com.example.buddies.Model.Model;
 import com.example.buddies.enums.eDogGender;
+import com.example.buddies.service.MyFirebaseMessagingService;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -41,8 +50,10 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.example.buddies.R;
 import com.google.firebase.database.DataSnapshot;
@@ -412,9 +423,63 @@ public class AppUtils
                 latLng,
                 (String) post.child("postContent").getValue(),
                 localTime, creationDateTimeAsLong,
-                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), (String) post.child("postID").getValue());
+                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(),
+                (String) post.child("postID").getValue());
 
         return newPost;
     }
     */
+
+    public static void initializeDataMessageAndSendToServer(Context context, Post post, Comment comment,
+                                                     UserProfile postCreatorProfile,
+                                                     UserProfile commentCreatorProfile) {
+
+        JSONObject rootObject = new JSONObject();
+        try {
+
+            String postAsJsonString = getGsonParser().toJson(post);
+
+            rootObject.put("to", "/topics/" + post.getPostID());
+            JSONObject object = new JSONObject();
+            object.put("message", comment.getCommentContent());
+            object.put(MyFirebaseMessagingService.POST_AS_JSON_STRING_KEY, postAsJsonString);
+            object.put(MyFirebaseMessagingService.POST_CREATOR_USERNAME_KEY, postCreatorProfile.getFullName());
+            object.put(MyFirebaseMessagingService.COMMENT_CREATOR_USERNAME_KEY, commentCreatorProfile.getFullName());
+            object.put(MyFirebaseMessagingService.COMMENT_CONTENT_KEY, comment.getCommentContent());
+            object.put(MyFirebaseMessagingService.COMMENT_CREATOR_IMAGE_KEY, commentCreatorProfile.getProfileImageUri());
+            rootObject.put("data", object);
+
+            String url = "https://fcm.googleapis.com/fcm/send";
+
+            RequestQueue queue = Volley.newRequestQueue(context);
+            StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) { } // Irrelevant
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) { } // Irrelevant.
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("Authorization", "key=" + MyFirebaseMessagingService.API_TOKEN_KEY);
+                    return headers;
+                }
+
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    return rootObject.toString().getBytes();
+                }
+            };
+
+            queue.add(request);
+            queue.start();
+
+            // By now, the request has been sent to the server.
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.buddies.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -128,6 +129,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
         return super.getItemViewType(position);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void updateAdapter(List<Comment> i_NewCommentsList)
     {
         this.m_CommentsOfPost.addAll(i_NewCommentsList);

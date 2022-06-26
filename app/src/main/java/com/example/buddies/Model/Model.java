@@ -59,6 +59,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
 import com.google.firebase.storage.OnProgressListener;
@@ -109,6 +110,8 @@ public class Model implements IModel,
     private FirebaseAuth m_FirebaseAuth;
     private FirebaseUser m_CurrentUser = null;
     FirebaseAuth.AuthStateListener m_AuthStateListener;
+
+    public final FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
 
     boolean m_IsFirstLoad = true;
     boolean m_IsOccurringAProfileDetailsUpdate = false;
@@ -449,6 +452,11 @@ public class Model implements IModel,
             {
                 m_CitiesTable.child(desiredCity).setValue(true);
             }
+
+            // Subscription allows the user to get notified when users comment on the relevant post.
+            firebaseMessaging.subscribeToTopic(newPost.getPostID());
+            // TODO: add this topic to the user's subscriptions list (need to create one).
+
             this.onSuccessToCreatePost(newPost);
         }
         catch (Exception exception)
@@ -458,14 +466,12 @@ public class Model implements IModel,
     }
 
     @Override
-    public void onSuccessToCreatePost(Post i_Post)
-    {
+    public void onSuccessToCreatePost(Post i_Post) {
         ((IPostCreationResponseEventHandler)viewModel).onSuccessToCreatePost(i_Post);
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason)
-    {
+    public void onFailureToCreatePost(Exception i_Reason) {
         ((IPostCreationResponseEventHandler)viewModel).onFailureToCreatePost(i_Reason);
     }
 
@@ -774,15 +780,12 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPosts(ePostType type)
-    {
-        try
-        {
+    public void onRequestToLoadPosts(ePostType type) {
+        try {
             m_PostsTable = m_CurrentSnapshotOfPostsTable.getRef();
             m_PostsList = new ArrayList<>();
 
-            switch (type)
-            {
+            switch (type) {
                 case ALL:
                     for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren())
                     {
@@ -858,9 +861,7 @@ public class Model implements IModel,
             Collections.sort(m_PostsList);
             Model.this.onSuccessToLoadPosts(m_PostsList);
 
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             Model.this.onFailureToLoadPosts(exception);
         }
     }
@@ -907,14 +908,12 @@ public class Model implements IModel,
     }
 
     @Override
-    public void onSuccessToLoadPosts(List<Post> i_PostsList)
-    {
+    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
         ((ILoadPostsResponseEventHandler)viewModel).onSuccessToLoadPosts(i_PostsList);
     }
 
     @Override
-    public void onFailureToLoadPosts(Exception i_Reason)
-    {
+    public void onFailureToLoadPosts(Exception i_Reason) {
         ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(i_Reason);
     }
 
@@ -925,36 +924,27 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate)
-    {
-        try
-        {
+    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
+        try {
             m_UserProfile = this.resolveUserProfileFromUID(i_CreatorUserUID);
-            if (m_UserProfile != null)
-            {
+            if (m_UserProfile != null) {
                 onSuccessToLoadPostCard(m_UserProfile, i_PostAdapterToUpdate);
-            }
-            else
-            {
+            } else {
                 onFailureToLoadPostCard(new Exception("Model.m_UserProfile is null"), i_PostAdapterToUpdate);
             }
 
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             onFailureToLoadPostCard(exception, i_PostAdapterToUpdate);
         }
     }
 
     @Override
-    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate)
-    {
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
         ((ILoadPostCardResponseEventHandler)viewModel).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
     }
 
     @Override
-    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate)
-    {
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
         ((ILoadPostCardResponseEventHandler)viewModel).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
     }
 
@@ -965,22 +955,15 @@ public class Model implements IModel,
     */
 
     @Override
-    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller)
-    {
-        try
-        {
+    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller) {
+        try {
             UserProfile currentResolvedUserProfile = this.resolveUserProfileFromUID(i_UserIDToResolve); // m_CurrentSnapshotOfUsersTable.child(i_CreatorUserUID).getValue(UserProfile.class);
-            if (currentResolvedUserProfile != null)
-            {
+            if (currentResolvedUserProfile != null) {
                 this.onSuccessToResolveUIDToUserProfile(currentResolvedUserProfile, i_Caller);
-            }
-            else
-            {
+            } else {
                 new Exception("Model.m_UserProfile is null");
             }
-        }
-        catch (Exception err)
-        {
+        } catch (Exception err) {
             this.onFailureToResolveUIDToUserProfile(err, i_Caller);
         }
     }
@@ -1037,8 +1020,7 @@ public class Model implements IModel,
     }
 
     @Override
-    public void onFailureToCreateComment(Exception i_Reason)
-    {
+    public void onFailureToCreateComment(Exception i_Reason) {
         ((ICommentCreationResponseEventHandler)viewModel).onFailureToCreateComment(i_Reason);
     }
 
@@ -1054,10 +1036,10 @@ public class Model implements IModel,
 
     public String getCurrentUserUID() { return Objects.requireNonNull(this.m_FirebaseAuth.getCurrentUser()).getUid(); }
 
-    public boolean areRegisterDetailsValid(String i_UserName, String i_Password, String i_FullName, String i_age, eDogGender i_DogGender)
-    {
-        if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("") || i_age.equals("") || i_DogGender == eDogGender.UNINITIALIZED)
-        {
+    public boolean areRegisterDetailsValid(String i_UserName, String i_Password,
+                                           String i_FullName, String i_age, eDogGender i_DogGender) {
+        if (i_UserName.equals("") || i_Password.equals("") || i_FullName.equals("") || i_age.equals("")
+                || i_DogGender == eDogGender.UNINITIALIZED) {
             return false;
         }
         return true;
@@ -1065,8 +1047,7 @@ public class Model implements IModel,
 
     public List<Post> getPostsList() { return m_PostsList; }
 
-    public UserProfile resolveUserProfileFromUID(String i_UserID)
-    {
+    public UserProfile resolveUserProfileFromUID(String i_UserID) {
         return m_CurrentSnapshotOfUsersTable.child(i_UserID).getValue(UserProfile.class);
     }
 
