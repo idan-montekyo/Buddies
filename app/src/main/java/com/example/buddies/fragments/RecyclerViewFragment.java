@@ -18,10 +18,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.buddies.Model.Model;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.adapters.PostAdapter;
+import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
+import com.example.buddies.common.UserProfile;
 import com.example.buddies.enums.ePostType;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsResponseEventHandler;
@@ -113,9 +116,23 @@ public class RecyclerViewFragment extends Fragment implements IView,
         m_PostAdapter.setListener(new PostAdapter.MyPostListener() {
             @Override
             public void onPostClicked(int index, View view) throws IOException {
-
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(RECYCLER_VIEW_FRAGMENT_TAG);
                 assert thisFragment != null;
+
+                Post currentPost = m_Posts.get(index);
+                UserProfile currentCreatorUserProfile = Model.getInstance().resolveUserProfileFromUID(currentPost.getCreatorUserUID()); // m_PostAdapter.getCreatorUserProfile();
+
+                // Convert the custom objects to json and pass them as json to the bundle (Source: https://stackoverflow.com/a/46591617/2196301)
+                String userProfileJsonString = AppUtils.getGsonParser().toJson(currentCreatorUserProfile);
+                String currentPostJsonString = AppUtils.getGsonParser().toJson(currentPost);
+
+                Bundle viewPostFragmentArguments = new Bundle();
+                viewPostFragmentArguments.putString("userProfileJsonString", userProfileJsonString);
+                viewPostFragmentArguments.putString("currentPostJsonString", currentPostJsonString);
+
+                ViewPostFragment postFragmentToLaunch = new ViewPostFragment();
+                postFragmentToLaunch.setArguments(viewPostFragmentArguments);
+
                 getParentFragmentManager().beginTransaction()
                         .setCustomAnimations(
                                 R.anim.slide_in,  // enter
@@ -123,7 +140,7 @@ public class RecyclerViewFragment extends Fragment implements IView,
                                 R.anim.fade_in,   // popEnter
                                 R.anim.slide_out) // popExit
                         .hide(thisFragment)
-                        .add(R.id.root_main_activity, new ViewPostFragment(), ViewPostFragment.VIEW_POST_FRAGMENT_TAG)
+                        .add(R.id.root_main_activity, postFragmentToLaunch, ViewPostFragment.VIEW_POST_FRAGMENT_TAG)
                         .addToBackStack(null).commit();
             }
         });
