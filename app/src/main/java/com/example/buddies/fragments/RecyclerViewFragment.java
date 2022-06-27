@@ -9,12 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -77,8 +80,19 @@ public class RecyclerViewFragment extends Fragment implements IView,
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         super.onViewCreated(view, savedInstanceState);
+
+        // Updates the list of all posts in HomeFragment when back pressed, to avoid crashing.
+        FragmentManager fragmentManager = getParentFragmentManager();
+        HomeFragment homeFragment = (HomeFragment)fragmentManager.findFragmentByTag(HomeFragment.HOME_FRAGMENT_TAG);
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                fragmentManager.popBackStack();
+                homeFragment.onRequestToLoadPosts(ePostType.ALL);
+                homeFragment.onSuccessToCreatePost(null);
+            }
+        });
 
         Bundle bundle = this.getArguments();
 
