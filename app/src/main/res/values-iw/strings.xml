@@ -41,4 +41,8 @@
     <string name="commenter_name">שם המגיב</string>
     <string name="comment_content">תוכן התגובה</string>
     <string name="soon">בקרוב</string>
+    <string name="notifications">התראות</string>
+    <string name="alert_dialog_builder_title">התראת גישה למיקום</string>
+    <string name="alert_dialog_builder_positive_button">קח אותי לשם</string>
+    <string name="alert_dialog_builder_message">תועברו כעת למסך ההגדרות. לאחר אישור גישה למיקומכם, אנא המתינו מספר שניות לטעינה מוצלחת.</string>
 </resources>

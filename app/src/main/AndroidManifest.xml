@@ -92,10 +92,20 @@
 
         <service
             android:name=".service.MyFirebaseMessagingService"
-            android:exported="false">
+            android:exported="false"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>
+            </intent-filter>
+        </service>
+
+        <service android:name=".BroadcastReceiver.MyBroadcastReceiver"
+            android:exported="false"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE"/>
             </intent-filter>
         </service>
 

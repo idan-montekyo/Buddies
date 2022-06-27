@@ -1,13 +1,10 @@
 package com.example.buddies.Model;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -80,33 +77,30 @@ import java.util.List;
 import java.util.Objects;
 
 public class Model implements IModel,
-                              ILoginRequestEventHandler,
-                              ILoginResponsesEventHandler,
-                              ILogoutRequestEventHandler,
-                              ILogoutResponsesEventHandler,
-                              ISignupRequestEventHandler,
-                              ISignupResponsesEventHandler,
-                              IPostCreationRequestEventHandler,
-                              IPostCreationResponseEventHandler,
-                              IUpdateCitiesAutocompleteListRequestEventHandler,
-                              IUpdateCitiesAutocompleteListResponsesEventHandler,
-                              ILoadUserProfileRequestEventHandler,
-                              ILoadUserProfileResponseEventHandler,
-                              // IUploadImageRequestEventHandler,
-                              // IUploadImageResponsesEventHandler,
-                              IUpdateProfileRequestEventHandler,
-                              IUpdateProfileResponsesEventHandler,
-                              ILoadPostsRequestEventHandler,
-                              ILoadPostsResponseEventHandler,
-                              ILoadPostCommentsRequestEventHandler,
-                              ILoadPostCommentsResponsesEventHandler,
-                              ILoadPostCardRequestEventHandler,
-                              ILoadPostCardResponseEventHandler,
-                              IResolveUIDToUserProfileRequestEventHandler,
-                              IResolveUIDToUserProfileResponsesEventHandler,
-                              ICommentCreationRequestEventHandler,
-                              ICommentCreationResponseEventHandler
-{
+        ILoginRequestEventHandler,
+        ILoginResponsesEventHandler,
+        ILogoutRequestEventHandler,
+        ILogoutResponsesEventHandler,
+        ISignupRequestEventHandler,
+        ISignupResponsesEventHandler,
+        IPostCreationRequestEventHandler,
+        IPostCreationResponseEventHandler,
+        IUpdateCitiesAutocompleteListRequestEventHandler,
+        IUpdateCitiesAutocompleteListResponsesEventHandler,
+        ILoadUserProfileRequestEventHandler,
+        ILoadUserProfileResponseEventHandler,
+        IUpdateProfileRequestEventHandler,
+        IUpdateProfileResponsesEventHandler,
+        ILoadPostsRequestEventHandler,
+        ILoadPostsResponseEventHandler,
+        ILoadPostCommentsRequestEventHandler,
+        ILoadPostCommentsResponsesEventHandler,
+        ILoadPostCardRequestEventHandler,
+        ILoadPostCardResponseEventHandler,
+        IResolveUIDToUserProfileRequestEventHandler,
+        IResolveUIDToUserProfileResponsesEventHandler,
+        ICommentCreationRequestEventHandler,
+        ICommentCreationResponseEventHandler {
     private static Model _instance = null;
     IViewModel viewModel = null;
 
@@ -204,7 +198,7 @@ public class Model implements IModel,
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                ((IUpdateCitiesAutocompleteListResponsesEventHandler)Model.this.viewModel).onFailureToUpdateListOfCities(databaseError.toException());
+                ((IUpdateCitiesAutocompleteListResponsesEventHandler) Model.this.viewModel).onFailureToUpdateListOfCities(databaseError.toException());
             }
         });
 
@@ -215,13 +209,13 @@ public class Model implements IModel,
                 try {
                     m_CurrentSnapshotOfUsersTable = snapshot;
                 } catch (Exception exception) {
-                    ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(exception);
+                    ((ILoadUserProfileResponseEventHandler) viewModel).onFailureToLoadProfile(exception);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(error.toException());
+                ((ILoadUserProfileResponseEventHandler) viewModel).onFailureToLoadProfile(error.toException());
             }
         });
 
@@ -231,41 +225,47 @@ public class Model implements IModel,
                 try {
                     m_CurrentSnapshotOfPostsTable = snapshot;
                 } catch (Exception exception) {
-                    ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(exception);
+                    ((ILoadPostsResponseEventHandler) viewModel).onFailureToLoadPosts(exception);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(error.toException());
+                ((ILoadPostsResponseEventHandler) viewModel).onFailureToLoadPosts(error.toException());
             }
         });
 
         this.m_CommentsTable.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                try
-                {
+                try {
                     m_CurrentSnapshotOfCommentsTable = snapshot;
+                } catch (Exception exception) {
                 }
-                catch (Exception exception) { }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
     public static Model getInstance() {
-        if (_instance == null) { _instance = new Model(); }
+        if (_instance == null) {
+            _instance = new Model();
+        }
         return _instance;
     }
 
     @Override
-    public void registerForEvents(IViewModel i_ViewModelToRegister) { this.viewModel = i_ViewModelToRegister; }
+    public void registerForEvents(IViewModel i_ViewModelToRegister) {
+        this.viewModel = i_ViewModelToRegister;
+    }
 
     @Override
-    public void unregisterForEvents() { this.viewModel = null; }
+    public void unregisterForEvents() {
+        this.viewModel = null;
+    }
 
     /*
     ****************************************************************************************************
@@ -308,17 +308,20 @@ public class Model implements IModel,
                     }
                 }
             });
-        }
-        catch (Exception err) {
+        } catch (Exception err) {
             this.onFailureToSignup(err);
         }
     }
 
     @Override
-    public void onSuccessToSignup() { ((ISignupResponsesEventHandler)this.viewModel).onSuccessToSignup(); }
+    public void onSuccessToSignup() {
+        ((ISignupResponsesEventHandler) this.viewModel).onSuccessToSignup();
+    }
 
     @Override
-    public void onFailureToSignup(Exception i_Reason) { ((ISignupResponsesEventHandler)this.viewModel).onFailureToSignup(i_Reason); }
+    public void onFailureToSignup(Exception i_Reason) {
+        ((ISignupResponsesEventHandler) this.viewModel).onFailureToSignup(i_Reason);
+    }
 
     /*
     ****************************************************************************************************
@@ -351,13 +354,13 @@ public class Model implements IModel,
     @Override
     public void onSuccessToLogin() {
         // if firebase login succeeded
-        ((ILoginResponsesEventHandler)this.viewModel).onSuccessToLogin();
+        ((ILoginResponsesEventHandler) this.viewModel).onSuccessToLogin();
     }
 
     @Override
     public void onFailureToLogin(Exception i_Reason) {
         // if firebase login failed
-        ((ILoginResponsesEventHandler)this.viewModel).onFailureToLogin(i_Reason);
+        ((ILoginResponsesEventHandler) this.viewModel).onFailureToLogin(i_Reason);
     }
 
     /*
@@ -383,13 +386,13 @@ public class Model implements IModel,
     @Override
     public void onSuccessToAnonymousLogin() {
         // if firebase anonymous login succeeded
-        ((ILoginResponsesEventHandler)this.viewModel).onSuccessToAnonymousLogin();
+        ((ILoginResponsesEventHandler) this.viewModel).onSuccessToAnonymousLogin();
     }
 
     @Override
     public void onFailureToAnonymousLogin(Exception i_Reason) {
         // if firebase anonymous login failed
-        ((ILoginResponsesEventHandler)this.viewModel).onFailureToAnonymousLogin(i_Reason);
+        ((ILoginResponsesEventHandler) this.viewModel).onFailureToAnonymousLogin(i_Reason);
     }
 
     /*
@@ -413,13 +416,13 @@ public class Model implements IModel,
 
     @Override
     public void onSuccessToLogout() {
-        ((ILogoutResponsesEventHandler)this.viewModel).onSuccessToLogout();
+        ((ILogoutResponsesEventHandler) this.viewModel).onSuccessToLogout();
     }
 
     @Override
     public void onFailureToLogout(Exception i_Reason) {
         // if firebase logout failed
-        ((ILogoutResponsesEventHandler)this.viewModel).onFailureToLogout(i_Reason);
+        ((ILogoutResponsesEventHandler) this.viewModel).onFailureToLogout(i_Reason);
     }
 
     /*
@@ -430,12 +433,10 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToCreatePost(Context i_Context, String i_UserID, String i_CityOfMeeting, String i_StreetOfMeeting, String i_DateOfMeeting, String i_TimeOfMeeting, LatLng i_LocationOfMeeting, String i_ContentOfPost)
-    {
+    public void onRequestToCreatePost(Context i_Context, String i_UserID, String i_CityOfMeeting, String i_StreetOfMeeting, String i_DateOfMeeting, String i_TimeOfMeeting, LatLng i_LocationOfMeeting, String i_ContentOfPost) {
         AppUtils.printDebugToLogcat("Model", "onRequestToCreatePost", "trying to save post details to FireBase...");
 
-        try
-        {
+        try {
             // First, create the Post object.
             Post newPost = new Post(i_UserID, i_CityOfMeeting, i_StreetOfMeeting, CreationDate.parse(i_DateOfMeeting), i_TimeOfMeeting, i_LocationOfMeeting, i_ContentOfPost);
 
@@ -448,31 +449,27 @@ public class Model implements IModel,
 
             // Save city at FireBase -> cities (if the city does not exist already).
             String desiredCity = newPost.getMeetingCity();
-            if (!this.m_ListOfCities.contains(desiredCity))
-            {
+            if (!this.m_ListOfCities.contains(desiredCity)) {
                 m_CitiesTable.child(desiredCity).setValue(true);
             }
 
             // Subscription allows the user to get notified when users comment on the relevant post.
             firebaseMessaging.subscribeToTopic(newPost.getPostID());
-            // TODO: add this topic to the user's subscriptions list (need to create one).
 
             this.onSuccessToCreatePost(newPost);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             onFailureToCreatePost(exception);
         }
     }
 
     @Override
     public void onSuccessToCreatePost(Post i_Post) {
-        ((IPostCreationResponseEventHandler)viewModel).onSuccessToCreatePost(i_Post);
+        ((IPostCreationResponseEventHandler) viewModel).onSuccessToCreatePost(i_Post);
     }
 
     @Override
     public void onFailureToCreatePost(Exception i_Reason) {
-        ((IPostCreationResponseEventHandler)viewModel).onFailureToCreatePost(i_Reason);
+        ((IPostCreationResponseEventHandler) viewModel).onFailureToCreatePost(i_Reason);
     }
 
     /*
@@ -502,119 +499,18 @@ public class Model implements IModel,
 
     @Override
     public void onSuccessToUpdateListOfCities(ArrayList<String> i_UpdatedListOfCities) {
-        ((IUpdateCitiesAutocompleteListResponsesEventHandler)Model.this.viewModel).onSuccessToUpdateListOfCities(i_UpdatedListOfCities);
+        ((IUpdateCitiesAutocompleteListResponsesEventHandler) Model.this.viewModel).onSuccessToUpdateListOfCities(i_UpdatedListOfCities);
     }
 
     @Override
     public void onFailureToUpdateListOfCities(Exception i_Reason) {
-        ((IUpdateCitiesAutocompleteListResponsesEventHandler)Model.this.viewModel).onFailureToUpdateListOfCities(i_Reason);
+        ((IUpdateCitiesAutocompleteListResponsesEventHandler) Model.this.viewModel).onFailureToUpdateListOfCities(i_Reason);
     }
 
     /*
     ****************************************************************************************************
-                                         TASK: Upload image
+                                        TASK: Update Profile
     ****************************************************************************************************
-    */
-
-    /*
-    @Override
-    public void onRequestToUploadImage(Uri i_PathOfFileInFilesystem)
-    {
-        // Create the file metadata
-        StorageMetadata.Builder metadata = new StorageMetadata.Builder();
-        metadata.setContentType("image/jpeg");
-
-        // Get the filename from the path
-        String filename = i_PathOfFileInFilesystem.getLastPathSegment();
-
-        // Upload file and metadata to the path 'images/<filename>.jpeg'
-        StorageReference referenceToFile = storageRef.child("images/" + filename);
-        UploadTask uploadTask = referenceToFile.putFile(i_PathOfFileInFilesystem, metadata.build());
-
-        // Listen for state changes, errors, and completion of the upload.
-        uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>()
-        {
-            @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot)
-            {
-                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                AppUtils.printDebugToLogcat("Model.java", "onRequestToUploadImage()", "Upload is " + progress + "% done");
-            }
-        });
-
-        uploadTask.addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>()
-        {
-            @Override
-            public void onPaused(UploadTask.TaskSnapshot taskSnapshot)
-            {
-                AppUtils.printDebugToLogcat("Model.java", "onRequestToUploadImage()", "Upload is paused");
-            }
-        });
-
-        uploadTask.addOnFailureListener(new OnFailureListener()
-        {
-            @Override
-            public void onFailure(@NonNull Exception exception)
-            {
-                Model.this.onFailureToUploadImage(exception);
-            }
-        });
-
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>()
-        {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot)
-            {
-                try
-                {
-                    StorageReference referenceToFileInCloud = taskSnapshot.getStorage();
-                    Task<Uri> fileUriOwner = referenceToFileInCloud.getDownloadUrl();
-
-                    fileUriOwner.addOnCompleteListener(new OnCompleteListener<Uri>()
-                    {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task)
-                        {
-                            Uri uriOfFileInCloud = task.getResult();
-                            Model.this.onSuccessToUploadImage(uriOfFileInCloud);
-                        }
-                    });
-                }
-                catch (Exception exception)
-                {
-                    Model.this.onFailureToUploadImage(exception);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onSuccessToUploadImage(Uri i_PathOfFileInCloud)
-    {
-        if (m_IsOccurringAProfileDetailsUpdate == true)
-        {
-            m_IsOccurringAProfileDetailsUpdate = false;
-            this.onSuccessToUpdateProfile();
-        }
-        else
-        {
-            ((IUploadImageResponsesEventHandler)this.viewModel).onSuccessToUploadImage(i_PathOfFileInCloud);
-        }
-    }
-
-    @Override
-    public void onFailureToUploadImage(Exception i_Reason)
-    {
-        if (m_IsOccurringAProfileDetailsUpdate == true)
-        {
-            m_IsOccurringAProfileDetailsUpdate = false;
-            this.onFailureToUpdateProfile(i_Reason);
-        }
-        else
-        {
-            ((IUploadImageResponsesEventHandler) this.viewModel).onFailureToUploadImage(i_Reason);
-        }
-    }
     */
 
     @Override
@@ -644,7 +540,7 @@ public class Model implements IModel,
 
                 // If the file has been se;ected from the gallery
                 if (i_ProfileImage.contains("content://") == true) {
-                    AssetFileDescriptor fileDescriptor = i_Context.getContentResolver().openAssetFileDescriptor(profileImageUri , "r");
+                    AssetFileDescriptor fileDescriptor = i_Context.getContentResolver().openAssetFileDescriptor(profileImageUri, "r");
                     fileSize = fileDescriptor.getLength();
 
                     uploadTask = referenceToFile.putFile(profileImageUri, metadata.build());
@@ -669,8 +565,6 @@ public class Model implements IModel,
                     public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                         if (isFirstCall == true) {
                             isFirstCall = false;
-
-                            // totalBytesCount = taskSnapshot.getTotalByteCount();
 
                             progressNotification = new ProgressNotification(i_Context,
                                     ProgressNotification.eSecondaryNotificationTypes.NOTIFICATIONS_OF_UPLOADS_PROGRESSES___UPLOAD_IMAGE_PROGRESS,
@@ -736,12 +630,12 @@ public class Model implements IModel,
 
     @Override
     public void onSuccessToUpdateProfile() {
-        ((IUpdateProfileResponsesEventHandler)this.viewModel).onSuccessToUpdateProfile();
+        ((IUpdateProfileResponsesEventHandler) this.viewModel).onSuccessToUpdateProfile();
     }
 
     @Override
     public void onFailureToUpdateProfile(Exception i_Reason) {
-        ((IUpdateProfileResponsesEventHandler)this.viewModel).onFailureToUpdateProfile(i_Reason);
+        ((IUpdateProfileResponsesEventHandler) this.viewModel).onFailureToUpdateProfile(i_Reason);
     }
 
     /*
@@ -763,12 +657,12 @@ public class Model implements IModel,
 
     @Override
     public void onSuccessToLoadProfile(UserProfile i_UserProfile) {
-        ((ILoadUserProfileResponseEventHandler)viewModel).onSuccessToLoadProfile(i_UserProfile);
+        ((ILoadUserProfileResponseEventHandler) viewModel).onSuccessToLoadProfile(i_UserProfile);
     }
 
     @Override
     public void onFailureToLoadProfile(Exception i_Reason) {
-        ((ILoadUserProfileResponseEventHandler)viewModel).onFailureToLoadProfile(i_Reason);
+        ((ILoadUserProfileResponseEventHandler) viewModel).onFailureToLoadProfile(i_Reason);
     }
 
     /*
@@ -786,69 +680,15 @@ public class Model implements IModel,
 
             switch (type) {
                 case ALL:
-                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren())
-                    {
-                        for (DataSnapshot post : UserUIDs.getChildren())
-                        {
-                            /*
-                            String userID = (String) post.child("creatorUserUID").getValue();
-                            String cityOfMeeting = (String) post.child("meetingCity").getValue();
-                            String streetOfMeeting = (String) post.child("meetingStreet").getValue();
-
-                            // Get the meeting date
-                            Long meetingYear = (long) post.child("meetingDate").child("creationYear").getValue();
-                            Long meetingMonth = (long) post.child("meetingDate").child("creationMonth").getValue();
-                            Long meetingDay = (long) post.child("meetingDate").child("creationDay").getValue();
-                            CreationDate dateOfMeeting = new CreationDate(meetingYear.intValue(), meetingMonth.intValue(), meetingDay.intValue());
-
-                            String timeOfMeeting = (String) post.child("meetingTime").getValue();
-
-                            LatLng locationOfMeeting = new LatLng(
-                                    (double) post.child("meetingLocation").child("latitude").getValue(),
-                                    (double) post.child("meetingLocation").child("longitude").getValue()
-                            );
-
-                            String contentOfPost = (String) post.child("postContent").getValue();
-
-                            // Get the time of post creation
-                            Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
-                            Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
-                            Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
-                            Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
-
-                            LocalTime postCreationTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
-                                    localSecond.intValue(), localNano.intValue());
-
-                            Long postCreationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
-
-                            // Get the date of post creation
-                            Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
-                            Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
-                            Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
-
-                            String postID = (String) post.child("postID").getValue();
-
-                            Post newPost = new Post(userID,
-                                    cityOfMeeting,
-                                    streetOfMeeting,
-                                    dateOfMeeting,
-                                    timeOfMeeting,
-                                    locationOfMeeting,
-                                    contentOfPost,
-                                    postCreationTime, postCreationDateTimeAsLong,
-                                    creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
-                             */
-
-                            // Post newPost = this._instance.ConvertDataSnapshotToPost(post);
+                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
+                        for (DataSnapshot post : UserUIDs.getChildren()) {
                             Post newPost = Post.parse(post);
-
                             m_PostsList.add(newPost);
                         }
                     }
                     break;
                 case MY_POSTS:
-                    for (DataSnapshot post : m_CurrentSnapshotOfPostsTable.child(getCurrentUserUID()).getChildren())
-                    {
+                    for (DataSnapshot post : m_CurrentSnapshotOfPostsTable.child(getCurrentUserUID()).getChildren()) {
                         Post newPost = Post.parse(post);
                         m_PostsList.add(newPost);
                     }
@@ -867,28 +707,19 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPostsByCity(String i_SearchedCity)
-    {
-        try
-        {
-            if (i_SearchedCity.equals("") == true)
-            {
+    public void onRequestToLoadPostsByCity(String i_SearchedCity) {
+        try {
+            if (i_SearchedCity.equals("") == true) {
                 this.onRequestToLoadPosts(ePostType.ALL);
-            }
-            else
-            {
+            } else {
                 m_PostsList = new ArrayList<>();
 
-                if (this.m_ListOfCities.contains(i_SearchedCity) == true)
-                {
-                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren())
-                    {
-                        for (DataSnapshot post : UserUIDs.getChildren())
-                        {
+                if (this.m_ListOfCities.contains(i_SearchedCity) == true) {
+                    for (DataSnapshot UserUIDs : m_CurrentSnapshotOfPostsTable.getChildren()) {
+                        for (DataSnapshot post : UserUIDs.getChildren()) {
                             Post newPost = Post.parse(post);
 
-                            if (newPost.getMeetingCity().equals(i_SearchedCity))
-                            {
+                            if (newPost.getMeetingCity().equals(i_SearchedCity)) {
                                 m_PostsList.add(newPost);
                             }
                         }
@@ -899,21 +730,19 @@ public class Model implements IModel,
 
                 Model.this.onSuccessToLoadPosts(m_PostsList);
             }
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             Model.this.onFailureToLoadPosts(exception);
         }
     }
 
     @Override
     public void onSuccessToLoadPosts(List<Post> i_PostsList) {
-        ((ILoadPostsResponseEventHandler)viewModel).onSuccessToLoadPosts(i_PostsList);
+        ((ILoadPostsResponseEventHandler) viewModel).onSuccessToLoadPosts(i_PostsList);
     }
 
     @Override
     public void onFailureToLoadPosts(Exception i_Reason) {
-        ((ILoadPostsResponseEventHandler)viewModel).onFailureToLoadPosts(i_Reason);
+        ((ILoadPostsResponseEventHandler) viewModel).onFailureToLoadPosts(i_Reason);
     }
 
     /*
@@ -939,12 +768,12 @@ public class Model implements IModel,
 
     @Override
     public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
-        ((ILoadPostCardResponseEventHandler)viewModel).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
+        ((ILoadPostCardResponseEventHandler) viewModel).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
     }
 
     @Override
     public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
-        ((ILoadPostCardResponseEventHandler)viewModel).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
+        ((ILoadPostCardResponseEventHandler) viewModel).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
     }
 
     /*
@@ -969,12 +798,12 @@ public class Model implements IModel,
 
     @Override
     public void onSuccessToResolveUIDToUserProfile(UserProfile i_ResolvedUserProfile, IView i_Caller) {
-        ((IResolveUIDToUserProfileResponsesEventHandler)viewModel).onSuccessToResolveUIDToUserProfile(i_ResolvedUserProfile, i_Caller);
+        ((IResolveUIDToUserProfileResponsesEventHandler) viewModel).onSuccessToResolveUIDToUserProfile(i_ResolvedUserProfile, i_Caller);
     }
 
     @Override
     public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller) {
-        ((IResolveUIDToUserProfileResponsesEventHandler)viewModel).onFailureToResolveUIDToUserProfile(i_Reason, i_Caller);
+        ((IResolveUIDToUserProfileResponsesEventHandler) viewModel).onFailureToResolveUIDToUserProfile(i_Reason, i_Caller);
     }
 
     /*
@@ -985,16 +814,12 @@ public class Model implements IModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID)
-    {
+    public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID) {
         AppUtils.printDebugToLogcat("Model", "onRequestToCreateComment", "trying to save comment details to FireBase...");
 
-        try
-        {
+        try {
             // Save comment under the relevant post at FireBase -> comments.
             // Each post will be identified by it's 'postCreationDateTimeAsLong' field.
-            // String postIdentificationAsString = String.valueOf(i_Comment.getBelongsToPostCreationDateTimeAsLong());
-
             Comment newComment = new Comment(i_CreatorUserUID, i_UserProfileImageUri, i_CommentContent, i_PostID);
 
             String postIdentificationAsString = newComment.getOwnerPostID();
@@ -1005,22 +830,51 @@ public class Model implements IModel,
             m_CommentsTable.child(postIdentificationAsString).child(newCommentKey).setValue(newComment);
 
             this.onSuccessToCreateComment(newComment);
-        }
-        catch (Exception exception)
-        {
+        } catch (Exception exception) {
             this.onFailureToCreatePost(exception);
         }
     }
 
     @Override
-    public void onSuccessToCreateComment(Comment i_Comment)
-    {
-        ((ICommentCreationResponseEventHandler)viewModel).onSuccessToCreateComment(i_Comment);
+    public void onSuccessToCreateComment(Comment i_Comment) {
+        ((ICommentCreationResponseEventHandler) viewModel).onSuccessToCreateComment(i_Comment);
     }
 
     @Override
     public void onFailureToCreateComment(Exception i_Reason) {
-        ((ICommentCreationResponseEventHandler)viewModel).onFailureToCreateComment(i_Reason);
+        ((ICommentCreationResponseEventHandler) viewModel).onFailureToCreateComment(i_Reason);
+    }
+
+    /*
+    ****************************************************************************************************
+                                  TASK: Load Comments For A Specific Post
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToLoadPostComments(String i_PostID) {
+        try {
+            List<Comment> commentsOfPost = new ArrayList<Comment>();
+
+            for (DataSnapshot commentOfPost : m_CurrentSnapshotOfCommentsTable.child(i_PostID).getChildren()) {
+                Comment currentComment = Comment.parse(commentOfPost);
+                commentsOfPost.add(currentComment);
+            }
+
+            this.onSuccessToLoadPostComments(commentsOfPost);
+        } catch (Exception error) {
+            this.onFailureToLoadPostComments(error);
+        }
+    }
+
+    @Override
+    public void onSuccessToLoadPostComments(List<Comment> i_Comments) {
+        ((ILoadPostCommentsResponsesEventHandler) viewModel).onSuccessToLoadPostComments(i_Comments);
+    }
+
+    @Override
+    public void onFailureToLoadPostComments(Exception i_Reason) {
+        ((ILoadPostCommentsResponsesEventHandler) viewModel).onFailureToLoadPostComments(i_Reason);
     }
 
     /*
@@ -1044,130 +898,7 @@ public class Model implements IModel,
         return true;
     }
 
-    public List<Post> getPostsList() { return m_PostsList; }
-
     public UserProfile resolveUserProfileFromUID(String i_UserID) {
         return m_CurrentSnapshotOfUsersTable.child(i_UserID).getValue(UserProfile.class);
-    }
-
-    /*
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public List<Comment> getAllPostComments(String postID)
-    {
-            List<Comment> commentsOfPost = new ArrayList<Comment>();
-
-            for (DataSnapshot commentOfPost : m_CurrentSnapshotOfCommentsTable.child(postID).getChildren())
-            {
-                String creatorUserUID = (String) commentOfPost.child("creatorUserUID").getValue();
-                String userProfileImageUri = (String) commentOfPost.child("userProfileImageUri").getValue();
-                String commentContent = (String) commentOfPost.child("commentContent").getValue();
-
-                long hour = (long) commentOfPost.child("commentCreationTime").child("hour").getValue();
-                long minute = (long) commentOfPost.child("commentCreationTime").child("minute").getValue();
-                long nano = (long) commentOfPost.child("commentCreationTime").child("nano").getValue();
-                long second = (long) commentOfPost.child("commentCreationTime").child("second").getValue();
-
-                LocalTime commentCreationTime = LocalTime.of((int)hour, (int)minute, (int)second, (int)nano);
-
-                long commentCreationDateTimeAsLong = (long) commentOfPost.child("commentCreationDateTimeAsLong").getValue();
-                long commentCreationYear = (long) commentOfPost.child("commentCreationDate").child("creationYear").getValue();
-                long commentCreationMonth = (long) commentOfPost.child("commentCreationDate").child("creationMonth").getValue();
-                long commentCreationDay = (long) commentOfPost.child("commentCreationDate").child("creationDay").getValue();
-                String ownerPostID = (String) commentOfPost.child("ownerPostID").getValue();
-                String commentID = (String) commentOfPost.child("commentID").getValue();
-
-                Comment currentComment = new Comment(creatorUserUID, userProfileImageUri, commentContent, commentCreationTime, commentCreationDateTimeAsLong, (int)commentCreationYear, (int)commentCreationMonth, (int)commentCreationDay, ownerPostID, commentID);
-
-                commentsOfPost.add(currentComment);
-            }
-
-            return commentsOfPost;
-    }
-    */
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private Post ConvertDataSnapshotToPost(DataSnapshot post)
-    {
-        String userID = (String) post.child("creatorUserUID").getValue();
-        String cityOfMeeting = (String) post.child("meetingCity").getValue();
-        String streetOfMeeting = (String) post.child("meetingStreet").getValue();
-
-        // Get the meeting date
-        Long meetingYear = (long) post.child("meetingDate").child("creationYear").getValue();
-        Long meetingMonth = (long) post.child("meetingDate").child("creationMonth").getValue();
-        Long meetingDay = (long) post.child("meetingDate").child("creationDay").getValue();
-        CreationDate dateOfMeeting = new CreationDate(meetingYear.intValue(), meetingMonth.intValue(), meetingDay.intValue());
-
-        String timeOfMeeting = (String) post.child("meetingTime").getValue();
-
-        LatLng locationOfMeeting = new LatLng(
-                (double) post.child("meetingLocation").child("latitude").getValue(),
-                (double) post.child("meetingLocation").child("longitude").getValue()
-        );
-
-        String contentOfPost = (String) post.child("postContent").getValue();
-
-        // Get the time of post creation
-        Long localHour = (long)post.child("postCreationTime").child("hour").getValue();
-        Long localMinute = (long)post.child("postCreationTime").child("minute").getValue();
-        Long localSecond = (long)post.child("postCreationTime").child("second").getValue();
-        Long localNano = (long)post.child("postCreationTime").child("nano").getValue();
-
-        LocalTime postCreationTime = LocalTime.of(localHour.intValue(), localMinute.intValue(),
-                localSecond.intValue(), localNano.intValue());
-
-        Long postCreationDateTimeAsLong = (long) post.child("postCreationDateTimeAsLong").getValue();
-
-        // Get the date of post creation
-        Long creationYear = (long) post.child("postCreationDate").child("creationYear").getValue();
-        Long creationMonth = (long) post.child("postCreationDate").child("creationMonth").getValue();
-        Long creationDay = (long) post.child("postCreationDate").child("creationDay").getValue();
-
-        String postID = (String) post.child("postID").getValue();
-
-        Post newPost = new Post(userID,
-                cityOfMeeting,
-                streetOfMeeting,
-                dateOfMeeting,
-                timeOfMeeting,
-                locationOfMeeting,
-                contentOfPost,
-                postCreationTime, postCreationDateTimeAsLong,
-                creationYear.intValue(), creationMonth.intValue(), creationDay.intValue(), postID);
-
-        return newPost;
-    }
-
-    @Override
-    public void onRequestToLoadPostComments(String i_PostID)
-    {
-        try
-        {
-            List<Comment> commentsOfPost = new ArrayList<Comment>();
-
-            for (DataSnapshot commentOfPost : m_CurrentSnapshotOfCommentsTable.child(i_PostID).getChildren())
-            {
-                Comment currentComment = Comment.parse(commentOfPost);
-                commentsOfPost.add(currentComment);
-            }
-
-            this.onSuccessToLoadPostComments(commentsOfPost);
-        }
-        catch (Exception error)
-        {
-            this.onFailureToLoadPostComments(error);
-        }
-    }
-
-    @Override
-    public void onSuccessToLoadPostComments(List<Comment> i_Comments)
-    {
-        ((ILoadPostCommentsResponsesEventHandler)viewModel).onSuccessToLoadPostComments(i_Comments);
-    }
-
-    @Override
-    public void onFailureToLoadPostComments(Exception i_Reason)
-    {
-        ((ILoadPostCommentsResponsesEventHandler)viewModel).onFailureToLoadPostComments(i_Reason);
     }
 }

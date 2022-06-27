@@ -48,7 +48,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             System.out.println("data-message: " + remoteMessage.getData());
 
-            Intent intent = new Intent("message_received");
+            Intent intent = new Intent(Intent.ACTION_SCREEN_OFF);
             intent.putExtra("message", remoteMessage.getData().get("message"));
             intent.putExtra(POST_AS_JSON_STRING_KEY, remoteMessage.getData().get(POST_AS_JSON_STRING_KEY));
             intent.putExtra(POST_CREATOR_USERNAME_KEY, remoteMessage.getData().get(POST_CREATOR_USERNAME_KEY));
@@ -59,9 +59,17 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    public static void initializeDataMessageAndSendToServer(Context context, Post post, Comment comment,
-                                                            UserProfile postCreatorProfile,
-                                                            UserProfile commentCreatorProfile) {
+    /**
+     * This function is responsible for sending a POST request with the Data-Message info to the server.
+     * @param context
+     * @param post
+     * @param comment
+     * @param postCreatorProfile
+     * @param commentCreatorProfile
+     */
+    public static void initializeDataMessageAfterCreatingACommentAndSendToServer(
+                       Context context, Post post, Comment comment,
+                       UserProfile postCreatorProfile, UserProfile commentCreatorProfile) {
 
         JSONObject rootObject = new JSONObject();
         try {
@@ -104,7 +112,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             queue.add(request);
             queue.start();
-
             // By now, the request has been sent to the server.
 
         } catch (JSONException e) {

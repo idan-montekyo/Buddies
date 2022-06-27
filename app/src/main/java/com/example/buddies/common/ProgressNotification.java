@@ -10,7 +10,6 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 public class ProgressNotification
 {
@@ -25,8 +24,8 @@ public class ProgressNotification
     String m_CurrentText = null;
     double m_CurrentPercentage = 0.0;
 
-    public enum eSecondaryNotificationTypes
-    {
+    public enum eSecondaryNotificationTypes {
+
         NOTIFICATIONS_OF_UPLOADS_PROGRESSES___UPLOAD_IMAGE_PROGRESS(1),
         NOTIFICATIONS_OF_UPLOADS_PROGRESSES___UPLOAD_POST_PROGRESS(2),
         NOTIFICATIONS_OF_MEETINGS_UPDATES___INCOMING_MESSAGE_FOR_MEETING(3),
@@ -43,8 +42,7 @@ public class ProgressNotification
         public int getValue() { return value; }
     }
 
-    public ProgressNotification(Context i_Context, eSecondaryNotificationTypes i_SubCategoryOfNotification, String i_Title, String i_Text)
-    {
+    public ProgressNotification(Context i_Context, eSecondaryNotificationTypes i_SubCategoryOfNotification, String i_Title, String i_Text) {
         super();
 
         this.m_CurrentContext = i_Context;
@@ -55,12 +53,10 @@ public class ProgressNotification
         this.createNotification();
     }
 
-    private void createNotification()
-    {
+    private void createNotification() {
         this.notificationManager = (NotificationManager)this.m_CurrentContext.getSystemService(NOTIFICATION_SERVICE);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(this.m_CurrentSubCategoryOfNotification.toString(), this.m_NotificationPrimaryCategory, NotificationManager.IMPORTANCE_DEFAULT);
             this.notificationManager.createNotificationChannel(channel);
         }
@@ -73,22 +69,17 @@ public class ProgressNotification
                 .setSmallIcon(android.R.drawable.ic_dialog_info);
     }
 
-    public void launchNotification()
-    {
+    public void launchNotification() {
         this.notification = builder.build();
         this.notificationManager.notify(this.m_CurrentSubCategoryOfNotification.getValue(), this.notification);
     }
 
-    public void updateNotification(String i_NewTitle, String i_NewText, double i_NewPercentage)
-    {
-        if (i_NewPercentage < 100.0)
-        {
+    public void updateNotification(String i_NewTitle, String i_NewText, double i_NewPercentage) {
+        if (i_NewPercentage < 100.0) {
             this.builder.setProgress(100, (int) i_NewPercentage, false);
             this.builder.setContentTitle(i_NewTitle);
             this.builder.setContentText(i_NewText);
-        }
-        else
-        {
+        } else {
             this.builder.setProgress(100, 0, false);
             this.builder.setContentTitle("Upload Finished !");
             this.builder.setContentText("Upload Finished !");
@@ -99,8 +90,5 @@ public class ProgressNotification
 
     @NonNull
     @Override
-    public String toString()
-    {
-        return super.toString();
-    }
+    public String toString() { return super.toString(); }
 }

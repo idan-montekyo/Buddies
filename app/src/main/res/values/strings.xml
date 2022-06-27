@@ -43,4 +43,8 @@
     <string name="comment_content">Comment Content</string>
     <string name="fcm_api_token_key" translatable="false">AAAAeAqZc38:APA91bHxOAprs_LKN_UBbrVpuy53xTsUoBZxvdYi386PPsKh8-caPc2dmsffqqAfhL7QdtQWT2WMFnemdPG7MiIyJT-z7qJvUhY4wyb3DcR26Iz1PmnLezsEqnN9R1fdoIhmzNOugWUT</string>
     <string name="soon">soon</string>
+    <string name="notifications">Notifications</string>
+    <string name="alert_dialog_builder_title">Location Access Alert</string>
+    <string name="alert_dialog_builder_positive_button">Take me there</string>
+    <string name="alert_dialog_builder_message">You will be now redirected to the settings page in order to turn on gps location.\\nAfter the location access confirmation, please wait a few seconds in order the app will recognize your location.</string>
 </resources>

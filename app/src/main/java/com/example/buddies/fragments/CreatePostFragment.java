@@ -94,8 +94,7 @@ public class CreatePostFragment extends Fragment implements IView,
     Marker m_CurrMarker;
     Context m_Context = null;
 
-    interface IOnUploadListener
-    {
+    interface IOnUploadListener {
         void onUpload();
     }
 
@@ -104,51 +103,40 @@ public class CreatePostFragment extends Fragment implements IView,
     public IOnUploadListener onUploadListener;
 
     @Override
-    public void onAttach(@NonNull Context context)
-    {
+    public void onAttach(@NonNull Context context) {
         this.m_Context = context;
         super.onAttach(context);
 
         Fragment homeFragment = getParentFragmentManager().findFragmentByTag(HomeFragment.HOME_FRAGMENT_TAG);
-        try
-        {
+        try {
             onUploadListener = (IOnUploadListener) homeFragment;
 
             autocompleteLocationLauncher = registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
-                    new ActivityResultCallback<ActivityResult>()
-                    {
+                    new ActivityResultCallback<ActivityResult>() {
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
-                        public void onActivityResult(ActivityResult result)
-                        {
-                            if (result.getResultCode() == Activity.RESULT_OK)
-                            {
+                        public void onActivityResult(ActivityResult result) {
+                            if (result.getResultCode() == Activity.RESULT_OK) {
                                 Intent data = result.getData();
 
                                 Place place = Autocomplete.getPlaceFromIntent(data);
 
                                 // If there is information available for the selected street
-                                if (place.getAddressComponents() != null)
-                                {
+                                if (place.getAddressComponents() != null) {
                                     List<AddressComponent> components = place.getAddressComponents().asList();
                                     String streetName = components.get(0).getName();
                                     String cityName = components.get(1).getName();
                                     AppUtils.printDebugToLogcat("CreatePostFragment", "onActivityResult()", "Address components are: " + place.getAddressComponents().toString());
 
                                     // If the user selected some street but not in the city that he selected earlier - show error message
-                                    if (cityName.equals(CreatePostFragment.this.m_LocationDetails[2]) == false)
-                                    {
+                                    if (cityName.equals(CreatePostFragment.this.m_LocationDetails[2]) == false) {
                                         Toast.makeText(CreatePostFragment.this.m_Context, CreatePostFragment.this.invalidCityNameErrorMessage, Toast.LENGTH_LONG).show();
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         CreatePostFragment.this.m_streetTv.setText(streetName);
                                         CreatePostFragment.this.m_streetTv.setEnabled(false);
                                     }
-                                }
-                                else
-                                {
+                                } else {
                                     Toast.makeText(CreatePostFragment.this.m_Context, CreatePostFragment.this.invalidLocationErrorMessage, Toast.LENGTH_LONG).show();
                                 }
 
@@ -157,24 +145,20 @@ public class CreatePostFragment extends Fragment implements IView,
                             }
                         }
                     });
-        }
-        catch (ClassCastException ex)
-        {
+        } catch (ClassCastException ex) {
             throw new ClassCastException(this.interfaceNotImplementedErrorMessage);
         }
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         this.m_ViewModel.registerForEvents((IView) this);
         super.onCreate(savedInstanceState);
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_post, container, false);
         return view;
     }
@@ -182,13 +166,11 @@ public class CreatePostFragment extends Fragment implements IView,
     @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         ImageButton backBtn = view.findViewById(R.id.create_post_back_image_button);
-        backBtn.setOnClickListener(new View.OnClickListener()
-        {
+        backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { getParentFragmentManager().popBackStack(); }
         });
@@ -198,17 +180,9 @@ public class CreatePostFragment extends Fragment implements IView,
         m_mapView.onResume();
 
         Button pickLocationBtn = view.findViewById(R.id.create_post_pick_location_button);
-        pickLocationBtn.setOnClickListener(new View.OnClickListener()
-        {
+        pickLocationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                // If a location has not been already selected
-                if (m_CurrMarker == null)
-                {
-                    // m_mapView.setVisibility(View.GONE);
-                }
-
+            public void onClick(View v) {
                 // FragmentsCenter.m_Fragment_AddNewSong = new Fragment_AddNewSong();
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
 
@@ -233,17 +207,13 @@ public class CreatePostFragment extends Fragment implements IView,
         });
 
         Button pickDateBtn = view.findViewById(R.id.create_post_pick_date_button);
-        pickDateBtn.setOnClickListener(new View.OnClickListener()
-        {
+        pickDateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 CreationDate currentDate = CreationDate.now();
 
-                DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener()
-                {
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)
-                    {
+                DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         // Set the month value to be the correct one.
                         monthOfYear++;
                         String selectedDate = dayOfMonth + "." + monthOfYear + "." + year;
@@ -257,12 +227,10 @@ public class CreatePostFragment extends Fragment implements IView,
         });
 
         Button pickTimeBtn = (Button) view.findViewById(R.id.create_post_pick_time_button);
-        pickTimeBtn.setOnClickListener(new View.OnClickListener()
-        {
+        pickTimeBtn.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Calendar c = Calendar.getInstance();
                 int hour = c.get(Calendar.HOUR_OF_DAY);
                 int minute = c.get(Calendar.MINUTE);
@@ -281,18 +249,13 @@ public class CreatePostFragment extends Fragment implements IView,
         m_streetTv.setFocusable(false);
         m_streetTv.setEnabled(false);
 
-        m_streetTv.setOnClickListener(new View.OnClickListener()
-        {
+        m_streetTv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 // If necessary - initialize the Places class
-                if (Places.isInitialized() == false)
-                {
+                if (Places.isInitialized() == false) {
                     Places.initialize(CreatePostFragment.this.m_Context, AppUtils.GetResourceStringValueByStringName("google_maps_key", CreatePostFragment.this.m_Context), Locale.US);
                 }
-
-                // PlacesClient placesClient = Places.createClient(CreatePostFragment.this.m_Context);
 
                 // Set the fields to specify which types of place data to
                 // return after the user has made a selection.
@@ -318,12 +281,10 @@ public class CreatePostFragment extends Fragment implements IView,
         EditText contentEt = view.findViewById(R.id.create_post_content_input);
 
         Button uploadBtn = view.findViewById(R.id.create_post_upload_button);
-        uploadBtn.setOnClickListener(new View.OnClickListener()
-        {
+        uploadBtn.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 String userUID = Model.getInstance().getCurrentUserUID();
                 String cityInput = m_cityTv.getText().toString();
                 String streetInput = m_streetTv.getText().toString();
@@ -331,12 +292,9 @@ public class CreatePostFragment extends Fragment implements IView,
                 String timeInput = m_timeTv.getText().toString();
                 String contentInput = contentEt.getText().toString();
 
-                if (cityInput.equals("") || streetInput.equals("") || dateInput.equals("") || timeInput.equals("") || contentInput.equals(""))
-                {
+                if (cityInput.equals("") || streetInput.equals("") || dateInput.equals("") || timeInput.equals("") || contentInput.equals("")) {
                     Toast.makeText(CreatePostFragment.this.m_Context, CreatePostFragment.this.notAllFieldsAreFullErrorMEssage, Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     // Save the new post to FireBase
                     m_ViewModel.onRequestToCreatePost(CreatePostFragment.this.m_Context, userUID, cityInput, streetInput, dateInput, timeInput, m_SelectedLocation, contentInput);
                 }
@@ -345,48 +303,38 @@ public class CreatePostFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         this.m_ViewModel.unregisterForEvents((IView) this);
         super.onDestroy();
     }
 
     @Override
-    public void onLocationSelected(LatLng i_SelectedLocation)
-    {
+    public void onLocationSelected(LatLng i_SelectedLocation) {
         m_SelectedLocation = i_SelectedLocation;
 
-        new Thread(new Runnable()
-        {
+        new Thread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
-            public void run()
-            {
+            public void run() {
                 m_LocationDetails = AppUtils.getStringValueFromJsonObject(CreatePostFragment.this.m_Context, i_SelectedLocation);
 
                 // Update the Activity's TextView
-                m_MainActivityHandlerFromRemoteThreads.post(new Runnable()
-                {
+                m_MainActivityHandlerFromRemoteThreads.post(new Runnable() {
                     @SuppressLint("SetTextI18n")
                     @Override
-                    public void run()
-                    {
+                    public void run() {
                         assert m_LocationDetails != null;
 
                         m_cityTv.setText(m_LocationDetails[2]);
 
-                        if (m_LocationDetails[1].equals(unknownStreetDefaultValue))
-                        {
+                        if (m_LocationDetails[1].equals(unknownStreetDefaultValue)) {
                             m_streetTv.setText("");
                             m_streetTv.setEnabled(true);
-                        }
-                        else
-                        {
+                        } else {
                             m_streetTv.setText(m_LocationDetails[1]);
                             m_streetTv.setEnabled(false);
                         }
 
-                        // m_mapView.setVisibility(View.VISIBLE);
                         m_mapView.getMapAsync(CreatePostFragment.this);
                     }
                 });
@@ -395,8 +343,7 @@ public class CreatePostFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap googleMap)
-    {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         m_GoogleMap = googleMap;
 
         // If we want to disable moving the map, uncomment this. (Source: https://stackoverflow.com/a/28452115/2196301)
@@ -404,13 +351,10 @@ public class CreatePostFragment extends Fragment implements IView,
 
         m_GoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        if (m_CurrMarker == null)
-        {
+        if (m_CurrMarker == null) {
             m_CurrMarker = m_GoogleMap.addMarker(new MarkerOptions().position(m_SelectedLocation)
                     .title(m_LocationDetails[0]).snippet(m_SelectedLocation.toString()));
-        }
-        else
-        {
+        } else {
             m_CurrMarker.setPosition(m_SelectedLocation);
         }
 
@@ -420,28 +364,22 @@ public class CreatePostFragment extends Fragment implements IView,
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute)
-    {
-        if (minute < 10)
-        {
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        if (minute < 10) {
             m_timeTv.setText(String.valueOf(hourOfDay) + ":0" + String.valueOf(minute));
-        }
-        else
-        {
+        } else {
             m_timeTv.setText(String.valueOf(hourOfDay) + ":" + String.valueOf(minute));
         }
     }
 
     @Override
-    public void onSuccessToCreatePost(Post i_Post)
-    {
+    public void onSuccessToCreatePost(Post i_Post) {
         getParentFragmentManager().popBackStack();
         onUploadListener.onUpload();
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason)
-    {
+    public void onFailureToCreatePost(Exception i_Reason) {
         AppUtils.printDebugToLogcat("CreatePostFragment", "onFailureToCreatePost", i_Reason.toString());
         Toast.makeText(requireContext(), i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }

@@ -23,9 +23,10 @@ import com.example.buddies.enums.eDogGender;
 import com.example.buddies.interfaces.MVVM.IView;
 import com.example.buddies.interfaces.SignupEvent.ISignupResponsesEventHandler;
 
-public class RegisterFragment extends Fragment implements IView,
-                                                          ISignupResponsesEventHandler
-{
+public class RegisterFragment extends Fragment
+                              implements IView,
+                                         ISignupResponsesEventHandler {
+
     public static final String REGISTER_FRAGMENT_TAG = "register_fragment";
     private final ViewModel m_ViewModel = ViewModel.getInstance();
 
@@ -41,14 +42,13 @@ public class RegisterFragment extends Fragment implements IView,
 
     // Initialize onRegisteredListener.
     @Override
-    public void onAttach(@NonNull Context context)
-    {
+    public void onAttach(@NonNull Context context) {
         this.m_Context = context;
         super.onAttach(context);
 
         Fragment loginFragment = getParentFragmentManager().findFragmentByTag(LoginFragment.LOGIN_FRAGMENT_TAG);
         try {
-            onRegisteredListener = (IOnRegisteredListener)loginFragment;
+            onRegisteredListener = (IOnRegisteredListener) loginFragment;
         } catch (ClassCastException ex) {
             throw new ClassCastException("Fragment must implement IOnRegisteredListener interface.");
         }
@@ -64,8 +64,7 @@ public class RegisterFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         this.m_ViewModel.registerForEvents((IView) this);
         super.onCreate(savedInstanceState);
     }
@@ -103,8 +102,7 @@ public class RegisterFragment extends Fragment implements IView,
                 m_radioButton = AppUtils.getSelectedRadioButtonFromRadioGroup(m_radioGroup, view);
 
                 // If RadioButton selected
-                if(m_radioButton != null)
-                {
+                if (m_radioButton != null) {
                     dogGenderInput = AppUtils.resolveDogGender(m_radioButton, RegisterFragment.this.m_Context);
                 }
 
@@ -116,22 +114,19 @@ public class RegisterFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         this.m_ViewModel.unregisterForEvents((IView) this);
         super.onDestroy();
     }
 
     @Override
-    public void onSuccessToSignup()
-    {
+    public void onSuccessToSignup() {
         getParentFragmentManager().popBackStack();
         onRegisteredListener.onRegistered();
     }
 
     @Override
-    public void onFailureToSignup(Exception i_Reason)
-    {
+    public void onFailureToSignup(Exception i_Reason) {
         AppUtils.printDebugToLogcat("RegisterFragment", "onFailureToSignup", i_Reason.toString());
         Toast.makeText(this.m_Context, i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }

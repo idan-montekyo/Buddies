@@ -12,7 +12,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -23,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,15 +42,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.List;
-
 /*
 This Fragment is used to allow the user to select a location from the map
 */
-
 public class SelectLocationFragment extends Fragment implements OnMapReadyCallback,
-                                                                GoogleMap.OnMapClickListener
-{
+        GoogleMap.OnMapClickListener {
+
     GoogleMap m_Map;
     MapView m_MapHolder;
     Marker currMarker;
@@ -64,24 +59,19 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
 
     LocationListener m_LocationListener = null;
 
-    int LOCATION_REFRESH_TIME = 15000; // 15 seconds to update
-    int LOCATION_REFRESH_DISTANCE = 500; // 500 meters to update
-
     public static final String SELECT_LOCATION_FRAGMENT_TAG = "select_location_fragment";
     private FusedLocationProviderClient fusedLocationClient;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
-    public void onAttach(@NonNull Context context)
-    {
+    public void onAttach(@NonNull Context context) {
         this.m_Context = context;
         this.initializeActivityResultLaunchers();
         super.onAttach(this.m_Context);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void initializeActivityResultLaunchers()
-    {
+    private void initializeActivityResultLaunchers() {
         // Request location permission with contracts (Source: https://stackoverflow.com/a/63546099/2196301)
         this.requestLocationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted ->
         {
@@ -89,21 +79,17 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
             m_MapHolder.getMapAsync(SelectLocationFragment.this);
 
             // If there is permission to access the device's location
-            if (isGranted)
-            {
+            if (isGranted) {
                 // Do this dummy permission check because the code doesn't recognize that we are inside a code block that means the location
                 // permission is actually granted (Source: https://www.gool.co.il/MyCourses/Chapter/86423#83994)
                 int hasLocationPermission = this.m_Context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
 
-                if (hasLocationPermission == PackageManager.PERMISSION_GRANTED)
-                {
+                if (hasLocationPermission == PackageManager.PERMISSION_GRANTED) {
                     LocationManager manager = (LocationManager) SelectLocationFragment.this.m_Context.getSystemService(LOCATION_SERVICE);
 
-                    SelectLocationFragment.this.m_LocationListener = new LocationListener()
-                    {
+                    SelectLocationFragment.this.m_LocationListener = new LocationListener() {
                         @Override
-                        public void onLocationChanged(@NonNull Location location)
-                        {
+                        public void onLocationChanged(@NonNull Location location) {
                             // After the first location has been granted, stop getting more location updates - we don't need them.
                             manager.removeUpdates(SelectLocationFragment.this.m_LocationListener);
 
@@ -116,24 +102,20 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                     };
 
                     // Check if the location service is off (Source: https://stackoverflow.com/a/54648795/2196301)
-                    if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false)
-                    {
+                    if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) {
                         SelectLocationFragment.this.askUserToTurnOnLocationService();
                     }
 
                     // Get the last known location
                     fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.m_Context);
                     Task<Location> lastKnownLocationTask = fusedLocationClient.getLastLocation();
-                    lastKnownLocationTask.addOnSuccessListener(new OnSuccessListener<Location>()
-                    {
+                    lastKnownLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
-                        public void onSuccess(Location location)
-                        {
+                        public void onSuccess(Location location) {
                             AppUtils.printDebugToLogcat("SelectLocationFragment", "onSuccess()", "Last known location is: " + location);
 
                             // If there is an information about the last location
-                            if (location != null)
-                            {
+                            if (location != null) {
                                 SelectLocationFragment.this.startingCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
 
                                 SelectLocationFragment.this.moveMapFocusToSpecificLocation(SelectLocationFragment.this.startingCoordinates);
@@ -147,28 +129,20 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
                     manager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, SelectLocationFragment.this.m_LocationListener);
                 }
             }
-            /*
-            else
-            {
-                // Start load the map
-                m_MapHolder.getMapAsync(this);
-            }
-            */
         });
     }
 
-    private void askUserToTurnOnLocationService()
-    {
+    private void askUserToTurnOnLocationService() {
         // Create a dialog for ordering the user to turn on the gps
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this.m_Context);
-        alertDialogBuilder.setTitle("Location Access Alert");
-        alertDialogBuilder.setMessage("You will be now redirected to the settings page in order to turn on gps location.\nAfter the location access confirmation, please wait a few seconds in order the app will recognize your location.");
+        alertDialogBuilder.setTitle(AppUtils.GetResourceStringValueByStringName("alert_dialog_builder_title", m_Context));
+        alertDialogBuilder.setMessage(AppUtils.GetResourceStringValueByStringName("alert_dialog_builder_message", m_Context));
         alertDialogBuilder.setCancelable(false);
-        alertDialogBuilder.setPositiveButton("Take me there !", new DialogInterface.OnClickListener()
-        {
+        alertDialogBuilder.setPositiveButton(
+                AppUtils.GetResourceStringValueByStringName("alert_dialog_builder_positive_button", m_Context)
+                        + " !", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
+            public void onClick(DialogInterface dialog, int which) {
                 // Open the GPS settings (Source: https://stackoverflow.com/a/23040461/2196301)
                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             }
@@ -180,8 +154,7 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final boolean isTheInflatedLayoutShouldBeTheRootLayout = false;
         View rootView = inflater.inflate(R.layout.fragment_select_location, container, isTheInflatedLayoutShouldBeTheRootLayout);
 
@@ -193,27 +166,20 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
         m_MapHolder.onResume();
 
         AppUtils.printDebugToLogcat("SelectLocationFragment", "onCreateView", "Loading the map");
-        // Start load the map
-        // m_MapHolder.getMapAsync(this);
 
         Button sendLocation = (Button) rootView.findViewById(R.id.select_location_pick_button);
-        sendLocation.setOnClickListener(new View.OnClickListener()
-        {
+        sendLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if (currentLatLng != null)
-                {
+            public void onClick(View v) {
+                if (currentLatLng != null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle("Close location selector?");
                     builder.setMessage("Are you sure you want to close the location selector?");
 
                     // Specifying a listener allows you to take an action before dismissing the dialog.
                     // The dialog is automatically dismissed when a dialog button is clicked.
-                    builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int which)
-                        {
+                    builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
                             AppUtils.closeFragmentsByFragmentsTags(getActivity().getSupportFragmentManager(), SELECT_LOCATION_FRAGMENT_TAG);
                             ViewModel.getInstance().onLocationSelected(currentLatLng);
                             getParentFragmentManager().popBackStack();
@@ -233,57 +199,38 @@ public class SelectLocationFragment extends Fragment implements OnMapReadyCallba
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
-    public void onDestroy()
-    {
-        // FragmentsCenter.isSelectLocationFragmentAlive = false;
-        super.onDestroy();
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
+    public void onMapReady(GoogleMap googleMap) {
         AppUtils.printDebugToLogcat("SelectLocationFragment", "onMapReady()", "got here");
         m_Map = googleMap;
         m_Map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-        // currMarker = m_Map.addMarker(new MarkerOptions().position(this.startingCoordinates).title("Title").snippet("Description"));
         m_Map.setOnMapClickListener(this);
 
         this.moveMapFocusToSpecificLocation(this.startingCoordinates);
     }
 
-    private void setMarkerPosition(LatLng latLng)
-    {
+    private void setMarkerPosition(LatLng latLng) {
         currentLatLng = latLng;
 
-        if (currMarker == null)
-        {
+        if (currMarker == null) {
             currMarker = m_Map.addMarker(new MarkerOptions().position(this.currentLatLng).title("The place I chose").snippet(""));
-        }
-        else
-        {
+        } else {
             currMarker.setPosition(latLng);
         }
     }
 
-    private void moveMapFocusToSpecificLocation(LatLng i_Location)
-    {
-        if (m_Map != null)
-        {
+    private void moveMapFocusToSpecificLocation(LatLng i_Location) {
+        if (m_Map != null) {
             // Center the map according to the chosen coordinates (Source: https://stackoverflow.com/a/16342378/2196301)
             m_Map.moveCamera(CameraUpdateFactory.newLatLngZoom(i_Location, 14f));
         }
     }
 
     @Override
-    public void onMapClick(LatLng latLng)
-    {
-        this.setMarkerPosition(latLng);
-    }
+    public void onMapClick(LatLng latLng) { this.setMarkerPosition(latLng); }
 }

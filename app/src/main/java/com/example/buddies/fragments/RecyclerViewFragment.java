@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.buddies.R;
 import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.adapters.PostAdapter;
-import com.example.buddies.common.Comment;
 import com.example.buddies.common.Post;
 import com.example.buddies.enums.ePostType;
 import com.example.buddies.interfaces.LoadPostsEvent.ILoadPostsRequestEventHandler;
@@ -31,7 +30,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,31 +53,28 @@ public class RecyclerViewFragment extends Fragment implements IView,
     private String m_Action = "";
 
     @Override
-    public void onAttach(@NonNull Context context)
-    {
+    public void onAttach(@NonNull Context context) {
         this.m_Context = context;
         super.onAttach(context);
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         this.m_ViewModel.registerForEvents((IView) this);
         super.onCreate(savedInstanceState);
     }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_recycler_view, container, false);
         return view;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         super.onViewCreated(view, savedInstanceState);
 
         Bundle bundle = this.getArguments();
@@ -88,8 +83,7 @@ public class RecyclerViewFragment extends Fragment implements IView,
         TextView titleTv = view.findViewById(R.id.recycler_view_title);
 
         ImageView backBtn = view.findViewById(R.id.recycler_view_back_button);
-        backBtn.setOnClickListener(new View.OnClickListener()
-        {
+        backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getParentFragmentManager().popBackStack();
@@ -100,8 +94,7 @@ public class RecyclerViewFragment extends Fragment implements IView,
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(m_Context, 1));
 
-        if (bundle != null)
-        {
+        if (bundle != null) {
             m_Action = bundle.getString(RecyclerViewFragment.ACTION_KEY);
         }
 
@@ -112,18 +105,15 @@ public class RecyclerViewFragment extends Fragment implements IView,
                 break;
             case RecyclerViewFragment.ACTION_POSTS_I_COMMENTED_ON:
                 titleTv.setText(m_Context.getString(R.string.posts_i_commented_on));
-                // TODO: handle Model.onLoadPosts(ePostType.POSTS_I_COMMENTED_ON)
-                // onLoadPosts(ePostType.POSTS_I_COMMENTED_ON);
                 break;
         }
 
         m_PostAdapter = new PostAdapter(m_Posts);
 
-        m_PostAdapter.setListener(new PostAdapter.MyPostListener()
-        {
+        m_PostAdapter.setListener(new PostAdapter.MyPostListener() {
             @Override
-            public void onPostClicked(int index, View view) throws IOException
-            {
+            public void onPostClicked(int index, View view) throws IOException {
+
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(RECYCLER_VIEW_FRAGMENT_TAG);
                 assert thisFragment != null;
                 getParentFragmentManager().beginTransaction()
@@ -142,16 +132,14 @@ public class RecyclerViewFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         this.m_ViewModel.unregisterForEvents((IView) this);
         super.onDestroy();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPosts(ePostType type)
-    {
+    public void onRequestToLoadPosts(ePostType type) {
         this.m_ViewModel.onRequestToLoadPosts(type);
     }
 
@@ -159,15 +147,13 @@ public class RecyclerViewFragment extends Fragment implements IView,
     public void onRequestToLoadPostsByCity(String i_SearchedCity) { } // Irrelevant.
 
     @Override
-    public void onSuccessToLoadPosts(List<Post> i_PostsList)
-    {
+    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
         m_Posts.clear();
         m_Posts.addAll(i_PostsList);
     }
 
     @Override
-    public void onFailureToLoadPosts(Exception i_Reason)
-    {
+    public void onFailureToLoadPosts(Exception i_Reason) {
         Snackbar.make(m_CoordinatorLayout, Objects.requireNonNull(i_Reason.getMessage()), Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }

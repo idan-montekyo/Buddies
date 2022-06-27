@@ -30,14 +30,11 @@ public class CreationDate
 
     @NonNull
     @Override
-    public String toString()
-    {
-        return creationDay + "." + creationMonth + "." + creationYear;
-    }
+    public String toString() { return creationDay + "." + creationMonth + "." + creationYear; }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static CreationDate now()
-    {
+    public static CreationDate now() {
+
         ZoneId zoneId = ZoneId.of("Israel");
         int year = (Year.now(zoneId)).getValue();
         int month = (YearMonth.now(zoneId)).getMonthValue();
@@ -46,32 +43,26 @@ public class CreationDate
         return new CreationDate(year, month, day);
     }
 
-    public static CreationDate parse(String i_StringOfDate)
-    {
+    public static CreationDate parse(String i_StringOfDate) {
+
         int day;
         int month;
         int year;
 
-        try
-        {
+        try {
             // Use escaping in order to split by dot (Source: https://stackoverflow.com/a/14833048/2196301)
             String[] dateParts = i_StringOfDate.split("\\.");
 
-            if (dateParts.length == 3)
-            {
+            if (dateParts.length == 3) {
                 day   = Integer.parseInt(dateParts[0]);
                 month = Integer.parseInt(dateParts[1]);
                 year  = Integer.parseInt(dateParts[2]);
 
                 return new CreationDate(year, month, day);
-            }
-            else
-            {
+            } else {
                 throw new Exception();
             }
-        }
-        catch (Exception error)
-        {
+        } catch (Exception error) {
             return null;
         }
     }

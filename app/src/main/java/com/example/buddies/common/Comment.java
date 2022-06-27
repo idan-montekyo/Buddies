@@ -1,6 +1,5 @@
 package com.example.buddies.common;
 
-import android.icu.text.MessageFormat;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -10,8 +9,8 @@ import com.google.firebase.database.DataSnapshot;
 
 import java.time.LocalTime;
 
-public class Comment implements Comparable<Comment>
-{
+public class Comment implements Comparable<Comment> {
+
     private String creatorUserUID;
     private String userProfileImageUri = null;
     private String commentContent;
@@ -54,8 +53,8 @@ public class Comment implements Comparable<Comment>
      * @param i_OwnerPostID         - The ID of the post which this comment belongs to
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Comment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_OwnerPostID)
-    {
+    public Comment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_OwnerPostID) {
+
         this.creatorUserUID = i_CreatorUserUID;
         this.userProfileImageUri = i_UserProfileImageUri;
         this.commentContent = i_CommentContent;
@@ -105,8 +104,7 @@ public class Comment implements Comparable<Comment>
     public Comment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent,
                    LocalTime i_CommentCreationTime, long i_CommentCreationDateTimeAsLong,
                    int i_CommentCreationYear, int i_CommentCreationMonth, int i_CommentCreationDay,
-                   String i_OwnerPostID, String i_CommentID)
-    {
+                   String i_OwnerPostID, String i_CommentID) {
 
         this.creatorUserUID = i_CreatorUserUID;
         this.userProfileImageUri = i_UserProfileImageUri;
@@ -143,8 +141,7 @@ public class Comment implements Comparable<Comment>
     public void setOwnerPostID(String ownerPostID) { this.ownerPostID = ownerPostID; }
 
     @Override
-    public int compareTo(Comment other)
-    {
+    public int compareTo(Comment other) {
         long comparison = other.getCommentCreationDateTimeAsLong() - this.getCommentCreationDateTimeAsLong();
         return (int)comparison;
     }
@@ -152,8 +149,7 @@ public class Comment implements Comparable<Comment>
     @RequiresApi(api = Build.VERSION_CODES.N)
     @NonNull
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "Comment{" +
                 "creatorUserUID='" + creatorUserUID + '\'' +
                 ", userProfileImageUri='" + userProfileImageUri + '\'' +
@@ -164,6 +160,7 @@ public class Comment implements Comparable<Comment>
                 '}';
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public static Comment parse(DataSnapshot commentOfPost) throws Exception
     {
         String creatorUserUID = (String) commentOfPost.child(creatorUserIDMainKey).getValue();

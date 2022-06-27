@@ -56,14 +56,13 @@ import java.util.Objects;
 
 public class HomeFragment extends Fragment implements IView,
                                                       CreatePostFragment.IOnUploadListener,
-                                                      // ProfileFragment.IOnSaveListener,
                                                       ILogoutResponsesEventHandler,
                                                       IUpdateCitiesAutocompleteListRequestEventHandler,
                                                       IUpdateCitiesAutocompleteListResponsesEventHandler,
                                                       ILoadPostsRequestEventHandler,
                                                       ILoadPostsResponseEventHandler,
-                                                      IPostCreationResponseEventHandler
-{
+                                                      IPostCreationResponseEventHandler {
+
     public static final String HOME_FRAGMENT_TAG = "home_fragment";
 
     ViewModel m_ViewModel = ViewModel.getInstance();
@@ -161,7 +160,7 @@ public class HomeFragment extends Fragment implements IView,
                 Fragment thisFragment = getParentFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
                 assert thisFragment != null;
 
-                Post        currentPost               = m_Posts.get(index);
+                Post currentPost = m_Posts.get(index);
                 UserProfile currentCreatorUserProfile = Model.getInstance().resolveUserProfileFromUID(currentPost.getCreatorUserUID()); // m_PostAdapter.getCreatorUserProfile();
 
                 // Convert the custom objects to json and pass them as json to the bundle (Source: https://stackoverflow.com/a/46591617/2196301)
@@ -211,7 +210,7 @@ public class HomeFragment extends Fragment implements IView,
         MenuItem item = m_NavigationView.getMenu().findItem(R.id.menu_posts_i_commented_on);
         SpannableString s = new SpannableString(getString(R.string.posts_i_commented_on) + " " + getString(R.string.soon));
         s.setSpan(new ForegroundColorSpan(Color.GRAY), 0, getString(R.string.posts_i_commented_on).length(), 0);
-        s.setSpan(new ForegroundColorSpan(Color.RED), getString(R.string.posts_i_commented_on).length()+1, s.length(), 0);
+        s.setSpan(new ForegroundColorSpan(Color.RED), getString(R.string.posts_i_commented_on).length() + 1, s.length(), 0);
         item.setTitle(s);
 
         if (Model.getInstance().isCurrentUserAnonymous()) {
@@ -232,7 +231,6 @@ public class HomeFragment extends Fragment implements IView,
 
                 switch (item.getItemId()) {
                     case R.id.menu_my_profile:
-
                         assert thisFragment != null;
                         getParentFragmentManager().beginTransaction()
                                 .setCustomAnimations(
@@ -245,7 +243,6 @@ public class HomeFragment extends Fragment implements IView,
                                 .addToBackStack(null).commit();
                         break;
                     case R.id.menu_my_posts:
-
                         Bundle bundleMyPosts = new Bundle();
                         bundleMyPosts.putString(RecyclerViewFragment.ACTION_KEY, RecyclerViewFragment.ACTION_MY_POSTS);
 
@@ -266,6 +263,8 @@ public class HomeFragment extends Fragment implements IView,
                     case R.id.menu_posts_i_commented_on:
                         break;
                     case R.id.menu_settings:
+                        SettingsFragment settingsFragment = new SettingsFragment();
+                        settingsFragment.show(getParentFragmentManager(), SettingsFragment.SETTINGS_FRAGMENT_TAG);
                         break;
                     case R.id.menu_log_out:
                         HomeFragment.this.m_ViewModel.onRequestToLogout(m_Context);
@@ -276,7 +275,6 @@ public class HomeFragment extends Fragment implements IView,
             }
         });
 
-        // EditText searchEt = view.findViewById(R.id.home_search_edit_text);
         this.m_MaterialAutoCompleteTextView_SearchPostsByCity = (MaterialAutoCompleteTextView) view.findViewById(R.id.home_search_edit_text);
 
         // Make the dropdown to be white with "setDropDownBackgroundDrawable" / "setDropDownBackgroundResource"
@@ -306,22 +304,12 @@ public class HomeFragment extends Fragment implements IView,
     @SuppressLint("WrongConstant")
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             m_DrawerLayout.openDrawer(Gravity.START);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
-    /*
-    @Override
-    public void onSave()
-    {
-        Snackbar.make(m_coordinatorLayout, "profile info successfully saved", Snackbar.LENGTH_LONG)
-                .setBackgroundTint(Color.BLACK).show();
-    }
-    */
 
     @Override
     public void onUpload() {
@@ -396,13 +384,10 @@ public class HomeFragment extends Fragment implements IView,
     @SuppressLint("NotifyDataSetChanged")
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onSuccessToCreatePost(Post i_Post)
-    {
-        m_Handler.postDelayed(new Runnable()
-        {
+    public void onSuccessToCreatePost(Post i_Post) {
+        m_Handler.postDelayed(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 HomeFragment.this.onRequestToLoadPosts(ePostType.ALL);
                 Objects.requireNonNull(m_RecyclerView.getAdapter()).notifyDataSetChanged();
             }

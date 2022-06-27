@@ -1,21 +1,20 @@
 package com.example.buddies.common;
-import android.net.Uri;
 
 import androidx.annotation.Nullable;
 
 import com.example.buddies.enums.eDogGender;
 
-public class UserProfile
-{
-    String m_FullName;
-    int m_Age;
-    eDogGender m_DogGender;
-    String m_ProfileImageUri = null;
+public class UserProfile {
+
+    private String m_FullName;
+    private int m_Age;
+    private eDogGender m_DogGender;
+    private String m_ProfileImageUri = null;
 
     public UserProfile() {}
 
-    public UserProfile(String i_FullName, int i_Age, eDogGender i_DogGender, String i_ProfileImageUri)
-    {
+    public UserProfile(String i_FullName, int i_Age, eDogGender i_DogGender, String i_ProfileImageUri) {
+
         this.m_FullName = i_FullName;
         this.m_Age = i_Age;
         this.m_DogGender = i_DogGender;
@@ -33,12 +32,10 @@ public class UserProfile
     public void setProfileImageUri(String i_NewProfileImageUri) { this.m_ProfileImageUri = i_NewProfileImageUri; }
 
     @Override
-    public boolean equals(@Nullable Object obj)
-    {
+    public boolean equals(@Nullable Object obj) {
         boolean isEqual = true;
 
-        if ((obj instanceof UserProfile) == false)
-        {
+        if ((obj instanceof UserProfile) == false) {
             return false;
         }
 

@@ -62,8 +62,8 @@ public class ViewPostFragment extends    Fragment
                                          ICommentCreationRequestEventHandler,
                                          ICommentCreationResponseEventHandler,
                                          ILoadPostCommentsRequestEventHandler,
-                                         ILoadPostCommentsResponsesEventHandler
-{
+                                         ILoadPostCommentsResponsesEventHandler {
+
     public static final String VIEW_POST_FRAGMENT_TAG           = "view_post_fragment";
 
     private Context            m_Context                        = null;
@@ -104,11 +104,8 @@ public class ViewPostFragment extends    Fragment
     private String             m_UserProfileJsonString          = null;
     private String             m_CurrentPostJsonString          = null;
 
-    // TODO: add CheckBox to subscribe/unsubscribe to FireBaseMessaging with postID.
-
     @Override
-    public void onAttach(@NonNull Context context)
-    {
+    public void onAttach(@NonNull Context context) {
         this.m_Context = context;
         super.onAttach(this.m_Context);
     }
@@ -148,15 +145,15 @@ public class ViewPostFragment extends    Fragment
         });
 
         this.m_ImageView_PostCreatorImage      = view.findViewById(R.id.view_post_creator_image_view);
-        this.m_TextView_PostCreatorFullName   = view.findViewById(R.id.view_post_creator_full_name_text_view);
-        this.m_TextView_PostCreatorDogsGender = view.findViewById(R.id.view_post_creator_dog_gender_text_view);
-        this.m_TextView_CityOfMeeting                  = view.findViewById(R.id.view_post_city_text_view);
-        this.m_TextView_StreetOfMeeting                = view.findViewById(R.id.view_post_street_text_view);
-        this.m_TextView_TimeOfMeeting                  = view.findViewById(R.id.view_post_time_text_view);
-        this.m_TextView_DateOfMeeting                  = view.findViewById(R.id.view_post_date_text_view);
-        this.m_TextView_ContentOfPost               = view.findViewById(R.id.view_post_content_text_view);
-        this.m_Button_ShowHideLocation     = view.findViewById(R.id.view_post_location_button);
-        this.m_MapView_MeetingLocationViewer  = view.findViewById(R.id.view_post_map_view);
+        this.m_TextView_PostCreatorFullName    = view.findViewById(R.id.view_post_creator_full_name_text_view);
+        this.m_TextView_PostCreatorDogsGender  = view.findViewById(R.id.view_post_creator_dog_gender_text_view);
+        this.m_TextView_CityOfMeeting          = view.findViewById(R.id.view_post_city_text_view);
+        this.m_TextView_StreetOfMeeting        = view.findViewById(R.id.view_post_street_text_view);
+        this.m_TextView_TimeOfMeeting          = view.findViewById(R.id.view_post_time_text_view);
+        this.m_TextView_DateOfMeeting          = view.findViewById(R.id.view_post_date_text_view);
+        this.m_TextView_ContentOfPost          = view.findViewById(R.id.view_post_content_text_view);
+        this.m_Button_ShowHideLocation         = view.findViewById(R.id.view_post_location_button);
+        this.m_MapView_MeetingLocationViewer   = view.findViewById(R.id.view_post_map_view);
 
         this.loadArgumentsFromBundle();
 
@@ -250,21 +247,6 @@ public class ViewPostFragment extends    Fragment
 
         // Load comments from firebase
         this.onRequestToLoadPostComments(this.m_PostID);
-
-        /*
-        // Load comments from firebase
-        this.m_PostComments = Model.getInstance().getAllPostComments(this.m_PostID);
-
-        // If no comments found for this post, initialize an empty list with no comments.
-        if (this.m_PostComments == null) {
-            this.m_PostComments = new ArrayList<Comment>();
-        }
-
-        // Create the CommentAdapter which will be bound to the RecyclerView
-        this.m_CommentAdapter = new CommentAdapter(this.m_Context, this.m_PostComments);
-
-        this.m_RecyclerView.setAdapter(this.m_CommentAdapter);
-        */
     }
 
     private void loadArgumentsFromBundle() {
@@ -306,15 +288,6 @@ public class ViewPostFragment extends    Fragment
                 return false;
             }
         };
-
-//        AppUtils.loadImageUsingGlide(
-//                ViewPostFragment.this.m_Context,
-//                uriToLoad,
-//                null,
-//                null,
-//                true,
-//                glideListener,
-//                m_ImageView_PostCreatorImage);
     }
 
     @Override
@@ -367,12 +340,10 @@ public class ViewPostFragment extends    Fragment
         //  Clear the messages edit text
         m_EditText_AddComment.setText("");
 
-        // TODO: add this post to PostsICommentedOn list, for future use.
-
         // Send notification only when you reply on someone else's posts.
         if (!m_CurrentPost.getCreatorUserUID().equals(i_Comment.getCreatorUserUID())) {
             MyFirebaseMessagingService.
-                    initializeDataMessageAndSendToServer(m_Context, m_CurrentPost, i_Comment,
+                    initializeDataMessageAfterCreatingACommentAndSendToServer(m_Context, m_CurrentPost, i_Comment,
                             m_CurrentCreatorUserProfile, m_CurrentUserProfile);
         }
     }
@@ -384,19 +355,17 @@ public class ViewPostFragment extends    Fragment
     }
 
     @Override
-    public void onRequestToLoadPostComments(String i_PostID)
-    {
+    public void onRequestToLoadPostComments(String i_PostID) {
         this.m_ViewModel.onRequestToLoadPostComments(i_PostID);
     }
 
     @Override
-    public void onSuccessToLoadPostComments(List<Comment> i_Comments)
-    {
+    public void onSuccessToLoadPostComments(List<Comment> i_Comments) {
+
         this.m_PostComments = i_Comments;
 
         // If no comments found for this post, initialize an empty list with no comments.
-        if (this.m_PostComments == null)
-        {
+        if (this.m_PostComments == null) {
             this.m_PostComments = new ArrayList<Comment>();
         }
 
@@ -407,8 +376,7 @@ public class ViewPostFragment extends    Fragment
     }
 
     @Override
-    public void onFailureToLoadPostComments(Exception i_Reason)
-    {
+    public void onFailureToLoadPostComments(Exception i_Reason) {
         Toast.makeText(this.m_Context, i_Reason.getMessage(), Toast.LENGTH_LONG).show();
     }
 }

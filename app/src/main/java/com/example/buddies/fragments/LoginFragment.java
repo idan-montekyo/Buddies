@@ -21,10 +21,11 @@ import com.example.buddies.interfaces.LoginEvent.ILoginResponsesEventHandler;
 import com.example.buddies.interfaces.MVVM.IView;
 import com.google.android.material.snackbar.Snackbar;
 
-public class LoginFragment extends Fragment implements IView,
-                                                       RegisterFragment.IOnRegisteredListener,
-                                                       ILoginResponsesEventHandler
-{
+public class LoginFragment extends Fragment
+                           implements IView,
+                                      RegisterFragment.IOnRegisteredListener,
+                                      ILoginResponsesEventHandler {
+
     public static final String LOGIN_FRAGMENT_TAG = "login_fragment";
 
     CoordinatorLayout loginCoordinatorLayout;
@@ -39,8 +40,7 @@ public class LoginFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState)
-    {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         this.m_ViewModel.registerForEvents((IView) this);
         super.onCreate(savedInstanceState);
     }
@@ -83,11 +83,9 @@ public class LoginFragment extends Fragment implements IView,
         });
 
         Button loginBtn = view.findViewById(R.id.login_login_button);
-        loginBtn.setOnClickListener(new View.OnClickListener()
-        {
+        loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 String i_UserName = usernameEt.getText().toString();
                 String i_Password = passwordEt.getText().toString();
 
@@ -96,8 +94,7 @@ public class LoginFragment extends Fragment implements IView,
         });
 
         Button guestBtn = view.findViewById(R.id.login_login_guest_button);
-        guestBtn.setOnClickListener(new View.OnClickListener()
-        {
+        guestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LoginFragment.this.m_ViewModel.onRequestToAnonymousLogin(m_Context);
@@ -107,38 +104,28 @@ public class LoginFragment extends Fragment implements IView,
 
     // Show snackbar message after returning from RegisterFragment and successfully creating a new user.
     @Override
-    public void onRegistered()
-    {
+    public void onRegistered() {
         Snackbar.make(loginCoordinatorLayout, "successfully registered", Snackbar.LENGTH_LONG)
                 .setBackgroundTint(Color.BLACK).show();
     }
 
     @Override
-    public void onSuccessToLogin()
-    {
-        this.moveToMainProgramFragment();
-    }
+    public void onSuccessToLogin() { this.moveToMainProgramFragment(); }
 
     @Override
-    public void onFailureToLogin(Exception i_Reason)
-    {
+    public void onFailureToLogin(Exception i_Reason) {
         Toast.makeText(this.m_Context, "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onSuccessToAnonymousLogin()
-    {
-        this.moveToMainProgramFragment();
-    }
+    public void onSuccessToAnonymousLogin() { this.moveToMainProgramFragment(); }
 
     @Override
-    public void onFailureToAnonymousLogin(Exception i_Reason)
-    {
+    public void onFailureToAnonymousLogin(Exception i_Reason) {
         Toast.makeText(this.m_Context, "An error occured while trying to login, please retry or contact support.", Toast.LENGTH_LONG).show();
     }
 
-    private void moveToMainProgramFragment()
-    {
+    private void moveToMainProgramFragment() {
         getParentFragmentManager().beginTransaction()
                 .setCustomAnimations(
                         R.anim.slide_in,  // enter
@@ -150,8 +137,7 @@ public class LoginFragment extends Fragment implements IView,
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         this.m_ViewModel.unregisterForEvents((IView) this);
         super.onDestroy();
     }

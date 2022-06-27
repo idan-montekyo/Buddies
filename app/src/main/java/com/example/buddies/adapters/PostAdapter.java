@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.buddies.Model.Model;
 import com.example.buddies.R;
-import com.example.buddies.ViewModel.ViewModel;
 import com.example.buddies.common.AppUtils;
 import com.example.buddies.common.Post;
 import com.example.buddies.common.UserProfile;
@@ -25,26 +24,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHolder>
-                         implements IView// ,
-                                    // ILoadPostCardRequestEventHandler,
-                                    // ILoadPostCardResponseEventHandler,
-                                    // IResolveUIDToUserProfileRequestEventHandler,
-                                    // IResolveUIDToUserProfileResponsesEventHandler
-{
-
-    private final ViewModel m_ViewModel = ViewModel.getInstance();
+public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder>
+                         implements IView {
 
     private final List<Post> m_Posts;
     private MyPostListener m_Listener;
 
     private PostViewHolder m_Holder;
     private Context m_Context;
-    PostAdapter i_PostAdapterToUpdate = null;
 
     // Interface for listeners
-    public interface MyPostListener
-    {
+    public interface MyPostListener {
         void onPostClicked(int index, View view) throws IOException;
     }
 
@@ -53,14 +43,12 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
     // Constructor
     public PostAdapter(List<Post> m_Posts) { this.m_Posts = m_Posts; }
 
-    public class PostViewHolder extends RecyclerView.ViewHolder
-    {
+    public class PostViewHolder extends RecyclerView.ViewHolder {
         ImageView m_ImageIv;
         TextView m_NameTv, m_MeetingDate, m_CityTv, m_CreationDateTv, m_TimeTv, m_ContentTv;
 
         // Constructor
-        public PostViewHolder(@NonNull View itemView)
-        {
+        public PostViewHolder(@NonNull View itemView) {
             super(itemView);
 
             m_ImageIv = itemView.findViewById(R.id.card_post_image);
@@ -71,19 +59,13 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
             m_TimeTv = itemView.findViewById(R.id.card_post_time);
             m_ContentTv = itemView.findViewById(R.id.card_post_content);
 
-            itemView.setOnClickListener(new View.OnClickListener()
-            {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
-                    if (m_Listener != null)
-                    {
-                        try
-                        {
+                public void onClick(View v) {
+                    if (m_Listener != null) {
+                        try {
                             m_Listener.onPostClicked(getAdapterPosition(), v);
-                        }
-                        catch (IOException exception)
-                        {
+                        } catch (IOException exception) {
                             exception.printStackTrace();
                         }
                     }
@@ -95,8 +77,7 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
     // Add the first cards to fill up the screen
     @NonNull
     @Override
-    public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
-    {
+    public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_post, parent, false);
         return new PostViewHolder(view);
     }
@@ -104,8 +85,7 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
     // Loading data into cards + Recycles card when scrolling
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull PostViewHolder holder, int position)
-    {
+    public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         m_Holder = holder;
         m_Context = holder.m_CreationDateTv.getContext();
 
@@ -113,7 +93,7 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
 
         holder.m_CityTv.setText(m_CurrentPost.getMeetingCity());
         holder.m_MeetingDate.setText(m_CurrentPost.getMeetingDate().getCreationDay() + "/" +
-                                     m_CurrentPost.getMeetingDate().getCreationMonth());
+                m_CurrentPost.getMeetingDate().getCreationMonth());
         holder.m_TimeTv.setText(m_CurrentPost.getMeetingTime());
         holder.m_ContentTv.setText(m_CurrentPost.getPostContent());
 
@@ -126,21 +106,15 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
         // this.i_PostAdapterToUpdate = this;
         UserProfile currentUserProfile = Model.getInstance().resolveUserProfileFromUID(m_CurrentPost.getCreatorUserUID());
 
-        if (currentUserProfile != null)
-        {
+        if (currentUserProfile != null) {
             m_Holder.m_NameTv.setText(currentUserProfile.getFullName());
 
-            if ((currentUserProfile.getProfileImageUri() != null) && (!currentUserProfile.getProfileImageUri().equals("")))
-            {
+            if ((currentUserProfile.getProfileImageUri() != null) && (!currentUserProfile.getProfileImageUri().equals(""))) {
                 AppUtils.loadImageUsingGlide(m_Context, Uri.parse(currentUserProfile.getProfileImageUri()), null, null, true, null, m_Holder.m_ImageIv);
-            }
-            else
-            {
+            } else {
                 AppUtils.loadImageUsingGlide(m_Context, AppUtils.getUriOfDrawable("dog_default_profile_rounded", m_Context), null, null, true, null, m_Holder.m_ImageIv);
             }
-        }
-        else
-        {
+        } else {
             Toast.makeText(m_Context, "Model.m_UserProfile is null", Toast.LENGTH_SHORT).show();
         }
     }
@@ -148,80 +122,9 @@ public class PostAdapter extends    RecyclerView.Adapter<PostAdapter.PostViewHol
     @Override
     public int getItemCount() { return m_Posts.size(); }
 
-    /*
-    @Override
-    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate)
-    {
-        m_ViewModel.onRequestToLoadPostCard(i_CreatorUserUID, i_PostAdapterToUpdate);
-    }
-
-    @SuppressLint("UseCompatLoadingForDrawables")
-    @Override
-    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate)
-    {
-        // this.m_CreatorUserProfile = i_UserProfile;
-
-        m_Holder.m_NameTv.setText(i_UserProfile.getFullName());
-
-        if ((i_UserProfile.getProfileImageUri() != null) && (!i_UserProfile.getProfileImageUri().equals("")))
-        {
-            Glide.with(m_Context).load(i_UserProfile.getProfileImageUri()).
-                    circleCrop().into(m_Holder.m_ImageIv);
-            System.out.println("TESTESTEST" + i_UserProfile.getProfileImageUri());
-        }
-        else
-        {
-            Glide.with(m_Context).load(m_Context.getDrawable(R.drawable.dog_default_profile_rounded)).
-                    circleCrop().into(m_Holder.m_ImageIv);
-        }
-    }
-
-    @Override
-    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate)
-    {
-        Toast.makeText(m_Context, i_Reason.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-    */
-
-    /*
-    @Override
-    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller)
-    {
-        m_ViewModel.onRequestToResolveUIDToUserProfile(i_UserIDToResolve, i_Caller);
-    }
-
-    @Override
-    public void onSuccessToResolveUIDToUserProfile(UserProfile i_ResolvedUserProfile, IView i_Caller)
-    {
-        m_Holder.m_NameTv.setText(i_ResolvedUserProfile.getFullName());
-
-        if ((i_ResolvedUserProfile.getProfileImageUri() != null) && (!i_ResolvedUserProfile.getProfileImageUri().equals("")))
-        {
-            Glide.with(m_Context).load(i_ResolvedUserProfile.getProfileImageUri()).
-                    circleCrop().into(m_Holder.m_ImageIv);
-            System.out.println("TESTESTEST" + i_ResolvedUserProfile.getProfileImageUri());
-        }
-        else
-        {
-            Glide.with(m_Context).load(m_Context.getDrawable(R.drawable.dog_default_profile_rounded)).
-                    circleCrop().into(m_Holder.m_ImageIv);
-        }
-    }
-
-    @Override
-    public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller)
-    {
-        Toast.makeText(m_Context, i_Reason.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-    */
-
-    public void updateAdapter(List<Post> i_NewPostsList)
-    {
+    public void updateAdapter(List<Post> i_NewPostsList) {
         this.m_Posts.addAll(i_NewPostsList);
     }
 
-    public void updateAdapter(Post i_NewPost)
-    {
-        this.updateAdapter(Arrays.asList(i_NewPost));
-    }
+    public void updateAdapter(Post i_NewPost) { this.updateAdapter(Arrays.asList(i_NewPost)); }
 }

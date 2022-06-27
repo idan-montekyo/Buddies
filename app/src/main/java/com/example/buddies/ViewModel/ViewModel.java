@@ -57,8 +57,6 @@ public class ViewModel implements IViewModel,
                                   IPostCreationResponseEventHandler,
                                   IUpdateCitiesAutocompleteListRequestEventHandler,
                                   IUpdateCitiesAutocompleteListResponsesEventHandler,
-                                  // IUploadImageRequestEventHandler,
-                                  // IUploadImageResponsesEventHandler,
                                   IUpdateProfileRequestEventHandler,
                                   IUpdateProfileResponsesEventHandler,
                                   ILoadUserProfileRequestEventHandler,
@@ -72,38 +70,29 @@ public class ViewModel implements IViewModel,
                                   IResolveUIDToUserProfileRequestEventHandler,
                                   IResolveUIDToUserProfileResponsesEventHandler,
                                   ICommentCreationRequestEventHandler,
-                                  ICommentCreationResponseEventHandler
-{
+                                  ICommentCreationResponseEventHandler {
+    
     private static ViewModel _instance = null;
-    // private LatLng location;
     private Model m_Model = null;
 
     List<IView> views = new ArrayList<IView>();
 
-    private ViewModel()
-    {
+    private ViewModel() {
         this.m_Model = Model.getInstance();
-        this.m_Model.registerForEvents(((IViewModel)this));
+        this.m_Model.registerForEvents(((IViewModel) this));
     }
 
-    public static ViewModel getInstance()
-    {
-        if (_instance == null)
-        {
+    public static ViewModel getInstance() {
+        if (_instance == null) {
             _instance = new ViewModel();
         }
 
         return _instance;
     }
 
-    // public LatLng getLocation() { return this.location; }
-
     @Override
-    public void registerForEvents(IView i_NewView) { this.views.add(i_NewView); }
-
-    @Override
-    public void registerForEventsAtIndex0(IView i_ViewToRegisterAtIndex0) {
-        this.views.add(0, i_ViewToRegisterAtIndex0);
+    public void registerForEvents(IView i_NewView) {
+        this.views.add(i_NewView);
     }
 
     @Override
@@ -111,13 +100,11 @@ public class ViewModel implements IViewModel,
         this.views.remove(i_ViewToUnregister);
     }
 
-    // public void setLocation(LatLng i_NewLocation) { this.location = i_NewLocation; }
-
     @Override
     public void onLocationSelected(LatLng i_SelectedLocation) {
         for (IView view : views) {
             if (view instanceof ILocationSelect_EventHandler) {
-                ((ILocationSelect_EventHandler)view).onLocationSelected(i_SelectedLocation);
+                ((ILocationSelect_EventHandler) view).onLocationSelected(i_SelectedLocation);
             }
         }
     }
@@ -129,31 +116,24 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToLogin(Context i_Context, String i_UserName, String i_Password)
-    {
+    public void onRequestToLogin(Context i_Context, String i_UserName, String i_Password) {
         this.m_Model.onRequestToLogin(i_Context, i_UserName, i_Password);
     }
 
     @Override
-    public void onSuccessToLogin()
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoginResponsesEventHandler)
-            {
-                ((ILoginResponsesEventHandler)view).onSuccessToLogin();
+    public void onSuccessToLogin() {
+        for (IView view : views) {
+            if (view instanceof ILoginResponsesEventHandler) {
+                ((ILoginResponsesEventHandler) view).onSuccessToLogin();
             }
         }
     }
 
     @Override
-    public void onFailureToLogin(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoginResponsesEventHandler)
-            {
-                ((ILoginResponsesEventHandler)view).onFailureToLogin(i_Reason);
+    public void onFailureToLogin(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ILoginResponsesEventHandler) {
+                ((ILoginResponsesEventHandler) view).onFailureToLogin(i_Reason);
             }
         }
     }
@@ -165,31 +145,24 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToAnonymousLogin(Context i_Context)
-    {
+    public void onRequestToAnonymousLogin(Context i_Context) {
         this.m_Model.onRequestToAnonymousLogin(i_Context);
     }
 
     @Override
-    public void onSuccessToAnonymousLogin()
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoginResponsesEventHandler)
-            {
-                ((ILoginResponsesEventHandler)view).onSuccessToAnonymousLogin();
+    public void onSuccessToAnonymousLogin() {
+        for (IView view : views) {
+            if (view instanceof ILoginResponsesEventHandler) {
+                ((ILoginResponsesEventHandler) view).onSuccessToAnonymousLogin();
             }
         }
     }
 
     @Override
-    public void onFailureToAnonymousLogin(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoginResponsesEventHandler)
-            {
-                ((ILoginResponsesEventHandler)view).onFailureToAnonymousLogin(i_Reason);
+    public void onFailureToAnonymousLogin(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ILoginResponsesEventHandler) {
+                ((ILoginResponsesEventHandler) view).onFailureToAnonymousLogin(i_Reason);
             }
         }
     }
@@ -201,31 +174,24 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToLogout(Context i_Context)
-    {
+    public void onRequestToLogout(Context i_Context) {
         this.m_Model.onRequestToLogout(i_Context);
     }
 
     @Override
-    public void onSuccessToLogout()
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILogoutResponsesEventHandler)
-            {
-                ((ILogoutResponsesEventHandler)view).onSuccessToLogout();
+    public void onSuccessToLogout() {
+        for (IView view : views) {
+            if (view instanceof ILogoutResponsesEventHandler) {
+                ((ILogoutResponsesEventHandler) view).onSuccessToLogout();
             }
         }
     }
 
     @Override
-    public void onFailureToLogout(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILogoutResponsesEventHandler)
-            {
-                ((ILogoutResponsesEventHandler)view).onFailureToLogout(i_Reason);
+    public void onFailureToLogout(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ILogoutResponsesEventHandler) {
+                ((ILogoutResponsesEventHandler) view).onFailureToLogout(i_Reason);
             }
         }
     }
@@ -237,33 +203,26 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender)
-    {
+    public void onRequestToSignup(Context i_Context, String i_UserName, String i_Password, String i_FullName, String i_Age, eDogGender i_DogGender) {
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToSignup", "calling onRequestToSignup()");
         this.m_Model.onRequestToSignup(i_Context, i_UserName, i_Password, i_FullName, i_Age, i_DogGender);
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToSignup", "returned from onRequestToSignup()");
     }
 
     @Override
-    public void onSuccessToSignup()
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ISignupResponsesEventHandler)
-            {
-                ((ISignupResponsesEventHandler)view).onSuccessToSignup();
+    public void onSuccessToSignup() {
+        for (IView view : views) {
+            if (view instanceof ISignupResponsesEventHandler) {
+                ((ISignupResponsesEventHandler) view).onSuccessToSignup();
             }
         }
     }
 
     @Override
-    public void onFailureToSignup(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ISignupResponsesEventHandler)
-            {
-                ((ISignupResponsesEventHandler)view).onFailureToSignup(i_Reason);
+    public void onFailureToSignup(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ISignupResponsesEventHandler) {
+                ((ISignupResponsesEventHandler) view).onFailureToSignup(i_Reason);
             }
         }
     }
@@ -276,8 +235,7 @@ public class ViewModel implements IViewModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToCreatePost(Context i_Context, String i_UserID, String i_CityOfMeeting, String i_StreetOfMeeting, String i_DateOfMeeting, String i_TimeOfMeeting, LatLng i_LocationOfMeeting, String i_ContentOfPost)
-    {
+    public void onRequestToCreatePost(Context i_Context, String i_UserID, String i_CityOfMeeting, String i_StreetOfMeeting, String i_DateOfMeeting, String i_TimeOfMeeting, LatLng i_LocationOfMeeting, String i_ContentOfPost) {
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "calling onRequestToCreatePost()");
         this.m_Model.onRequestToCreatePost(i_Context, i_UserID, i_CityOfMeeting, i_StreetOfMeeting, i_DateOfMeeting, i_TimeOfMeeting, i_LocationOfMeeting, i_ContentOfPost);
         AppUtils.printDebugToLogcat("ViewModel", "onRequestToCreatePost", "returned from onRequestToCreatePost()");
@@ -285,55 +243,48 @@ public class ViewModel implements IViewModel,
     }
 
     @Override
-    public void onSuccessToCreatePost(Post i_Post)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IPostCreationResponseEventHandler)
-            {
-                ((IPostCreationResponseEventHandler)view).onSuccessToCreatePost(i_Post);
+    public void onSuccessToCreatePost(Post i_Post) {
+        for (IView view : views) {
+            if (view instanceof IPostCreationResponseEventHandler) {
+                ((IPostCreationResponseEventHandler) view).onSuccessToCreatePost(i_Post);
             }
         }
     }
 
     @Override
-    public void onFailureToCreatePost(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IPostCreationResponseEventHandler)
-            {
-                ((IPostCreationResponseEventHandler)view).onFailureToCreatePost(i_Reason);
+    public void onFailureToCreatePost(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof IPostCreationResponseEventHandler) {
+                ((IPostCreationResponseEventHandler) view).onFailureToCreatePost(i_Reason);
+            }
+        }
+    }
+
+    /*
+    ****************************************************************************************************
+                                      TASK: Update Cities List
+    ****************************************************************************************************
+    */
+
+    @Override
+    public void onRequestToUpdateListOfCities() {
+        ((IUpdateCitiesAutocompleteListRequestEventHandler) this.m_Model).onRequestToUpdateListOfCities();
+    }
+
+    @Override
+    public void onSuccessToUpdateListOfCities(ArrayList<String> i_UpdatedListOfCities) {
+        for (IView view : views) {
+            if (view instanceof IUpdateCitiesAutocompleteListResponsesEventHandler) {
+                ((IUpdateCitiesAutocompleteListResponsesEventHandler) view).onSuccessToUpdateListOfCities(i_UpdatedListOfCities);
             }
         }
     }
 
     @Override
-    public void onRequestToUpdateListOfCities()
-    {
-        ((IUpdateCitiesAutocompleteListRequestEventHandler)this.m_Model).onRequestToUpdateListOfCities();
-    }
-
-    @Override
-    public void onSuccessToUpdateListOfCities(ArrayList<String> i_UpdatedListOfCities)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IUpdateCitiesAutocompleteListResponsesEventHandler)
-            {
-                ((IUpdateCitiesAutocompleteListResponsesEventHandler)view).onSuccessToUpdateListOfCities(i_UpdatedListOfCities);
-            }
-        }
-    }
-
-    @Override
-    public void onFailureToUpdateListOfCities(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IUpdateCitiesAutocompleteListResponsesEventHandler)
-            {
-                ((IUpdateCitiesAutocompleteListResponsesEventHandler)view).onFailureToUpdateListOfCities(i_Reason);
+    public void onFailureToUpdateListOfCities(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof IUpdateCitiesAutocompleteListResponsesEventHandler) {
+                ((IUpdateCitiesAutocompleteListResponsesEventHandler) view).onFailureToUpdateListOfCities(i_Reason);
             }
         }
     }
@@ -350,91 +301,48 @@ public class ViewModel implements IViewModel,
     }
 
     @Override
-    public void onSuccessToLoadProfile(UserProfile i_UserProfile)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoadUserProfileResponseEventHandler)
-            {
+    public void onSuccessToLoadProfile(UserProfile i_UserProfile) {
+        for (IView view : views) {
+            if (view instanceof ILoadUserProfileResponseEventHandler) {
                 ((ILoadUserProfileResponseEventHandler) view).onSuccessToLoadProfile(i_UserProfile);
             }
         }
     }
 
     @Override
-    public void onFailureToLoadProfile(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoadUserProfileResponseEventHandler)
-            {
+    public void onFailureToLoadProfile(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ILoadUserProfileResponseEventHandler) {
                 ((ILoadUserProfileResponseEventHandler) view).onFailureToLoadProfile(i_Reason);
             }
         }
     }
 
     /*
-    @Override
-    public void onRequestToUploadImage(Uri i_PathOfFileInFilesystem)
-    {
-        this.m_Model.onRequestToUploadImage(i_PathOfFileInFilesystem);
-    }
-    */
-
-    /*
-    @Override
-    public void onSuccessToUploadImage(Uri i_PathOfFileInCloud)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IUploadImageResponsesEventHandler)
-            {
-                ((IUploadImageResponsesEventHandler)view).onSuccessToUploadImage(i_PathOfFileInCloud);
-            }
-        }
-    }
-    */
-
-    /*
-    @Override
-    public void onFailureToUploadImage(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IUploadImageResponsesEventHandler)
-            {
-                ((IUploadImageResponsesEventHandler)view).onFailureToUploadImage(i_Reason);
-            }
-        }
-    }
+    ****************************************************************************************************
+                                       TASK: Update Profile Info
+    ****************************************************************************************************
     */
 
     @Override
-    public void onRequestToUpdateProfile(Context i_Context, String i_FullName, String i_Age, eDogGender i_DogGender, String i_ProfileImage)
-    {
+    public void onRequestToUpdateProfile(Context i_Context, String i_FullName, String i_Age, eDogGender i_DogGender, String i_ProfileImage) {
         this.m_Model.onRequestToUpdateProfile(i_Context, i_FullName, i_Age, i_DogGender, i_ProfileImage);
     }
 
     @Override
-    public void onSuccessToUpdateProfile()
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IUpdateProfileResponsesEventHandler)
-            {
-                ((IUpdateProfileResponsesEventHandler)view).onSuccessToUpdateProfile();
+    public void onSuccessToUpdateProfile() {
+        for (IView view : views) {
+            if (view instanceof IUpdateProfileResponsesEventHandler) {
+                ((IUpdateProfileResponsesEventHandler) view).onSuccessToUpdateProfile();
             }
         }
     }
 
     @Override
-    public void onFailureToUpdateProfile(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof IUpdateProfileResponsesEventHandler)
-            {
-                ((IUpdateProfileResponsesEventHandler)view).onFailureToUpdateProfile(i_Reason);
+    public void onFailureToUpdateProfile(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof IUpdateProfileResponsesEventHandler) {
+                ((IUpdateProfileResponsesEventHandler) view).onFailureToUpdateProfile(i_Reason);
             }
         }
     }
@@ -447,32 +355,30 @@ public class ViewModel implements IViewModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPosts(ePostType type) { m_Model.onRequestToLoadPosts(type); }
+    public void onRequestToLoadPosts(ePostType type) {
+        m_Model.onRequestToLoadPosts(type);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToLoadPostsByCity(String i_SearchedCity) { m_Model.onRequestToLoadPostsByCity(i_SearchedCity); }
+    public void onRequestToLoadPostsByCity(String i_SearchedCity) {
+        m_Model.onRequestToLoadPostsByCity(i_SearchedCity);
+    }
 
     @Override
-    public void onSuccessToLoadPosts(List<Post> i_PostsList)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoadPostsResponseEventHandler)
-            {
-                ((ILoadPostsResponseEventHandler)view).onSuccessToLoadPosts(i_PostsList);
+    public void onSuccessToLoadPosts(List<Post> i_PostsList) {
+        for (IView view : views) {
+            if (view instanceof ILoadPostsResponseEventHandler) {
+                ((ILoadPostsResponseEventHandler) view).onSuccessToLoadPosts(i_PostsList);
             }
         }
     }
 
     @Override
-    public void onFailureToLoadPosts(Exception i_Reason)
-    {
-        for (IView view : views)
-        {
-            if (view instanceof ILoadPostsResponseEventHandler)
-            {
-                ((ILoadPostsResponseEventHandler)view).onFailureToLoadPosts(i_Reason);
+    public void onFailureToLoadPosts(Exception i_Reason) {
+        for (IView view : views) {
+            if (view instanceof ILoadPostsResponseEventHandler) {
+                ((ILoadPostsResponseEventHandler) view).onFailureToLoadPosts(i_Reason);
             }
         }
     }
@@ -484,45 +390,39 @@ public class ViewModel implements IViewModel,
     */
 
     @Override
-    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate)
-    {
+    public void onRequestToLoadPostCard(String i_CreatorUserUID, PostAdapter i_PostAdapterToUpdate) {
         m_Model.onRequestToLoadPostCard(i_CreatorUserUID, i_PostAdapterToUpdate);
     }
 
     @Override
-    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate)
-    {
-        ((ILoadPostCardResponseEventHandler)i_PostAdapterToUpdate).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
+    public void onSuccessToLoadPostCard(UserProfile i_UserProfile, PostAdapter i_PostAdapterToUpdate) {
+        ((ILoadPostCardResponseEventHandler) i_PostAdapterToUpdate).onSuccessToLoadPostCard(i_UserProfile, i_PostAdapterToUpdate);
     }
 
     @Override
-    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate)
-    {
-        ((ILoadPostCardResponseEventHandler)i_PostAdapterToUpdate).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
+    public void onFailureToLoadPostCard(Exception i_Reason, PostAdapter i_PostAdapterToUpdate) {
+        ((ILoadPostCardResponseEventHandler) i_PostAdapterToUpdate).onFailureToLoadPostCard(i_Reason, i_PostAdapterToUpdate);
     }
 
     /*
     ****************************************************************************************************
-                                         TASK: Resolve UID To User Profile
+                                      TASK: Resolve UID To User Profile
     ****************************************************************************************************
     */
 
     @Override
-    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller)
-    {
+    public void onRequestToResolveUIDToUserProfile(String i_UserIDToResolve, IView i_Caller) {
         this.m_Model.onRequestToResolveUIDToUserProfile(i_UserIDToResolve, i_Caller);
     }
 
     @Override
-    public void onSuccessToResolveUIDToUserProfile(UserProfile i_ResolvedUserProfile, IView i_Caller)
-    {
-        ((IResolveUIDToUserProfileResponsesEventHandler)i_Caller).onSuccessToResolveUIDToUserProfile(i_ResolvedUserProfile, i_Caller);
+    public void onSuccessToResolveUIDToUserProfile(UserProfile i_ResolvedUserProfile, IView i_Caller) {
+        ((IResolveUIDToUserProfileResponsesEventHandler) i_Caller).onSuccessToResolveUIDToUserProfile(i_ResolvedUserProfile, i_Caller);
     }
 
     @Override
-    public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller)
-    {
-        ((IResolveUIDToUserProfileResponsesEventHandler)i_Caller).onFailureToResolveUIDToUserProfile(i_Reason, i_Caller);
+    public void onFailureToResolveUIDToUserProfile(Exception i_Reason, IView i_Caller) {
+        ((IResolveUIDToUserProfileResponsesEventHandler) i_Caller).onFailureToResolveUIDToUserProfile(i_Reason, i_Caller);
     }
 
     /*
@@ -533,8 +433,7 @@ public class ViewModel implements IViewModel,
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID)
-    {
+    public void onRequestToCreateComment(String i_CreatorUserUID, String i_UserProfileImageUri, String i_CommentContent, String i_PostID) {
         m_Model.onRequestToCreateComment(i_CreatorUserUID, i_UserProfileImageUri, i_CommentContent, i_PostID);
     }
 
@@ -542,7 +441,7 @@ public class ViewModel implements IViewModel,
     public void onSuccessToCreateComment(Comment i_Comment) {
         for (IView view : views) {
             if (view instanceof ICommentCreationResponseEventHandler) {
-                ((ICommentCreationResponseEventHandler)view).onSuccessToCreateComment(i_Comment);
+                ((ICommentCreationResponseEventHandler) view).onSuccessToCreateComment(i_Comment);
             }
         }
     }
@@ -551,33 +450,36 @@ public class ViewModel implements IViewModel,
     public void onFailureToCreateComment(Exception i_Reason) {
         for (IView view : views) {
             if (view instanceof ICommentCreationResponseEventHandler) {
-                ((ICommentCreationResponseEventHandler)view).onFailureToCreateComment(i_Reason);
+                ((ICommentCreationResponseEventHandler) view).onFailureToCreateComment(i_Reason);
             }
         }
     }
 
+    /*
+    ****************************************************************************************************
+                                  TASK: Load Comments For A Specific Post
+    ****************************************************************************************************
+    */
+
     @Override
-    public void onRequestToLoadPostComments(String i_PostID)
-    {
+    public void onRequestToLoadPostComments(String i_PostID) {
         this.m_Model.onRequestToLoadPostComments(i_PostID);
     }
 
     @Override
-    public void onSuccessToLoadPostComments(List<Comment> i_Comments)
-    {
+    public void onSuccessToLoadPostComments(List<Comment> i_Comments) {
         for (IView view : views) {
             if (view instanceof ILoadPostCommentsResponsesEventHandler) {
-                ((ILoadPostCommentsResponsesEventHandler)view).onSuccessToLoadPostComments(i_Comments);
+                ((ILoadPostCommentsResponsesEventHandler) view).onSuccessToLoadPostComments(i_Comments);
             }
         }
     }
 
     @Override
-    public void onFailureToLoadPostComments(Exception i_Reason)
-    {
+    public void onFailureToLoadPostComments(Exception i_Reason) {
         for (IView view : views) {
             if (view instanceof ILoadPostCommentsResponsesEventHandler) {
-                ((ILoadPostCommentsResponsesEventHandler)view).onFailureToLoadPostComments(i_Reason);
+                ((ILoadPostCommentsResponsesEventHandler) view).onFailureToLoadPostComments(i_Reason);
             }
         }
     }

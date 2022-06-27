@@ -40,6 +40,12 @@
         <action
             android:id="@+id/action_homeFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_viewPostFragment2"
+            app:destination="@id/viewPostFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_recyclerViewFragment3"
+            app:destination="@id/recyclerViewFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -70,5 +76,29 @@
         <action
             android:id="@+id/action_selectLocationFragment_to_createPostFragment"
             app:destination="@id/createPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recyclerViewFragment"
+        android:name="com.example.buddies.fragments.RecyclerViewFragment"
+        tools:layout="@layout/fragment_recycler_view"
+        android:label="RecyclerViewFragment" >
+        <action
+            android:id="@+id/action_recyclerViewFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_recyclerViewFragment_to_viewPostFragment"
+            app:destination="@id/viewPostFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/viewPostFragment"
+        android:name="com.example.buddies.fragments.ViewPostFragment"
+        tools:layout="@layout/fragment_view_post"
+        android:label="ViewPostFragment" >
+        <action
+            android:id="@+id/action_viewPostFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_viewPostFragment_to_recyclerViewFragment"
+            app:destination="@id/recyclerViewFragment" />
     </fragment>
 </navigation>
